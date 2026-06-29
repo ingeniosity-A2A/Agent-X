@@ -1,4 +1,5 @@
 import json, random
+from src.config import BUSINESS_PHONE
 def _ph(): return f"+1404555{random.randint(1000,9999)}"
 def _bid(): return f"HAS-{random.randint(1000,9999)}"
 PATTERNS = {
