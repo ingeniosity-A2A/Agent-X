@@ -1,0 +1,892 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap");
+
+:root {
+  --assembly-color-light: #faf4f4;
+  --assembly-color-dark: #17171f;
+  --assembly-color-dark-rgb: 23, 23, 31;
+  --assembly-font-family: "Poppins", sans-serif;
+}
+
+/* ── 3D REFLECTION CAROUSEL ── */
+.rc-wrap {
+  position: relative;
+  width: 100%;
+  height: 260px;
+  perspective: 600px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: visible;
+  margin: 10px 0 6px;
+}
+.rc-stage {
+  position: relative;
+  width: 210px;
+  height: 240px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.rc-card {
+  position: absolute;
+  width: 210px;
+  height: 158px;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+.rc-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  -webkit-box-reflect: below 6px
+    linear-gradient(transparent 0%, transparent 45%, rgba(0,0,0,0.75) 100%);
+}
+.rc-center {
+  z-index: 3;
+  transform: translateX(0) rotateY(0deg) scale(1);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.7);
+}
+.rc-left {
+  z-index: 2;
+  transform: translateX(-170px) rotateY(40deg) scale(0.72);
+  opacity: 0.55;
+}
+.rc-left::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to left, rgba(0,0,0,0.75), transparent);
+  border-radius: 16px;
+  pointer-events: none;
+}
+.rc-right {
+  z-index: 2;
+  transform: translateX(170px) rotateY(-40deg) scale(0.72);
+  opacity: 0.55;
+}
+.rc-right::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.75), transparent);
+  border-radius: 16px;
+  pointer-events: none;
+}
+.rc-hidden {
+  opacity: 0;
+  transform: scale(0.4);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ── PAGE LAYOUT ── */
+.assembly-page-bg {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--assembly-color-light);
+  font-family: var(--assembly-font-family);
+}
+
+.assembly-wrapper {
+  width: 420px;
+  min-height: 720px;
+  margin: 40px auto;
+  background: var(--assembly-color-dark);
+  border-radius: 45px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: -40px 50px 40px -20px rgb(var(--assembly-color-dark-rgb) / 15%);
+  scrollbar-width: none;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.assembly-wrapper::-webkit-scrollbar { display: none; }
+
+@media (max-width: 540px) {
+  .assembly-wrapper {
+    margin: 0px;
+    width: 100%;
+    border-radius: 0;
+    padding: 0;
+    min-height: 100vh;
+  }
+}
+
+/* ── HEADER ── */
+.assembly-header {
+  z-index: 5;
+  position: sticky;
+  top: 0;
+  background: linear-gradient(0deg,
+    rgba(0,0,0,0) 0%,
+    rgba(var(--assembly-color-dark-rgb), 0.8) 25%,
+    rgba(var(--assembly-color-dark-rgb), 1) 100%);
+  color: var(--assembly-color-light);
+  padding: 30px 25px 15px;
+}
+.assembly-header-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+}
+.assembly-header-left { display: flex; align-items: center; }
+.assembly-header-center { display: flex; justify-content: center; }
+.assembly-header-right { display: flex; justify-content: flex-end; }
+
+.assembly-header-logo-text {
+  font-family: var(--assembly-font-family);
+  font-size: 14px;
+  font-weight: 700;
+  color: #f7ad32;
+  letter-spacing: 0.5px;
+}
+.assembly-profile-initials {
+  background: linear-gradient(135deg, #f7ad32, #e09020);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--assembly-font-family);
+  font-size: 12px;
+  font-weight: 700;
+  color: #0a0a0a;
+}
+
+.assembly-page-title {
+  font-size: 16px;
+  color: var(--assembly-color-light);
+  font-family: var(--assembly-font-family);
+}
+
+.assembly-profile {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border-radius: 15px;
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: cover;
+  position: relative;
+}
+.assembly-profile-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 100%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: block;
+  box-shadow: 0 0 0 3px var(--assembly-color-dark);
+  background-color: #e7d583;
+}
+
+/* ── SECTION ── */
+.assembly-section { padding: 0 25px; }
+
+/* ── HERO CARD — Rev. Ike compact ── */
+.assembly-hero-card {
+  margin: 14px 0;
+  display: flex;
+  align-items: stretch;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 2px solid #c8920a;
+  background: #0f0f14;
+  animation: flip-in-hor-top 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  min-height: 100px;
+}
+.assembly-hero-gold-panel {
+  flex: 1;
+  background: #d4a017;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px 12px 8px 12px;
+  border-radius: 14px 0 0 14px;
+}
+.assembly-hero-textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: var(--assembly-font-family);
+  font-size: 11px;
+  font-weight: 600;
+  color: #1a1200;
+  line-height: 1.5;
+  width: 100%;
+  min-height: 48px;
+}
+.assembly-hero-textarea::placeholder {
+  color: rgba(26,18,0,0.5);
+  font-style: italic;
+}
+.assembly-hero-model-label {
+  font-family: var(--assembly-font-family);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(26,18,0,0.65);
+  text-align: right;
+  margin-top: 4px;
+}
+.assembly-hero-camera-box {
+  flex: 0 0 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f0f14;
+  border: 3px solid #f48fb1;
+  border-radius: 12px;
+  margin: 5px;
+  padding: 6px;
+  perspective: 400px;
+}
+
+/* ── 3D CAMERA (white, animated only when rotating) ── */
+/* Frozen state: gentle float, static pose */
+.assembly-hero-camera-box .camera {
+  --cam-hue: 223;
+  background-color: hsl(var(--cam-hue),5%,82%);
+  border-radius: 3em;
+  display: flex;
+  margin: 0;
+  position: relative;
+  width: 7em;
+  height: 7em;
+  transform: rotateY(0deg);
+  transform-style: preserve-3d;
+  font-size: 10px;
+  animation: cameraFloat 3s ease-in-out infinite;
+}
+/* Rotating state: full animation */
+.assembly-hero-camera-box .camera--rotating,
+.assembly-hero-camera-box .camera--rotating .camera__red-light,
+.assembly-hero-camera-box .camera--rotating .camera__lens-ring-glare1,
+.assembly-hero-camera-box .camera--rotating .camera__lens-ring-glare2,
+.assembly-hero-camera-box .camera--rotating .camera__lens-ring-glare3,
+.assembly-hero-camera-box .camera--rotating .camera__lens-inner,
+.assembly-hero-camera-box .camera--rotating .camera__lens-inner-glare1,
+.assembly-hero-camera-box .camera--rotating .camera__lens-inner-glare2,
+.assembly-hero-camera-box .camera--rotating .camera__lens-glare,
+.assembly-hero-camera-box .camera--rotating .camera__lens-eye-ring,
+.assembly-hero-camera-box .camera--rotating .camera__lens-eye-inner-glare,
+.assembly-hero-camera-box .camera--rotating .camera__lens-eye-center,
+.assembly-hero-camera-box .camera--rotating .camera__lens-eye-center-glare,
+.assembly-hero-camera-box .camera--rotating .camera__lens-eye-glass,
+.assembly-hero-camera-box .camera--rotating .camera__lens-eye-glare {
+  animation: camera3d 4s ease-in-out infinite;
+}
+/* Red light blinks when frozen (recording standby) */
+.assembly-hero-camera-box .camera:not(.camera--rotating) .camera__red-light {
+  animation: cameraRedBlink 2s ease-in-out infinite;
+}
+.assembly-hero-camera-box .camera__front,
+.assembly-hero-camera-box .camera__contents,
+.assembly-hero-camera-box .camera__red-light,
+.assembly-hero-camera-box .camera__lens-inner,
+.assembly-hero-camera-box .camera__lens-inner-glare1,
+.assembly-hero-camera-box .camera__lens-inner-glare2,
+.assembly-hero-camera-box .camera__lens-glare,
+.assembly-hero-camera-box .camera__lens-ring,
+.assembly-hero-camera-box .camera__lens-ring-glare1,
+.assembly-hero-camera-box .camera__lens-ring-glare2,
+.assembly-hero-camera-box .camera__lens-ring-glare3,
+.assembly-hero-camera-box .camera__lens-eye,
+.assembly-hero-camera-box .camera__lens-eye-shadow,
+.assembly-hero-camera-box .camera__lens-eye-ring,
+.assembly-hero-camera-box .camera__lens-eye-inner-glare,
+.assembly-hero-camera-box .camera__lens-eye-center,
+.assembly-hero-camera-box .camera__lens-eye-center-glare,
+.assembly-hero-camera-box .camera__lens-eye-glass,
+.assembly-hero-camera-box .camera__lens-eye-glass-color,
+.assembly-hero-camera-box .camera__lens-eye-glare,
+.assembly-hero-camera-box .camera__lens-shadow,
+.assembly-hero-camera-box .camera__shadow {
+  position: absolute;
+}
+.assembly-hero-camera-box .camera__red-light,
+.assembly-hero-camera-box .camera__lens-back,
+.assembly-hero-camera-box .camera__lens-ring,
+.assembly-hero-camera-box .camera__lens-inner,
+.assembly-hero-camera-box .camera__lens-inner-glare1,
+.assembly-hero-camera-box .camera__lens-inner-glare2,
+.assembly-hero-camera-box .camera__lens-glare,
+.assembly-hero-camera-box .camera__lens-ring-glare1,
+.assembly-hero-camera-box .camera__lens-ring-glare2,
+.assembly-hero-camera-box .camera__lens-ring-glare3,
+.assembly-hero-camera-box .camera__lens-eye,
+.assembly-hero-camera-box .camera__lens-eye-shadow,
+.assembly-hero-camera-box .camera__lens-eye-ring,
+.assembly-hero-camera-box .camera__lens-eye-center,
+.assembly-hero-camera-box .camera__lens-eye-glass,
+.assembly-hero-camera-box .camera__lens-eye-glass-color {
+  border-radius: 50%;
+}
+.assembly-hero-camera-box .camera__front {
+  background-image: linear-gradient(hsl(var(--cam-hue),5%,92%),hsl(var(--cam-hue),5%,96%));
+  border-radius: inherit;
+  box-shadow: 0 0.1em 0 hsl(var(--cam-hue),5%,98%) inset;
+  width: 100%;
+  height: 100%;
+  transform: translateZ(1em);
+  z-index: 1;
+}
+.assembly-hero-camera-box .camera__contents {
+  top: 1.2em;
+  left: 1.2em;
+  width: 4.6em;
+  height: 4.6em;
+  transform: translateZ(1em);
+  transform-style: preserve-3d;
+  z-index: 2;
+}
+.assembly-hero-camera-box .camera__red-light {
+  animation-name: camera3dRedLight;
+  background-color: hsl(3,90%,65%);
+  box-shadow:
+    0.1em -0.1em 0.1em 0.1em hsl(3,90%,50%) inset,
+    0 0 0.5em 0.25em hsla(3,90%,70%,0.5);
+  top: 0;
+  right: 0;
+  width: 0.4em;
+  height: 0.4em;
+}
+.assembly-hero-camera-box .camera__lens-back,
+.assembly-hero-camera-box .camera__lens-ring,
+.assembly-hero-camera-box .camera__lens-inner {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.assembly-hero-camera-box .camera__lens-back {
+  background-color: hsl(var(--cam-hue),10%,70%);
+  transform: translateZ(0.01em);
+}
+.assembly-hero-camera-box .camera__lens-ring {
+  background-color: hsl(var(--cam-hue),10%,45%);
+  border-radius: 50%;
+  overflow: hidden;
+  transform: translateZ(1.5em);
+}
+.assembly-hero-camera-box .camera__lens-ring-glare1 {
+  animation-name: camera3dRingGlare1;
+  background-image: radial-gradient(100% 100% at center,hsl(0,0%,100%) 25%,hsla(0,0%,100%,0) 50%);
+  bottom: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform-origin: 0 50%;
+}
+.assembly-hero-camera-box .camera__lens-ring-glare2 {
+  animation-name: camera3dRingGlare2;
+  background-image: radial-gradient(100% 100% at center,hsl(var(--cam-hue),10%,85%) 30%,hsla(var(--cam-hue),10%,85%,0) 50%);
+  top: 30%;
+  right: 30%;
+  width: 140%;
+  height: 140%;
+}
+.assembly-hero-camera-box .camera__lens-ring-glare3 {
+  animation-name: camera3dRingGlare3;
+  background-image: radial-gradient(100% 100% at center,hsl(var(--cam-hue),10%,70%) 30%,hsla(var(--cam-hue),10%,70%,0) 50%);
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+}
+.assembly-hero-camera-box .camera__lens-inner {
+  animation-name: camera3dLensInner;
+  background-color: hsl(var(--cam-hue),5%,75%);
+  box-shadow: 0 0 0 0.125em hsl(var(--cam-hue),10%,50%);
+  top: 0.5em;
+  left: 0.5em;
+  width: 3.6em;
+  height: 3.6em;
+  transform: translateZ(1.5em);
+}
+.assembly-hero-camera-box .camera__lens-inner-glare1 {
+  animation-name: camera3dLensInnerGlare1;
+  box-shadow: 0.5em -1em 0.5em 0.5em hsl(var(--cam-hue),10%,85%) inset;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+}
+.assembly-hero-camera-box .camera__lens-inner-glare2 {
+  animation-name: camera3dLensInnerGlare2;
+  border: 0.5em solid hsl(var(--cam-hue),5%,88%);
+  border-bottom: 0.5em solid transparent;
+  filter: blur(2px);
+  opacity: 0.5;
+  top: 0.4em;
+  left: 0.4em;
+  width: 2.6em;
+  height: 2.6em;
+  transform: rotate(-45deg);
+}
+.assembly-hero-camera-box .camera__lens-glare {
+  animation-name: camera3dLensGlare;
+  background-image: radial-gradient(100% 100% at center,hsl(0,0%,100%) 15%,hsla(0,0%,100%,0) 50%);
+  top: 2em;
+  left: 1.2em;
+  width: 1em;
+  height: 0.5em;
+  transform: rotate(0) translateY(1.2em);
+}
+.assembly-hero-camera-box .camera__lens-eye,
+.assembly-hero-camera-box .camera__lens-eye-shadow {
+  top: 0.8em;
+  left: 0.8em;
+  width: 2em;
+  height: 2em;
+  transform: translateZ(0);
+}
+.assembly-hero-camera-box .camera__lens-eye {
+  background-color: hsl(var(--cam-hue),10%,10%);
+  box-shadow: 0 0 0 0.0625em hsl(var(--cam-hue),10%,10%);
+  overflow: hidden;
+}
+.assembly-hero-camera-box .camera__lens-eye-shadow {
+  box-shadow: 0 0 0.375em 0.25em hsl(var(--cam-hue),10%,50%);
+}
+.assembly-hero-camera-box .camera__lens-eye-ring {
+  animation-name: camera3dEyeRing;
+  box-shadow:
+    0 0 0 0.25em hsl(0,0%,0%),
+    0 0 0.25em 0.5em hsl(var(--cam-hue),10%,25%),
+    0 -0.25em 0.25em 0.5em hsl(var(--cam-hue),10%,20%),
+    0 0.2em 0.125em hsl(var(--cam-hue),10%,40%) inset;
+  top: 0.4em;
+  left: 0.4em;
+  width: 1.2em;
+  height: 1.2em;
+}
+.assembly-hero-camera-box .camera__lens-eye-inner-glare {
+  animation-name: camera3dEyeInnerGlare;
+  background-color: hsl(var(--cam-hue),10%,35%);
+  border-radius: 50% 50% 50% 50% / 20% 20% 80% 80%;
+  box-shadow: 0 0 0.375em 0.25em hsl(var(--cam-hue),10%,35%);
+  top: 1.2em;
+  left: 0.7em;
+  width: 0.6em;
+  height: 0.2em;
+  opacity: 0;
+  transform: scale(0);
+}
+.assembly-hero-camera-box .camera__lens-eye-center {
+  background-image: linear-gradient(hsl(123,90%,5%) 45%,hsl(123,90%,15%) 75%);
+  box-shadow: 0 0 0.125em 0.25em hsl(0,0%,0%);
+  overflow: hidden;
+  top: 0.85em;
+  left: 0.85em;
+  width: 0.4em;
+  height: 0.4em;
+}
+.assembly-hero-camera-box .camera__lens-eye-center-glare {
+  animation-name: camera3dEyeCenterGlare;
+  background-color: hsl(123,10%,35%);
+  border-radius: 50%;
+  top: 0;
+  right: 0;
+  width: 0.18em;
+  height: 0.18em;
+}
+.assembly-hero-camera-box .camera__lens-eye-glass {
+  animation-name: camera3dEyeGlass;
+  box-shadow:
+    0 -0.1em 0.1em hsl(63,90%,20%) inset,
+    0 0 0.125em hsl(3,90%,20%) inset,
+    0 0 0.125em hsl(263,90%,40%) inset,
+    0 0 0.125em 0.25em hsl(0,0%,0%) inset;
+  width: 100%;
+  height: 100%;
+}
+.assembly-hero-camera-box .camera__lens-eye-glass-color {
+  background-image: linear-gradient(hsla(253,90%,10%,0.5) 60%,hsla(253,90%,40%,0.5) 60%);
+  width: 100%;
+  height: 100%;
+}
+.assembly-hero-camera-box .camera__lens-eye-glare {
+  animation-name: camera3dEyeGlare;
+  background-color: hsla(223,90%,60%,0.7);
+  border-radius: 50%;
+  box-shadow: -0.125em 0.375em 0.5em hsl(268,90%,50%) inset;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 50%;
+  transform: translateX(0) rotate(45deg) scaleY(0.45);
+}
+.assembly-hero-camera-box .camera__lens-shadow {
+  background-image: linear-gradient(135deg,hsla(var(--cam-hue),50%,0%,0.25),hsla(var(--cam-hue),50%,0%,0));
+  filter: blur(4px);
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 3.5em;
+}
+.assembly-hero-camera-box .camera__shadow {
+  background-image: linear-gradient(90deg,hsla(var(--cam-hue),50%,0%,0.5),hsla(var(--cam-hue),50%,0%,0.1));
+  border-radius: 40%;
+  filter: blur(1px);
+  top: calc(100% - 1em);
+  width: 100%;
+  height: 1em;
+  transform: translateZ(-0.01em);
+}
+
+/* ── 3D Camera keyframes ── */
+@keyframes cameraFloat {
+  0%, 100% { transform: rotateY(0deg) translateY(0); }
+  50% { transform: rotateY(0deg) translateY(-6px); }
+}
+@keyframes cameraRedBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+@keyframes camera3d {
+  from, to { transform: rotateY(20deg); }
+  50% { transform: rotateY(-20deg); }
+}
+@keyframes camera3dRedLight {
+  from, to { transform: translateZ(0.6em) rotateY(-20deg); }
+  50% { transform: translateZ(0.6em) rotateY(20deg); }
+}
+@keyframes camera3dRingGlare1 {
+  from, to { transform: translateX(-25%) scaleX(0.33); }
+  50% { transform: translateX(0) scaleX(1); }
+}
+@keyframes camera3dRingGlare2 {
+  from, to { transform: scale(0.75); }
+  50% { transform: scale(1.25); }
+}
+@keyframes camera3dRingGlare3 {
+  from, to { transform: translateX(-20%) scale(0.75); }
+  50% { transform: translateX(0) scale(1.2); }
+}
+@keyframes camera3dLensInner {
+  from, to { box-shadow: 0.0625em 0 0 0.125em hsl(223,5%,55%); }
+  50% { box-shadow: -0.0625em 0 0 0.125em hsl(223,5%,55%); }
+}
+@keyframes camera3dLensInnerGlare1 {
+  from, to { opacity: 1; transform: rotate(0); }
+  50% { opacity: 0; transform: rotate(45deg); }
+}
+@keyframes camera3dLensInnerGlare2 {
+  from, to { opacity: 0.2; transform: translate(0,0.2em) scale(1.1) rotate(-45deg); }
+  50% { opacity: 1; transform: translate(0,0) scale(1) rotate(-15deg); }
+}
+@keyframes camera3dLensGlare {
+  from, to { transform: rotate(-25deg) translateY(1em); }
+  50% { transform: rotate(25deg) translateY(1em); }
+}
+@keyframes camera3dEyeInnerGlare {
+  from, to { opacity: 1; transform: scale(1); }
+  50% { opacity: 0; transform: scale(0); }
+}
+@keyframes camera3dEyeCenterGlare {
+  from, to { transform: translateX(-25%); }
+  50% { transform: translateX(50%); }
+}
+@keyframes camera3dEyeGlass {
+  from, to {
+    box-shadow:
+      -0.1em -0.1em 0.1em hsl(63,90%,20%) inset,
+      -0.2em -0.1em 0.125em hsl(3,90%,20%) inset,
+      -0.3em -0.3em 0.125em hsl(263,90%,40%) inset,
+      0 0 0.125em 0.25em hsl(0,0%,0%) inset;
+  }
+  50% {
+    box-shadow:
+      0.1em -0.1em 0.1em hsl(63,90%,20%) inset,
+      0.2em -0.1em 0.125em hsl(3,90%,20%) inset,
+      0.3em -0.3em 0.125em hsl(263,90%,40%) inset,
+      0 0 0.125em 0.25em hsl(0,0%,0%) inset;
+  }
+}
+@keyframes camera3dEyeGlare {
+  from, to { transform: translateX(-0.75em) rotate(10deg) scale(1.5,1); }
+  50% { transform: translateX(0.375em) rotate(50deg) scale(1.5,0.25); }
+}
+@keyframes camera3dEyeRing {
+  from, to {
+    box-shadow:
+      0 0 0 0.25em hsl(0,0%,0%),
+      0 0.25em 0.25em 0.5em hsl(223,10%,25%),
+      0 -0.25em 0.25em 0.5em hsl(223,10%,20%),
+      0 0.2em 0.125em hsl(223,10%,40%) inset;
+  }
+  50% {
+    box-shadow:
+      0 0 0 0.25em hsl(0,0%,0%),
+      0 0 0.25em 0 hsl(223,10%,25%),
+      0 -0.25em 0.25em 0.5em hsl(223,10%,20%),
+      0 0.2em 0.125em hsl(223,10%,40%) inset;
+  }
+}
+
+/* ── ROW HEADERS ── */
+.assembly-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+.assembly-margin-vertical { margin: 10px 0; }
+
+.assembly-segment-title {
+  color: var(--assembly-color-light);
+  font-family: var(--assembly-font-family);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* ── BUTTONS ── */
+.assembly-btn {
+  display: inline-flex;
+  color: var(--assembly-color-light);
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.1);
+  background: transparent;
+  transition: ease all 0.3s;
+  text-decoration: none;
+  font-family: var(--assembly-font-family);
+  font-weight: 600;
+  font-size: 12px;
+  align-items: center;
+}
+.assembly-btn-primary {
+  position: relative;
+  padding: 12px 18px;
+  color: var(--assembly-color-dark);
+  border-radius: 18px;
+  font-size: 11px;
+  background:
+    radial-gradient(farthest-side at bottom center, #f0c1bb 25%, transparent 75%),
+    radial-gradient(farthest-side at left bottom, #ebc6c0 25%, transparent 75%),
+    radial-gradient(farthest-side at left center, #dabbc3 25%, transparent 75%),
+    radial-gradient(farthest-side at left top, #e7cdce 25%, transparent 75%),
+    radial-gradient(farthest-side at right top, #bcb7d7 25%, transparent 75%),
+    radial-gradient(farthest-side at right bottom, #bcb7d7 25%, transparent 75%),
+    radial-gradient(farthest-side at right center, #bcb7d7 25%, transparent 75%),
+    radial-gradient(farthest-side at top center, #f6ede8 60%, transparent 100%),
+    radial-gradient(farthest-side at center center, #eed8db 100%, transparent 100%);
+}
+.assembly-btn-primary:hover { transform: scale(1.05); }
+
+/* ── FEATURED PRODUCT (Neumorphic raised rectangle) ── */
+.assembly-featured-product {
+  animation: fade-in-bottom 0.6s cubic-bezier(0.39, 0.575, 0.565, 1) both 0.4s;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-bottom: 30px;
+  padding: 18px 16px;
+  background: linear-gradient(145deg, #1e1e28, #16161e);
+  border: 2px solid #d4a017;
+  box-shadow:
+    8px 8px 20px rgba(0,0,0,0.6),
+    -4px -4px 12px rgba(50,50,65,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.assembly-featured-product .featured-top-row {
+  display: flex;
+  align-items: center;
+}
+.assembly-featured-product .content-img {
+  width: 60px;
+  flex: 0 0 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.assembly-featured-product .product-detail {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 8px;
+}
+.assembly-featured-product .product-name {
+  font-family: var(--assembly-font-family);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--assembly-color-light);
+}
+.assembly-featured-product .price {
+  color: #f7ad32;
+  font-family: var(--assembly-font-family);
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+.assembly-featured-product .share-inline {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── WORKSHOP SEARCH BAR (Attachment) ── */
+.assembly-workshop {
+  position: relative;
+  text-align: center;
+  padding: 14px 0 4px;
+}
+.assembly-workshop form {
+  background: linear-gradient(#1b1b1b, #111);
+  border: 1px solid #000;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1px #272727;
+  display: inline-flex;
+  font-size: 0px;
+  padding: 0;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+.assembly-workshop input {
+  background: linear-gradient(#333, #222);
+  border: 1px solid #444;
+  border-radius: 5px 0 0 5px;
+  box-shadow: 0 2px 0 #000;
+  color: #888;
+  display: block;
+  float: left;
+  font-family: 'Cabin', var(--assembly-font-family);
+  font-size: 12px;
+  font-weight: 400;
+  height: 36px;
+  margin: 0;
+  padding: 0 10px;
+  text-shadow: 0 -1px 0 #000;
+  width: 100%;
+  flex: 1;
+  min-width: 0;
+  outline: none;
+}
+.assembly-workshop input::placeholder {
+  color: #888;
+}
+.assembly-workshop input:focus {
+  animation: glow 800ms ease-out infinite alternate;
+  background: linear-gradient(#333933, #222922);
+  border-color: #393;
+  box-shadow: 0 0 5px rgba(0,255,0,.2), inset 0 0 5px rgba(0,255,0,.1), 0 2px 0 #000;
+  color: #efe;
+  outline: none;
+}
+.assembly-workshop input:focus::placeholder {
+  color: #efe;
+}
+.assembly-workshop button {
+  background: linear-gradient(#333, #222);
+  box-sizing: content-box;
+  border: 1px solid #444;
+  border-left-color: #000;
+  border-radius: 0 5px 5px 0;
+  box-shadow: 0 2px 0 #000;
+  color: #fff;
+  display: block;
+  float: left;
+  font-family: 'Cabin', var(--assembly-font-family);
+  font-size: 12px;
+  font-weight: 400;
+  height: 36px;
+  line-height: 36px;
+  margin: 0;
+  padding: 0 12px;
+  position: relative;
+  text-shadow: 0 -1px 0 #000;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.assembly-workshop button:hover,
+.assembly-workshop button:focus {
+  background: linear-gradient(#393939, #292929);
+  color: #5f5;
+  outline: none;
+}
+.assembly-workshop button:active {
+  background: linear-gradient(#393939, #292929);
+  box-shadow: 0 1px 0 #000, inset 1px 0 1px #222;
+  top: 1px;
+}
+
+@keyframes glow {
+  0% {
+    border-color: #393;
+    box-shadow: 0 0 5px rgba(0,255,0,.2), inset 0 0 5px rgba(0,255,0,.1), 0 2px 0 #000;
+  }
+  100% {
+    border-color: #6f6;
+    box-shadow: 0 0 20px rgba(0,255,0,.6), inset 0 0 10px rgba(0,255,0,.4), 0 2px 0 #000;
+  }
+}
+
+/* ── EMAIL INPUT (inline) ── */
+.assembly-email-input {
+  width: 90px;
+  padding: 5px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(247,173,50,0.4);
+  background: rgba(255,255,255,0.06);
+  color: var(--assembly-color-light);
+  font-family: var(--assembly-font-family);
+  font-size: 9px;
+  outline: none;
+}
+.assembly-email-input::placeholder { color: rgba(255,255,255,0.35); }
+
+/* ── SHARE BUTTON (inline) ── */
+.assembly-share-btn-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--assembly-font-family);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--assembly-color-dark);
+  background:
+    radial-gradient(farthest-side at bottom center, #f0c1bb 25%, transparent 75%),
+    radial-gradient(farthest-side at left bottom, #ebc6c0 25%, transparent 75%),
+    radial-gradient(farthest-side at left center, #dabbc3 25%, transparent 75%),
+    radial-gradient(farthest-side at left top, #e7cdce 25%, transparent 75%),
+    radial-gradient(farthest-side at right top, #bcb7d7 25%, transparent 75%),
+    radial-gradient(farthest-side at right bottom, #bcb7d7 25%, transparent 75%),
+    radial-gradient(farthest-side at right center, #bcb7d7 25%, transparent 75%),
+    radial-gradient(farthest-side at top center, #f6ede8 60%, transparent 100%),
+    radial-gradient(farthest-side at center center, #eed8db 100%, transparent 100%);
+  transition: transform 0.2s;
+  white-space: nowrap;
+}
+.assembly-share-btn-sm:hover { transform: scale(1.05); }
+.assembly-share-sent { color: #2d7a2d; font-weight: 700; }
+
+/* ── ANIMATIONS ── */
+@keyframes float {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-14px); }
+  100% { transform: translateY(0px); }
+}
+@keyframes fade-in-bottom {
+  0%   { transform: translateY(50px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes flip-in-hor-top {
+  0%   { transform: rotateX(-80deg); opacity: 0; }
+  100% { transform: rotateX(0); opacity: 1; }
+}
