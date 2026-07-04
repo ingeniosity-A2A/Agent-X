@@ -1,0 +1,45 @@
+{
+  "repo": "helpassembly-platform",
+  "state": "production-convergent multi-runtime layout",
+  "deployment_model": "edge-routed deterministic deployment",
+  "public_runtime": {
+    "edge-client": "apps/public-ds",
+    "domain": "www.helpassembly.com",
+    "purpose": ["Docking Station mode=public", "customer booking flow", "scan + quote UX", "payment UX", "A2A customer entry"]
+  },
+  "ops_runtime": {
+    "edge-client": "apps/ops-ds",
+    "domain": "ops.helpassembly.com",
+    "purpose": ["Docking Station mode=admin", "dispatch overlays", "technician routing", "queue inspection", "orchestration visibility"]
+  },
+  "booking_surface": {
+    "edge-client": "apps/booking-surface",
+    "purpose": ["booking completion", "payment continuation", "quote persistence", "schedule confirmation"]
+  },
+  "marketing_root": {
+    "edge-client": "apps/marketing-root",
+    "purpose": ["homepage", "QR landing", "social entry links", "marketing content"]
+  },
+  "workers": {
+    "edge-router": ["hostname router", "auth boundary enforcement", "worker dispatch logic", "canonical edge control"],
+    "api-worker": ["/upload", "/dispatch", "/quote", "/session", "/events", "webhook handlers"],
+    "ai-worker": ["Ava007 orchestration", "A2A-BEEP runtime", "intent routing", "Rev.Ike binding", "negotiation engine"],
+    "ops-worker": ["dispatch APIs", "telemetry APIs", "audit inspection", "technician systems", "swarm coordination"],
+    "realtime-worker": ["websocket routing", "stream projection", "event fanout", "live technician updates"]
+  },
+  "packages": {
+    "ui-system": ["glassmorphism components", "docking station shell", "card system", "motion primitives", "GSAP orchestration"],
+    "a2ui": ["render contracts", "interface state machine", "adaptive panels", "cognition overlays"],
+    "quote-engine": ["pricing logic", "category pricing", "labor estimation", "add-on logic"],
+    "revike": ["DID binding", "session persistence", "vendor memory", "trust relationships"],
+    "beeper-core": ["dispatch engine", "scheduling", "ETA tracking", "queue systems", "assignment logic"],
+    "ingenosity-lens": ["image ingestion", "CLIP integration", "SKU matching", "retailer normalization", "confidence scoring"],
+    "shared": ["types", "schemas", "constants", "env loaders", "utility functions"]
+  },
+  "infrastructure": {
+    "cloudflare": ["wrangler configs", "worker routes", "KV bindings", "Durable Objects", "deployment scripts"],
+    "database": ["migrations", "pgvector setup", "indexes", "seed data"],
+    "monitoring": ["logs", "metrics", "traces", "alert configs"]
+  },
+  "migration_sequence": ["extract ui-system/shared/a2ui", "split public-ds/ops-ds", "extract workers", "move deterministic logic", "finalize routing and environment separation"]
+}
