@@ -290,3 +290,20 @@ echo ""
 echo "For srsRAN/sSDR builds:"
 echo "  proot-distro login ubuntu"
 echo ""
+
+# --- Quantum Fetch (Model Acquisition) ---
+cat > "$BASE/run_fetch.sh" << 'FETCH'
+#!/bin/bash
+cd "$(dirname "$0")"
+if [ -z "$1" ] || [ -z "$2" ]; then
+    echo "Usage: ./run_fetch.sh <repo_id> <filename>"
+    echo ""
+    echo "Examples:"
+    echo "  ./run_fetch.sh prithivMLmods/VibeThinker-3B-GGUF VibeThinker-3B.Q4_K_M.gguf"
+    echo "  ./run_fetch.sh --list"
+    echo "  ./run_fetch.sh --stats"
+    exit 1
+fi
+python3 -m src.quantum.quantum_fetch "$1" "$2"
+FETCH
+chmod +x "$BASE/run_fetch.sh"
