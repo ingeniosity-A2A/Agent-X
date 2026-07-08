@@ -307,3 +307,14 @@ fi
 python3 -m src.quantum.quantum_fetch "$1" "$2"
 FETCH
 chmod +x "$BASE/run_fetch.sh"
+
+# --- On-Device UI ---
+cat > "$BASE/run_ui.sh" << 'UIEOF'
+#!/bin/bash
+cd "$(dirname "$0")"
+PORT=${1:-8080}
+echo "⚡ SIF AVA007 Dashboard"
+echo "  Open: http://localhost:$PORT"
+python3 -m src.ui.dashboard
+UIEOF
+chmod +x "$BASE/run_ui.sh"
