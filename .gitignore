@@ -3,3 +3,7 @@ __pycache__/
 *.pyc
 cache/
 data/corpus/*.jsonl
+models/
+destiny_build/
+.openclaw/
+__pycache__/

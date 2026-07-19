@@ -1,5 +1,6 @@
 import json, random
-def _ph(): return f"+1404555{random.randint(1000,9999)}"
+from src.config import BUSINESS_PHONE
+def _ph(): return f"+1404439{random.randint(1000,9999)}"
 def _bid(): return f"HAS-{random.randint(1000,9999)}"
 PATTERNS = {
     "reminder": {"triggers": ["reminder","day before","confirm appointment","tomorrow"], "gen": lambda c: {"actions": [{"tool":"send_sms","params":{"number":c.get("phone",_ph()),"message":f"Hi {c.get('customer','there')}! Help Assembly Services LLC reminder: your {c.get('item','furniture')} assembly is {c.get('date','tomorrow')} at {c.get('time','10:00 AM')}. Reply with questions!"},"reason":"Send reminder"}]}},
