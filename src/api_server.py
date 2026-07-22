@@ -26,5 +26,6 @@ def main():
     if not k: print("ERROR: MERCURY_API_KEY"); exit(1)
     harness = Harness(mercury_engine=MercuryEngine(k))
     print(f"{COMPANY_NAME} API on http://0.0.0.0:7474")
-    HTTPServer(("0.0.0.0",7474), H).serve_forever()
+    port = int(os.environ.get("PORT", 7474))
+    HTTPServer(("0.0.0.0", port), H).serve_forever()
 if __name__ == "__main__": main()

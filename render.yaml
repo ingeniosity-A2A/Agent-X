@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: agent-x
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: MERCURY_API_KEY
+        sync: false
+      - key: COMPANY_NAME
+        value: Help Assembly Services LLC
