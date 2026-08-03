@@ -1,0 +1,7 @@
+# Agent-X — Help Assembly Exoskeleton surface (exo.help_assembly)
+
+Architecture SoR: https://github.com/ingeniosity-A2A/Ava007/tree/main/docs/exoskeleton
+VCard example: examples/agent-card.json
+A2A appless: docs/exoskeleton/A2A-Agent-Card-Appless.md
+
+Not a peer Intellect. Gateway/execution suit for Cybernetic Ava007.
