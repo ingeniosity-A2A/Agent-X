@@ -1,0 +1,16 @@
+{
+  "schema": "ava007.customers.v1",
+  "updated_at": "2026-07-17T05:33:00+08:00",
+  "customers": [
+    {
+      "id": "C001",
+      "name": "Help Assembly Services LLC",
+      "phone": "+14044391350",
+      "email": "info@helpassembly.com",
+      "address": "Metro Atlanta, GA",
+      "tags": ["vip", "repeat"],
+      "notes": "Primary demo customer",
+      "created_at": "2026-07-17"
+    }
+  ]
+}

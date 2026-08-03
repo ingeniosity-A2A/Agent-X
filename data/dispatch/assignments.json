@@ -1,0 +1,23 @@
+{
+  "schema": "ava007.dispatch.v1",
+  "updated_at": "2026-07-17T05:33:00+08:00",
+  "technicians": [
+    {
+      "id": "T001",
+      "name": "Marcus",
+      "phone": "+14045550101",
+      "status": "available",
+      "current_booking": null,
+      "service_areas": ["Atlanta", "Marietta", "Decatur"]
+    },
+    {
+      "id": "T002",
+      "name": "James",
+      "phone": "+14045550102",
+      "status": "available",
+      "current_booking": null,
+      "service_areas": ["Alpharetta", "Sandy Springs", "Roswell"]
+    }
+  ],
+  "assignments": []
+}

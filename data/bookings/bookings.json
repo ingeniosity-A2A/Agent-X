@@ -1,0 +1,19 @@
+{
+  "schema": "ava007.bookings.v1",
+  "updated_at": "2026-07-17T05:33:00+08:00",
+  "bookings": [
+    {
+      "id": "B001",
+      "customer_id": "C001",
+      "service": "Standard Assembly",
+      "item": "IKEA MALM dresser",
+      "price": 150,
+      "date": "2026-07-18",
+      "time": "10:00 AM",
+      "technician": "Marcus",
+      "status": "scheduled",
+      "address": "123 Main St, Atlanta, GA",
+      "created_at": "2026-07-17"
+    }
+  ]
+}
