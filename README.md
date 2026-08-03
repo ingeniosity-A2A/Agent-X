@@ -1,6 +1,7 @@
 # Agent X
 
-**Role:** Experimental / evolvable execution surface (Exoskeleton capability)  
+**Role:** Execution surface for the **Help Assembly Exoskeleton** (`exo.help_assembly`)
+**Also:** Experimental / evolvable sandbox capability when that path is enabled  
 **Not:** Cybernetic Ava007, Core-Q², or a peer Intellect
 
 Agent X runs sandboxed experiments, latent skill work, and provisional code paths.
@@ -37,3 +38,9 @@ Platform app: see `platform/`.
 | `platform/` | Help Assembly Services UI / Next.js surface |
 | `docs/exoskeleton/` | Capability identity and alignment |
 | `imports/qag-skills-agent_x/` | Snapshot from QAG-MemBrain for reconciliation |
+
+
+## Rotational profile
+
+When Ava007 attaches `exo.help_assembly`, this repo’s `platform/` and `src/` provide the specialized suit.
+Mechanics: Ava007 `docs/exoskeleton/Exoskeleton-Rotational-Mechanics.md`.
