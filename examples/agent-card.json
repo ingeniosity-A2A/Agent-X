@@ -1,0 +1,36 @@
+{
+  "name": "Help Assembly Appless",
+  "description": "A2A gateway for exo.help_assembly. Not a peer Intellect.",
+  "version": "1.0.0",
+  "protocol": "a2a",
+  "protocol_version": "1.0",
+  "url": "https://help-assembly.example/a2a",
+  "provider": {
+    "organization": "Ingeniosity",
+    "url": "https://github.com/ingeniosity-A2A"
+  },
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false,
+    "structuredOutputs": true
+  },
+  "defaultInputModes": ["text", "application/json"],
+  "defaultOutputModes": ["text", "application/json"],
+  "skills": [
+    {
+      "id": "help_assembly.quote",
+      "name": "Assembly quote",
+      "description": "Create or revise a field assembly quote",
+      "tags": ["exo.help_assembly", "quote"]
+    },
+    {
+      "id": "help_assembly.patterns",
+      "name": "Assembly patterns",
+      "description": "Run field assembly pattern library",
+      "tags": ["exo.help_assembly"]
+    }
+  ],
+  "authentication": { "schemes": ["bearer", "oauth2"] },
+  "exo_default": "exo.help_assembly",
+  "sovereignty_note": "Tasks are fulfilled by Cybernetic Ava007 via substrate capabilities. This card is a gateway, not a second mind."
+}
