@@ -55,7 +55,7 @@ class QuantumFetcher:
         self.dag = TashiDAG(storage_path=os.path.join(self.storage_dir, "fetch_dag.jsonl"))
         self.lake = AtomicMemoryLake(lake_dir=os.path.join(self.storage_dir, "fetch_lake"))
         self.memory = GriptapeTaskMemory(storage_dir=os.path.join(self.storage_dir, "fetch_mem"))
-        self.signer = QuantumSigner.from_did("did:s25ultra:fetcher")
+        self.signer = QuantumSigner.from_did("did:s26ultra:fetcher")
 
     def fetch(self, repo_id: str, filename: str, subfolder: str = None) -> dict:
         """
@@ -186,7 +186,7 @@ class QuantumFetcher:
     ):
         """Create an Interaction Quantum for the fetch operation."""
         builder = (QuantumBuilder()
-            .source("did:s25ultra:fetcher")
+            .source("did:s26ultra:fetcher")
             .intent("model_acquisition", confidence=1.0, role="fetcher")
             .tween(TweenType.EASE, duration_ms=min(int(latency_ms), 1000))
             .payload({

@@ -7,7 +7,7 @@ Access from phone browser: http://localhost:8080
 Features:
 - Quantum harness status
 - Identity rotation controls
-- Mesh connectivity (S25↔S26)
+- Mesh connectivity (S26 Ultra)
 - SMS bridge status
 - Destiny-4B inference
 - UWB ranging display
@@ -82,7 +82,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <div class="header">
   <h1>⚡ SIF AVA007</h1>
-  <div class="status">S25 Ultra • <span id="clock">--:--:--</span> • <span id="uptime">--</span></div>
+  <div class="status">S26 Ultra • <span id="clock">--:--:--</span> • <span id="uptime">--</span></div>
 </div>
 
 <div class="tabs">
@@ -104,7 +104,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="card">
       <h3>Mesh Status</h3>
       <div class="value green" id="mesh-status">● LIVE</div>
-      <div class="sub">S25 ↔ S26</div>
+      <div class="sub">S26 Ultra • Mesh Relay</div>
     </div>
     <div class="card">
       <h3>Quanta Created</h3>
@@ -120,7 +120,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <h3>UWB Ranging</h3>
       <div style="display:flex;align-items:baseline;gap:8px">
         <div class="value accent" id="uwb-distance">--</div>
-        <div class="sub">meters S25↔S26</div>
+        <div class="sub">meters</div>
       </div>
       <div class="sub">Quality: <span id="uwb-quality">--</span> • Channel 9 (7.987 GHz)</div>
     </div>
@@ -141,15 +141,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="mesh-node">
         <div class="mesh-dot online"></div>
         <div>
-          <div style="font-weight:600">S25 Ultra</div>
-          <div class="sub">10.0.0.38:9042 • Orchestrator • SIF-Rotated</div>
-        </div>
-      </div>
-      <div class="mesh-node">
-        <div class="mesh-dot online"></div>
-        <div>
           <div style="font-weight:600">S26 Ultra</div>
-          <div class="sub">10.0.0.175:9043 • Mesh Relay • SIF-Mesh-Sovereign</div>
+          <div class="sub">10.0.0.175:9043 • Orchestrator • exo.help_assembly</div>
         </div>
       </div>
     </div>
@@ -461,7 +454,7 @@ def main():
     print(f"\n  ⚡ SIF AVA007 Dashboard")
     print(f"  ─────────────────────")
     print(f"  URL: http://localhost:{port}")
-    print(f"  Open in browser on S25")
+    print(f"  Open in browser on S26 Ultra")
     print()
     server.serve_forever()
 

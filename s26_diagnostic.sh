@@ -1,7 +1,7 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════════════
-#  SIF AVA007 — S25 Ultra Diagnostic
-#  Run on S25 Ultra via Termux/Proot Ubuntu
+#  SIF AVA007 — S26 Ultra Diagnostic
+#  Run on S26 Ultra via Termux/Proot Ubuntu
 # ═══════════════════════════════════════════════════════════════
 
 GREEN='\033[0;32m'
@@ -19,7 +19,7 @@ warn() { echo -e " ${YELLOW}⚠${NC} $1"; WARN=$((WARN+1)); }
 info() { echo -e " ${CYAN}ℹ${NC} $1"; }
 
 echo "╔══════════════════════════════════════════════════════════╗"
-echo "║  SIF AVA007 — S25 Ultra Diagnostic                     ║"
+echo "║  SIF AVA007 — S26 Ultra Diagnostic                     ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
 
@@ -226,9 +226,9 @@ else
 fi
 
 if curl -s --connect-timeout 2 http://127.0.0.1:9042/status &>/dev/null; then
-    pass "S25 API (127.0.0.1:9042) running"
+    pass "S26 API (127.0.0.1:9042) running"
 else
-    info "S25 API not running on 9042"
+    info "S26 API not running on 9042"
 fi
 
 # ─── Python Environment ────────────────────────────────────────
@@ -266,7 +266,7 @@ echo -e "║  ${GREEN}Passed: $PASS${NC}  ${RED}Failed: $FAIL${NC}  ${YELLOW}War
 echo "╠══════════════════════════════════════════════════════════╣"
 
 if [ $FAIL -eq 0 ]; then
-    echo -e "║  ${GREEN}✅ S25 ULTRA READY${NC}                                    ║"
+    echo -e "║  ${GREEN}✅ S26 ULTRA READY${NC}                                    ║"
 else
     echo -e "║  ${YELLOW}⚠️  $FAIL ITEMS NEED ATTENTION${NC}                          ║"
 fi
@@ -275,4 +275,4 @@ echo "╚═══════════════════════�
 echo ""
 echo "Next: Run inside proot Ubuntu for full detection:"
 echo "  proot-distro login ubuntu"
-echo "  bash s25_diagnostic.sh"
+echo "  bash s26_diagnostic.sh"

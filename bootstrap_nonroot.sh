@@ -1,8 +1,8 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════════════
 #  SIF AVA007 — Non-Root Runtime Bootstrap
-#  S25 Ultra (Termux + Proot Ubuntu)
-#  No root required — S25 as reasoning hub, peripherals for RF
+#  S26 Ultra (Termux + Proot Ubuntu)
+#  No root required — S26 as reasoning hub, peripherals for RF
 # ═══════════════════════════════════════════════════════════════
 
 GREEN='\033[0;32m'; YELLOW='\033[1;33m'; CYAN='\033[0;36m'; NC='\033[0m'
@@ -143,7 +143,7 @@ echo "📡 Flipper Zero Dispatch"
 python3 -c "
 from src.quantum import FlipperEncoder, QuantumBuilder
 encoder = FlipperEncoder()
-q = QuantumBuilder().source('did:s25ultra').intent('dispatch').payload({'action': 'test'}).build()
+q = QuantumBuilder().source('did:s26ultra').intent('dispatch').payload({'action': 'test'}).build()
 cmd = encoder.encode_quantum(q)
 print(f'Command: {cmd.name}')
 print(f'Protocol: {cmd.signals[0].protocol.value}')
@@ -159,7 +159,7 @@ cd "$(dirname "$0")"
 echo "📡 LoRa Mesh Node"
 python3 -c "
 from src.quantum import LoRaMeshProtocol, MeshNode
-mesh = LoRaMeshProtocol('did:s25ultra:orchestrator')
+mesh = LoRaMeshProtocol('did:s26ultra:orchestrator')
 print(f'Node: {mesh.local_did}')
 print(f'Transport: {mesh.transport.value}')
 print('Ready for mesh connections.')
@@ -238,18 +238,13 @@ cat > "$BASE/QUICKREF.md" << 'QR'
 ## Architecture
 
 ```
-S25 Ultra (Orchestrator)
+S26 Ultra (Orchestrator)
 ├── Reasoning: Destiny-4B (ollama/llama.cpp)
 ├── Quantum: Zero Latency Harness (6-layer)
 ├── Memory: TashiDAG + TaskMemory + MemoryLake
 ├── SMS: Termux API bridge
 ├── Care: Appless VCF server
 └── Dispatch: Flipper / LoRa / UWB → external RF
-
-S26 Ultra (Mesh Node)
-├── Syncs with S25 via mesh
-├── Identity: SIF-Mesh-Sovereign
-└── Role: Distributed RF sensor
 ```
 
 ## External RF Peripherals

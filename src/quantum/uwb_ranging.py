@@ -2,11 +2,10 @@
 SIF AVA007 — UWB Ranging Module
 
 Uses Android's UWB API (API level 31+) for precise ranging
-between S25 Ultra and S26 Ultra without root access.
+on S26 Ultra without root access.
 
 Architecture:
-- S25 = UWB controller (initiates ranging)
-- S26 = UWB controlee (responds to ranging)
+- S26 Ultra = UWB controller (initiates ranging)
 - Results feed into Interaction Quantum temporal_index
 
 UWB Specs (Qualcomm FastConnect 7900):
@@ -31,7 +30,7 @@ class UWBRanging:
     No root required — uses standard Android UWB API.
     """
 
-    def __init__(self, local_device: str = "s25ultra"):
+    def __init__(self, local_device: str = "s26ultra"):
         self.local_device = local_device
         self.last_range: Optional[dict] = None
         self.range_history: list[dict] = []
@@ -84,7 +83,7 @@ class UWBRanging:
         except Exception:
             pass
 
-        # Known specs for S25 Ultra
+        # Known specs for S26 Ultra
         info["expected_chip"] = "Qualcomm FastConnect 7900"
         info["frequency_bands"] = [
             {"channel": 5, "center_ghz": 6.489, "bandwidth_mhz": 499.2},
@@ -243,7 +242,7 @@ def main():
     print("║  SIF AVA007 — UWB Ranging               ║")
     print("╚══════════════════════════════════════════╝")
 
-    uwb = UWBRanging(local_device="s25ultra")
+    uwb = UWBRanging(local_device="s26ultra")
 
     # Check availability
     print("\n── UWB Status ──")
