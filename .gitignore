@@ -20,3 +20,6 @@ platform/node_modules/
 
 # Local development logs
 platform/dev.log
+
+# Next.js generated files
+next-env.d.ts

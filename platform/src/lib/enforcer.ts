@@ -20,7 +20,7 @@
 
 // ── Policy Types ─────────────────────────────────────────────────
 
-export type Decision = "allow" | "deny" | "allow_with_conditions"];
+export type Decision = "allow" | "deny" | "allow_with_conditions";
 
 export interface EnforcerContext {
   capability: string;
