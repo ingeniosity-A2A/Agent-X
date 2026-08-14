@@ -30,3 +30,12 @@ Agent-X does NOT own: Core-Q² weights, canonical architecture docs, memory impl
 - Tree: platform/ (Help Assembly), src/ (execution), examples/agent-card.json, docs/exoskeleton/ (pointers only).
 - Do not duplicate Core-Membrain memory trees.
 - Nested AGENTS.md may scope per package. Deeper files win on conflict.
+
+## ESA / Exoskeleton UI surface
+- ESA Inventory (`esa_inventory`) is an Exoskeleton Framework capability, not a general product dashboard.
+- Operator configuration lives under **ESA Exoskeleton**: `platform/src/app/consoles/esa-maintenance` → Select Card.
+- Help Assembly console: `/consoles/help-assembly`.
+- Ava007 Dashboard is the sole Dashboard (Ava007 repo) — never re-home it on Agent-X.
+- Inventory is mandatory when no parts DB exists.
+- Service requests → Daily To-Dos via `/api/service-request`.
+- AgentMail: ava007@agentmail.to → manager (ESA_MANAGER_EMAIL).
