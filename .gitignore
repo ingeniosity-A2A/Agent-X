@@ -7,3 +7,16 @@ models/
 destiny_build/
 .openclaw/
 __pycache__/
+
+# Local environment
+.env.local
+.env.*.local
+
+# Next.js
+platform/.next/
+
+# Node dependencies
+platform/node_modules/
+
+# Local development logs
+platform/dev.log
