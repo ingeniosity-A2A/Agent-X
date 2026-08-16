@@ -18,8 +18,6 @@
  * - Muscle failure prevention (no port/token/infra reasoning by model)
  */
 
-// ── Policy Types ─────────────────────────────────────────────────
-
 export type Decision = "allow" | "deny" | "allow_with_conditions";
 
 export interface EnforcerContext {
@@ -55,7 +53,15 @@ export interface DeploymentSpec {
   fqn: string;
 }
 
-// ── Policy Rules ────────────────────────────────────────────────
+export type ESAIntent = "deploy" | "sync" | "scan" | "reorder" | "status";
+
+export interface ESAFeatureFlag {
+  id: string;
+  label: string;
+  description: string;
+  enabled: boolean;
+  requires: string[];
+}
 
 const ESA_POLICY_RULES: Array<{
   name: string;
@@ -99,6 +105,13 @@ const ESA_POLICY_RULES: Array<{
     conditions: ["cart.items.length > 0", "output: PDF reorder sheet"],
   },
   {
+    name: "esa_status_allow",
+    match: (ctx) =>
+      ctx.capability === "esa_inventory" && ctx.intent === "status",
+    decision: "allow",
+    reason: "Status inspection is always permitted for operators",
+  },
+  {
     name: "default_deny",
     match: () => true,
     decision: "deny",
@@ -106,29 +119,53 @@ const ESA_POLICY_RULES: Array<{
   },
 ];
 
-// ── Enforcer ────────────────────────────────────────────────────
+const DEFAULT_ESA_FEATURES: ESAFeatureFlag[] = [
+  {
+    id: "esa.deploy",
+    label: "Deploy capability",
+    description: "Register and hydrate ESA.ingeniosity.tech under Exoskeleton",
+    enabled: true,
+    requires: ["repo", "dns", "build"],
+  },
+  {
+    id: "esa.sync",
+    label: "Vendor sync (HD Supply)",
+    description: "PDF/CSV inventory ingest → local catalog",
+    enabled: true,
+    requires: ["vendor_read"],
+  },
+  {
+    id: "esa.scan",
+    label: "Ingeniosity Lens scan",
+    description: "Vision / SKU capture via IRIS",
+    enabled: true,
+    requires: ["camera", "vision"],
+  },
+  {
+    id: "esa.reorder",
+    label: "Reorder sheet",
+    description: "Generate PDF reorder for non-empty cart",
+    enabled: true,
+    requires: ["vendor_write", "pdf_gen"],
+  },
+  {
+    id: "esa.governance",
+    label: "Exoskeleton enforcer",
+    description: "Default-deny policy + IAM boundary checks",
+    enabled: true,
+    requires: [],
+  },
+];
 
-/**
- * The Exoskeleton Enforcer for ESA Inventory deployments.
- *
- * Evaluates capability invocations against registered policy rules.
- * Returns a structured result that the substrate uses to decide
- * whether to proceed, proceed with conditions, or block.
- *
- * CRITICAL: This is invisible to the Intellect. The model emits
- * an intent ("deploy ESA inventory"), and the substrate calls
- * `enforce()` internally. The model only sees the canonical
- * response shape — never the governance decision.
- */
 export class ExoskeletonEnforcer {
   private rules = ESA_POLICY_RULES;
   private deployed: Map<string, DeploymentSpec> = new Map();
+  private features: ESAFeatureFlag[] = [...DEFAULT_ESA_FEATURES];
 
   constructor() {
-    // Register default ESA deployment spec
     this.registerDeployment({
       subdomain: "ESA",
-      repo: "ingeniosity-A2A/Ava007",
+      repo: "ingeniosity-A2A/Agent-X",
       branch: "main",
       vendor: "HD Supply",
       property: "Extended Stay America · Buckhead · Brookhaven, GA",
@@ -138,10 +175,6 @@ export class ExoskeletonEnforcer {
     });
   }
 
-  /**
-   * Evaluate a capability invocation against policy rules.
-   * Rules are evaluated in order — first match wins.
-   */
   enforce(ctx: EnforcerContext): EnforcerResult {
     for (const rule of this.rules) {
       if (rule.match(ctx)) {
@@ -149,22 +182,16 @@ export class ExoskeletonEnforcer {
           decision: rule.decision,
           reason: rule.reason,
           conditions: rule.conditions,
-          latency_budget_ms: 0, // Capability collapse = zero perceived latency
+          latency_budget_ms: 0,
         };
       }
     }
-
     return {
       decision: "deny",
       reason: "No policy rules registered",
     };
   }
 
-  /**
-   * Verify required security headers for the ESA deployment.
-   * These headers are injected by Caddy — the Intellect never
-   * configures them. This is the substrate's responsibility.
-   */
   verifySecurityHeaders(): SecurityHeaders {
     return {
       "X-Frame-Options": "DENY",
@@ -176,16 +203,6 @@ export class ExoskeletonEnforcer {
     };
   }
 
-  /**
-   * Speculative hydration contract.
-   *
-   * When a `deploy` intent succeeds, the substrate SHOULD
-   * speculatively pre-provision these resources so the Intellect
-   * perceives zero latency on the next `sync` or `reorder` call.
-   *
-   * This eliminates "nerve damage" — the model never waits for
-   * DNS propagation or container spin-up.
-   */
   speculativeHydrationPlan(deployment: DeploymentSpec): {
     dns: { type: string; name: string; proxied: boolean };
     reverseProxy: { port: number; target: number };
@@ -211,38 +228,68 @@ export class ExoskeletonEnforcer {
         NEXT_PUBLIC_BRAND: "Extended Stay America",
         NEXT_PUBLIC_VENDOR: "HD Supply",
         NEXT_PUBLIC_PROPERTY: "Buckhead",
+        NEXT_PUBLIC_SURFACE: "esa_console",
       },
     };
   }
 
-  /**
-   * Register a deployment specification.
-   */
   registerDeployment(spec: DeploymentSpec): void {
     this.deployed.set(spec.subdomain, spec);
   }
 
-  /**
-   * Get a registered deployment spec.
-   */
   getDeployment(subdomain: string): DeploymentSpec | undefined {
     return this.deployed.get(subdomain);
   }
 
-  /**
-   * List all registered deployments.
-   */
   listDeployments(): DeploymentSpec[] {
     return Array.from(this.deployed.values());
   }
 
-  /**
-   * IAM boundary check.
-   *
-   * Validates that the provided credentials have the required
-   * scope for the requested operation. The Intellect never
-   * sees tokens — this is a substrate-internal gate.
-   */
+  listFeatures(): ESAFeatureFlag[] {
+    return this.features.map((f) => ({ ...f }));
+  }
+
+  setFeatureEnabled(id: string, enabled: boolean): ESAFeatureFlag | undefined {
+    const feature = this.features.find((f) => f.id === id);
+    if (!feature) return undefined;
+    feature.enabled = enabled;
+    return { ...feature };
+  }
+
+  getConsoleSnapshot() {
+    const deployment = this.getDeployment("ESA");
+    const governance = this.enforce({
+      capability: "esa_inventory",
+      intent: "status",
+    });
+    return {
+      surface: "esa_console",
+      framework: "exoskeleton",
+      capability: "esa_inventory",
+      deployment: deployment ?? null,
+      features: this.listFeatures(),
+      agents: [
+        { id: "IRIS", role: "Vision", status: "idle" },
+        { id: "FORGE", role: "SKU Match", status: "idle" },
+        { id: "NEXUS", role: "Reorder", status: "idle" },
+        { id: "AVA", role: "Executive", status: "idle" },
+      ],
+      governance: {
+        decision: governance.decision,
+        reason: governance.reason,
+      },
+      securityHeaders: this.verifySecurityHeaders(),
+      hydration: deployment
+        ? this.speculativeHydrationPlan(deployment)
+        : null,
+      notes: [
+        "Dashboard routes are retired. Operator surface is /consoles/esa-maintenance (Select Card).",
+        "Intellect never calls enforcer directly; substrate collapses capability.",
+        "Agent-X is exo surface + sandbox — not a peer Intellect.",
+      ],
+    };
+  }
+
   verifyIAM(operation: string, scopes: string[]): {
     valid: boolean;
     missing: string[];
@@ -265,17 +312,8 @@ export class ExoskeletonEnforcer {
   }
 }
 
-// ── Singleton ────────────────────────────────────────────────────
-
-/** Global enforcer instance. */
 export const enforcer = new ExoskeletonEnforcer();
 
-// ── Canonical Response Shape ────────────────────────────────────
-
-/**
- * The model-facing contract for ESA deployment responses.
- * This is the ONLY shape the Intellect ever sees.
- */
 export interface ESACanonicalResponse {
   status: "ok" | "error";
   result: {
@@ -291,10 +329,6 @@ export interface ESACanonicalResponse {
   };
 }
 
-/**
- * Build a canonical response from a deployment result.
- * The substrate calls this after the capability executes.
- */
 export function buildCanonicalResponse(
   deployment: DeploymentSpec,
   governance: string
