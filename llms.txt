@@ -1,7 +1,13 @@
 # Agent-X — Help Assembly Exoskeleton surface (exo.help_assembly)
 
 Architecture SoR: https://github.com/ingeniosity-A2A/Ava007/tree/main/docs/exoskeleton
+Agent-X repo: https://github.com/ingeniosity-A2A/Agent-X
 VCard example: examples/agent-card.json
 A2A appless: docs/exoskeleton/A2A-Agent-Card-Appless.md
 
+## SDK Location
+Primary SDK code lives in Termux (on-device, S26 Ultra) and the Agent-X GitHub repo.
+The Agent-X/ folder in THIS project is a reference snapshot — top-level dirs (tekton-sdk/, quantum-membrain/, ava007-runtime/, onomondo-softsim-cli/) are empty placeholders here.
+
 Not a peer Intellect. Gateway/execution suit for Cybernetic Ava007.
+No military/combative/adversary terminology.
