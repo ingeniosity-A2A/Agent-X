@@ -1,13 +1,18 @@
-# Agent-X — Help Assembly Exoskeleton surface (exo.help_assembly)
+# Ava007 Exoskeleton - LLM Context & Rules
 
-Architecture SoR: https://github.com/ingeniosity-A2A/Ava007/tree/main/docs/exoskeleton
-Agent-X repo: https://github.com/ingeniosity-A2A/Agent-X
-VCard example: examples/agent-card.json
-A2A appless: docs/exoskeleton/A2A-Agent-Card-Appless.md
+## Repository Scope
+This is the Web Orchestration Layer. Edge-native SDKs (quantum-membrain, tekton-sdk, ava007-runtime, onomondo-softsim) live in the separate Agent-X repository and run on-device via Termux.
 
-## SDK Location
-Primary SDK code lives in Termux (on-device, S26 Ultra) and the Agent-X GitHub repo.
-The Agent-X/ folder in THIS project is a reference snapshot — top-level dirs (tekton-sdk/, quantum-membrain/, ava007-runtime/, onomondo-softsim-cli/) are empty placeholders here.
+## Core Directives
+1. NEVER attempt to import or run edge-native Rust/Python modules in this Next.js environment.
+2. All communication with the edge must use the A2A Protocol (JSON-RPC 2.0) or Arrow Flight endpoints.
+3. Respect the O(1) Context Invariant: Do not generate bloated prompts. Rely on the edge's LatentSkill LoRAs for capability execution.
+4. App-less Protocols (NFC, UWB, Captive Portal) are handled by the edge. This console only receives the structured `InteractionQuantum` payload.
 
+## Architecture SoR
+- https://github.com/ingeniosity-A2A/Ava007/tree/main/docs/exoskeleton
+- Agent-X repo: https://github.com/ingeniosity-A2A/Agent-X
+
+## Identity
 Not a peer Intellect. Gateway/execution suit for Cybernetic Ava007.
 No military/combative/adversary terminology.

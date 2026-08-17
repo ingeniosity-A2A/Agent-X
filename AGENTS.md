@@ -5,6 +5,19 @@
 - Agent-X = Help Assembly Exoskeleton execution surface + experimental sandbox. NOT a peer Intellect.
 - Edge device: Galaxy S26 Ultra only (never target S25).
 
+## CRITICAL ARCHITECTURAL BOUNDARY
+
+This repository (`Ava007-Console` / Web UI) is the **Orchestration and Intelligence Layer**. It provides the dashboard, API routing, and high-level A2A coordination.
+
+**DO NOT** look for or attempt to build the heavy-lifting edge SDKs here. The following components reside in the dedicated `Agent-X` repository and execute directly on the S26 Ultra via Termux:
+- `tekton-sdk` (Execution runtime)
+- `quantum-membrain` (DuckDB + Tashi DAG + Griptape TaskMemory)
+- `ava007-runtime` (Local NPU inference & GSAP manifold)
+- `onomondo-softsim-cli` (eSIM/eUICC provisioning)
+- `RadioLib` / LoRa / WebRTC / Captive Portal handlers
+
+This console communicates with those edge nodes via the **A2A Protocol** and **Apache Arrow Flight**. Treat the edge as a black box that consumes Interaction Quanta and returns deterministic state mutations.
+
 ## SDK & Runtime Location
 The primary SDK implementations live in two places — NOT in this project's Agent-X/ reference folder:
 
