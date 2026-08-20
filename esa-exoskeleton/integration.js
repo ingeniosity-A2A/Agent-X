@@ -30,6 +30,7 @@ import { ESAButtonPanel } from './components/ESA.ButtonPanel.js';
 import { ESADiagnosticCard } from './components/ESA.DiagnosticCard.js';
 import { ESAInvPartsCardB } from './components/ESA.InvPartsCard-B.js';
 import { ESAWorkorder } from './components/ESA.workorder.js';
+import { ESAPtacB } from './components/ESA.Ptac-B.js';
 import { ESASandboxManager } from './components/ESA.SandboxManager.js';
 import { ESAGSAPTransport } from './components/ESA.GSAPTransport.js';
 import { initDuckDB } from './config/duckdb-setup.js';
@@ -50,6 +51,8 @@ window.ESA = {
   components: {
     diagnosticCard: null,
     invPartsCard: null,
+    invPartsCardB: null,  // Service Broadcasting (B-side)
+    ptacB: null,           // PTAC-specific sliding card
     workorder: null,
     buttonPanel: null
   },
@@ -84,6 +87,8 @@ window.ESA = {
     components: {
       diagnosticCard: !!window.ESA.components.diagnosticCard,
       invPartsCard: !!window.ESA.components.invPartsCard,
+      invPartsCardB: !!window.ESA.components.invPartsCardB,
+      ptacB: !!window.ESA.components.ptacB,
       workorder: !!window.ESA.components.workorder,
       buttonPanel: !!window.ESA.components.buttonPanel
     }
@@ -187,6 +192,10 @@ export async function initESAExoskeleton() {
     logToConsole('[6/8] Mounting ButtonPanel component...', 'info');
     await mountButtonPanel(gsapTransport);
     
+    // 6.5. Mount ESA-Ptac-B (Service Broadcasting sliding card)
+    logToConsole('[6.5/8] Mounting ESA-Ptac-B Service Broadcasting...', 'info');
+    await mountPtacB(gsapTransport);
+    
     // ============================================
     // STEP 7: INITIALIZE SANDBOX (WRAPPED WITH GSAP TRANSPORT)
     // The sandbox CONTAINS all components
@@ -204,6 +213,7 @@ export async function initESAExoskeleton() {
           { name: 'ESA.DiagnosticCard', verified: true },
           { name: 'ESA.InvPartsCard-B', verified: true },
           { name: 'ESA.Workorder', verified: true },
+          { name: 'ESA.Ptac-B', verified: true },
           { name: 'ESA.ButtonPanel', verified: false }
         ],
         api: { 
@@ -527,6 +537,74 @@ async function mountButtonPanel(transport) {
     logToConsole('      ✓ ButtonPanel mounted (via GSAP Transport)', 'success');
   } catch (error) {
     logToConsole('      ⚠ ButtonPanel mount error: ' + error.message, 'warning');
+  }
+}
+
+/**
+ * Mount ESA-Ptac-B (Service Broadcasting Sliding Card)
+ * Connected to: ESA.InvPartsCard, ESA.workorder, ESA.DiagnosticCard, ESA.duckDB
+ * Uses: GSAP Transport for state sync, Ava007 Voice for broadcasts
+ */
+async function mountPtacB(transport) {
+  // PTAC-B is a SLIDING PANEL that mounts to body (fixed position)
+  // It doesn't need a container element - it creates its own
+  
+  try {
+    const ptacBComponent = ESAPtacB({});
+    
+    // PTAC-B appends itself to body as fixed-position sliding panel
+    document.body.appendChild(ptacBComponent);
+    
+    window.ESA.components.ptacB = ptacBComponent;
+    window.ESA.components.invPartsCardB = ptacBComponent; // Also reference as InvPartsCard-B
+    
+    // Register with GSAP Transport (ALL connections!)
+    if (transport) {
+      transport.registerComponent('ESA.Ptac-B', ptacBComponent, [
+        // Workorder connections
+        'workorder:create',
+        'workorder:update',
+        'workorder:complete',
+        // Inventory/Parts connections
+        'inventory:scan',
+        'inventory:update',
+        'part:lookup',
+        'part:add',
+        'part:order',
+        // Diagnostic connections
+        'diagnostic:code',
+        'diagnostic:result',
+        // Voice/Broadcast connections
+        'voice:speak',
+        'broadcast:start',
+        'broadcast:stop',
+        'broadcast:message',
+        // Service connections
+        'service:scheduled',
+        'service:urgent',
+        'service:completed',
+        // Component lifecycle
+        'ptac-b:panel',
+        'ptac-b:tab',
+        'ptac-b:hd-supply',
+        'component:mount'
+      ]);
+      
+      // Verify and log all connections
+      console.log(`%c[ESA-Ptac-B] 🔗 Connected via GSAP Transport:`, `color: ${activeTheme.aqua}`);
+      console.log(`   → ESA.duckDB: ${!!window.ESA.duckDB ? '✅' : '❌'}`);
+      console.log(`   → ESA.InvPartsCard: ${!!window.ESA.components.invPartsCard ? '✅' : '❌'}`);
+      console.log(`   → ESA.workorder: ${!!window.ESA.components.workorder ? '✅' : '❌'}`);
+      console.log(`   → ESA.DiagnosticCard: ${!!window.ESA.components.diagnosticCard ? '✅' : '❌'}`);
+      console.log(`   → GSAP Transport: ✅`);
+    }
+    
+    logToConsole('      ✓ ESA-Ptac-B mounted (Service Broadcasting sliding card)', 'success');
+    logToConsole('         📡 HD Supply: Seasons 9000 BTU PTAC (#223532)', 'info');
+    logToConsole('         🔗 Connected to: duckDB, InvParts, Workorder, Diagnostics', 'info');
+    
+  } catch (error) {
+    logToConsole('      ⚠ ESA-Ptac-B mount error: ' + error.message, 'warning');
   }
 }
 
