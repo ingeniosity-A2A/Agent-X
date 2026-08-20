@@ -1,18 +1,12 @@
-/**
- * Gruvbox Color Theme for ESA EXOSKELETON
- * Dark/Light toggleable color scheme
- */
-
-export const gruvbox = {
+// Gruvbox Official Color Scheme
+export const gruvboxTheme = {
   dark: {
     bg: '#282828',
-    bg0: '#1d2021',
-    bg0_soft: '#32302f',
-    bg1: '#3c3836',
-    bg2: '#504945',
+    bg_soft: '#32302f',
+    bg_selection: '#3c3836',
     fg: '#ebdbb2',
-    fg0: '#fbf1c7',
     fg_soft: '#a89984',
+    fg_disabled: '#928374',
     red: '#cc241d',
     green: '#98971a',
     yellow: '#d79921',
@@ -20,51 +14,53 @@ export const gruvbox = {
     purple: '#b16286',
     aqua: '#689d6a',
     orange: '#d65d0e',
+    gray: '#928374',
     border: '#3c3836',
-    shadow: 'rgba(0, 0, 0, 0.3)'
+    shadow: 'rgba(0, 0, 0, 0.5)',
+    console_bg: '#1d2021',
+    chat_bg: '#32302f',
+    bg_red: '#423935',
+    bg_green: '#423b2f',
+    bg_blue: '#264244',
+    bg_purple: '#3c3836',
+    bg_aqua: '#2f4135',
+    bg_orange: '#423935'
   },
   light: {
-    '#fbf1c7': '#fbf1c7',
-    bg0: '#f9f5d7',
-    bg0_soft: '#ebdbb2',
-    bg1: '#d5c4a1',
-    bg2: '#bdae93',
+    bg: '#fbf1c7',
+    bg_soft: '#f2e5bc',
+    bg_selection: '#ebdbb2',
     fg: '#3c3836',
-    fg0: '#282828',
-    fg_soft: '#7c6f64',
-    red: '#9d0006',
-    green: '#79740e',
-    yellow: '#b57614',
+    fg_soft: '#665c54',
+    fg_disabled: '#928374',
+    red: '#cc241d',
+    green: '#98971a',
+    yellow: '#d79921',
     blue: '#076678',
-    purple: '#8f3f71',
+    purple: '#b16286',
     aqua: '#427b58',
-    orange: '#af3a03',
+    orange: '#d65d0e',
+    gray: '#928374',
     border: '#d5c4a1',
-    shadow: 'rgba(0, 0, 0, 0.15)'
+    shadow: 'rgba(0, 0, 0, 0.15)',
+    console_bg: '#fbf1c7',
+    chat_bg: '#f2e5bc',
+    bg_red: '#fbd0c8',
+    bg_green: '#f4e8a0',
+    bg_blue: '#c7e0e6',
+    bg_purple: '#f0d5e0',
+    bg_aqua: '#c5e0cf',
+    bg_orange: '#fbd0c8'
   }
 };
 
-// Active theme (default dark)
-let currentMode = 'dark';
-
-export const activeTheme = new Proxy(gruvbox.dark, {
-  get(target, prop) {
-    return gruvbox[currentMode][prop] || target[prop];
-  }
-});
-
-export function setTheme(mode) {
-  if (gruvbox[mode]) {
-    currentMode = mode;
-    document.documentElement.setAttribute('data-theme', mode);
-    console.log(`%c[ESA.Theme] Switched to ${mode} mode`, 
-      `color: ${activeTheme.aqua}`);
-  }
-}
+export let activeTheme = gruvboxTheme.dark;
 
 export function toggleTheme() {
-  setTheme(currentMode === 'dark' ? 'light' : 'dark');
+  activeTheme = activeTheme === gruvboxTheme.dark ? gruvboxTheme.light : gruvboxTheme.dark;
+  return activeTheme;
 }
 
-export { gruvbox };
-export default activeTheme;
+export function getThemeName() {
+  return activeTheme === gruvboxTheme.dark ? 'dark' : 'light';
+}

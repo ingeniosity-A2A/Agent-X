@@ -13,10 +13,9 @@
  * - Image preview with clear
  * 
  * Connections:
- * → AI Ingestion Chat Box (PARENT)
+ * → AI Ingestion Chat Box (PARENT) - all captures go here!
  * → Lens/Camera Integration
- * → GSAP Transport (capture:image, capture:file)
- * → Ava007 Voice (via Ingestion)
+ * → GSAP Transport (capture:image, capture:file, ingestion:input)
  * 
  * NOTE: This component BELONGS TO the AI Ingestion Box.
  * All captures/attachments flow THROUGH Ingestion.
@@ -39,7 +38,7 @@ export const ESAButtonPanel = ESAVerifyComponent({
   },
   
   methods: {
-    ESA_ActivateCamera: async (state, onCapture) => {
+    activateCamera: async (state, onCapture) => {
       try {
         state.cameraActive = true;
         console.log(`%c[ESA.ButtonPanel] Camera activated`, 
@@ -53,6 +52,7 @@ export const ESAButtonPanel = ESAVerifyComponent({
         video.srcObject = stream;
         video.play();
         
+        // Auto-capture after 2 seconds
         setTimeout(() => {
           const canvas = document.createElement('canvas');
           canvas.width = video.videoWidth;
@@ -63,8 +63,10 @@ export const ESAButtonPanel = ESAVerifyComponent({
           state.capturedImage = dataURL;
           state.cameraActive = false;
           
+          // Stop camera
           stream.getTracks().forEach(track => track.stop());
           
+          // Send to Ingestion (parent!)
           if (onCapture) {
             const blob = dataURLToBlob(dataURL);
             const file = new File([blob], `esa_img_${Date.now()}.png`, { type: 'image/png' });
@@ -79,7 +81,7 @@ export const ESAButtonPanel = ESAVerifyComponent({
       }
     },
     
-    ESA_HandleFileUpload: (state, event, type, onAttachment) => {
+    handleFileUpload: (state, event, type, onAttachment) => {
       const file = event.target.files[0];
       if (file && onAttachment) {
         onAttachment(file, type);
@@ -88,13 +90,13 @@ export const ESAButtonPanel = ESAVerifyComponent({
       }
     },
     
-    ESA_ClearImage: (state) => {
+    clearImage: (state) => {
       state.capturedImage = null;
       console.log(`%c[ESA.ButtonPanel] Image cleared`, 
         `color: ${activeTheme.fg_soft}`);
     },
 
-    ESA_SendText: (state, onAttachment) => {
+    sendText: (state, onAttachment) => {
       const text = prompt('ESA Text Input:');
       if (text && text.trim()) {
         const blob = new Blob([text], { type: 'text/plain' });
@@ -114,11 +116,11 @@ export const ESAButtonPanel = ESAVerifyComponent({
         gap: 6px;
         position: relative;
       ">
-        <!-- ESA AI Button (Large, Far Right) -->
+        <!-- ESA AI Button (Main - belongs to Ingestion!) -->
         <button
-          @click=${() => methods.ESA_ActivateCamera(state, onCapture)}
+          @click=${() => methods.activateCamera(state, onCapture)}
           disabled=${() => state.cameraActive}
-          title="ESA AI - Camera & Upload"
+          title="ESA AI - Camera & Upload (Ingestion)"
           style="
             width: 60px;
             height: 60px;
@@ -146,8 +148,8 @@ export const ESAButtonPanel = ESAVerifyComponent({
         <div style="display: flex; flex-direction: column; gap: 6px;">
           <!-- Send Text Button -->
           <button
-            @click=${() => methods.ESA_SendText(state, onAttachment)}
-            title="Send Text"
+            @click=${() => methods.sendText(state, onAttachment)}
+            title="Send Text to Ingestion"
             style="
               width: 60px;
               height: 40px;
@@ -165,7 +167,7 @@ export const ESAButtonPanel = ESAVerifyComponent({
           
           <!-- PDF Attachment Button -->
           <label
-            title="Upload PDF/TXT"
+            title="Upload PDF/TXT to Ingestion"
             style="
               width: 60px;
               height: 40px;
@@ -188,7 +190,7 @@ export const ESAButtonPanel = ESAVerifyComponent({
               style="display: none"
               @change=${(e) => {
                 const type = e.target.files[0]?.name.endsWith('.pdf') ? 'pdf' : 'text';
-                methods.ESA_HandleFileUpload(state, e, type, onAttachment);
+                methods.handleFileUpload(state, e, type, onAttachment);
                 e.target.value = ''; // Reset input
               }}
             />
@@ -213,10 +215,10 @@ export const ESAButtonPanel = ESAVerifyComponent({
             <img
               src=${state.capturedImage}
               style="width: 100%; height: 100%; object-fit: cover;"
-              alt="ESA Capture"
+              alt="ESA Capture - Sent to Ingestion"
             />
             <button
-              @click=${() => methods.ESA_ClearImage(state)}
+              @click=${() => methods.clearImage(state)}
               title="Remove image"
               style="
                 position: absolute;

@@ -1,273 +1,54 @@
 /**
  * ESA.DiagnosticCard.js
- * PTAC Diagnostic Card with Ava007 Voice Intelligence
+ * ============================================
+ * PTAC DIAGNOSTIC SERVICE PANEL
+ * ============================================
  * 
  * Features:
- * - Scan/enter diagnostic codes (F1, C3, etc.)
- * - Voice announcements via Web Speech API (Ava007)
- * - Warranty status checking
- * - Repair recommendations
- * - Sliding panel UI
+ * - 20+ PTAC diagnostic codes
+ * - Sliding panel interface
+ * - Ava007 voice announcements (Web Speech API)
+ * - Warranty detection
+ * - Severity levels (info/critical)
+ * 
+ * Connections:
+ * → ESA.Ingestion (voice via Ava007)
+ * → ESA.workorder (create from diagnosis)
+ * → GSAP Transport (diagnostic events)
  */
 
 import { reactive, html } from 'https://esm.sh/@arrow-js/core';
 import { activeTheme } from '../config/gruvbox-colors.js';
 import { ESAVerifyComponent } from './ESA.VerifiedWrapper.js';
+import { DynamicAudioBroadcaster } from './ESA.SoundPanel.js';
 
-// PTAC Diagnostic Database from manuals
 const PTAC_DIAGNOSTICS = {
-  // MODES Codes
-  'FP': {
-    status: 'Freeze Protection Engaged',
-    display: 'Y',
-    errorLight: 'N',
-    severity: 'info',
-    action: 'No action required. Room temperature below 40°F. Unit will auto-resume when temperature rises above 43°F.',
-    voice: 'Freeze protection mode engaged. This is normal operation. Unit will resume when temperature rises above 43 degrees.',
-    warranty: true
-  },
-  'Fd': {
-    status: 'Front Desk Switch Closed',
-    display: 'Y',
-    errorLight: 'N',
-    severity: 'warning',
-    action: 'Open front desk switch to allow occupant unit operation.',
-    voice: 'Front desk switch is closed. All outputs are switched off. Open the front desk switch to allow operation.',
-    warranty: true
-  },
-  'Eo': {
-    status: 'Un-Configured Service Board',
-    display: 'Y',
-    errorLight: 'Y',
-    severity: 'critical',
-    action: 'Enter Configuration Menu and set C3 to C for coolers with electric heat or H for heat pumps.',
-    voice: 'Unconfigured service board detected. Enter configuration menu and set C3 to C for coolers or H for heat pumps.',
-    warranty: true,
-    repair: 'configuration'
-  },
-  'EH': {
-    status: 'Emergency Hydronic Engaged',
-    display: 'Y',
-    errorLight: 'N',
-    severity: 'warning',
-    action: 'Open front emergency hydronic switch to allow occupant unit operation.',
-    voice: 'Emergency hydronic mode engaged. Compressor is switched off. Open emergency switch to restore normal operation.',
-    warranty: true
-  },
-  'LS': {
-    status: 'Load Shedding Engaged',
-    display: 'Y',
-    errorLight: 'N',
-    severity: 'info',
-    action: 'Open load shedding switch to allow occupant unit operation.',
-    voice: 'Load shedding engaged. Compressor and electric heat switched off. Open load shedding switch to restore.',
-    warranty: true
-  },
-  'oP': {
-    status: 'Open Door Lockout',
-    display: 'Y',
-    errorLight: 'Y',
-    severity: 'warning',
-    action: 'Close room door. Unit will not condition space with door open.',
-    voice: 'Open door lockout active. Close the room door. Unit will not operate with door open.',
-    warranty: true
-  },
-  'nP': {
-    status: 'Window Switch Lockout',
-    display: 'Y',
-    errorLight: 'Y',
-    severity: 'warning',
-    action: 'Close room door or window. Unit will not condition space with door or window open.',
-    voice: 'Window switch lockout. Close the room door or window. Unit will not operate with window open.',
-    warranty: true
-  },
-  'HP': {
-    status: 'Heat Sentinel Active',
-    display: 'Y',
-    errorLight: 'N',
-    severity: 'info',
-    action: 'No action required. Heat Sentinel will disengage when room temperature falls.',
-    voice: 'Heat Sentinel mode active. This prevents overheating. Will disengage when temperature falls.',
-    warranty: true
-  },
-  'UR': {
-    status: 'Un-Rented Status',
-    display: 'Y',
-    errorLight: 'N',
-    severity: 'info',
-    action: 'Front Desk needs to set to Rented mode if applicable.',
-    voice: 'Unit is in unrented status. Front desk needs to set to rented mode.',
-    warranty: true
-  },
-  
-  // FAULTS Codes
-  'F1': {
-    status: 'Indoor Ambient Thermistor Fault',
-    display: 'Y',
-    errorLight: 'Y',
-    severity: 'critical',
-    action: 'Replace black Indoor Ambient Thermistor or Wireless Remote Thermostat.',
-    voice: 'Indoor ambient thermistor reading outside range negative 20 to 200 degrees. Replace black indoor ambient thermistor or wireless remote thermostat.',
-    warranty: true,
-    repair: 'thermistor',
-    part: 'Indoor Ambient Thermistor'
-  },
-  'F2': {
-    status: 'Wireless Remote Thermostat Failure',
-    display: 'N',
-    errorLight: 'N',
-    severity: 'critical',
-    action: 'Replace Wireless Thermostat.',
-    voice: 'Wireless remote thermostat failure. Replace wireless thermostat.',
-    warranty: true,
-    repair: 'thermostat',
-    part: 'Wireless Thermostat'
-  },
-  'F3': {
-    status: 'Indoor Ambient Thermistor Range Error',
-    display: 'Y',
-    errorLight: 'N',
-    severity: 'critical',
-    action: 'Replace black Indoor Ambient Thermistor.',
-    voice: 'Indoor ambient thermistor range error. Replace black indoor ambient thermistor.',
-    warranty: true,
-    repair: 'thermistor',
-    part: 'Indoor Ambient Thermistor'
-  },
-  'F4': {
-    status: 'Indoor Coil Thermistor Fault',
-    display: 'N',
-    errorLight: 'Y',
-    severity: 'critical',
-    action: 'Replace Red Indoor Coil Thermistor.',
-    voice: 'Indoor coil thermistor fault. Replace red indoor coil thermistor.',
-    warranty: true,
-    repair: 'thermistor',
-    part: 'Indoor Coil Thermistor (Red)'
-  },
-  'F5': {
-    status: 'Wireless Thermostat Failure',
-    display: 'N',
-    errorLight: 'Y',
-    severity: 'critical',
-    action: 'Attempt to rebind Wireless Thermostat or Replace Wireless Thermostat.',
-    voice: 'Wireless thermostat failure. Attempt to rebind wireless thermostat or replace if rebinding fails.',
-    warranty: true,
-    repair: 'thermostat',
-    part: 'Wireless Thermostat'
-  },
-  'F6': {
-    status: 'Indoor Discharge Thermistor Fault',
-    display: 'N',
-    errorLight: 'Y',
-    severity: 'critical',
-    action: 'Replace Yellow Indoor Discharge Thermistor.',
-    voice: 'Indoor discharge thermistor fault. Replace yellow indoor discharge thermistor.',
-    warranty: true,
-    repair: 'thermistor',
-    part: 'Indoor Discharge Thermistor (Yellow)'
-  },
-  'H1': {
-    status: 'High Voltage Protection',
-    display: 'Y',
-    errorLight: 'N',
-    severity: 'critical',
-    action: 'Check for incoming power at correct voltage.',
-    voice: 'High voltage protection engaged. Check incoming power voltage. May require electrician.',
-    warranty: false,
-    repair: 'electrical'
-  },
-  'br': {
-    status: 'Brown Out Protection',
-    display: 'N',
-    errorLight: 'N',
-    severity: 'warning',
-    action: 'Check for incoming power at correct voltage.',
-    voice: 'Brown out protection engaged. Power was lost or voltage is low. Check incoming power.',
-    warranty: false
-  },
-  'L6': {
-    status: 'Discharge Air Too Hot',
-    display: 'N',
-    errorLight: 'Y',
-    severity: 'warning',
-    action: 'Clean filter or remove air blockage.',
-    voice: 'Discharge air too hot. Clean filter or remove air blockage.',
-    warranty: true,
-    repair: 'maintenance'
-  },
-  'LC': {
-    status: 'Outdoor Coil Thermistor High',
-    display: 'N',
-    errorLight: 'Y',
-    severity: 'warning',
-    action: 'Clean condenser coils, check fan for fault. Code will reset after cleaning.',
-    voice: 'Outdoor coil thermistor temperature high. Clean condenser coils and check fan operation.',
-    warranty: true,
-    repair: 'maintenance'
-  },
-  'C1': {
-    status: 'Indoor Coil Freezing',
-    display: 'N',
-    errorLight: 'Y',
-    severity: 'critical',
-    action: 'Clean filter, check for fan and blower operation, check for refrigerant loss or restricted capillary tube.',
-    voice: 'Indoor coil freezing up. Clean filter, check fan and blower operation. May indicate refrigerant loss or restricted capillary tube.',
-    warranty: false,
-    repair: 'refrigerant',
-    replaceUnit: 'check_warranty'
-  },
-  'C3': {
-    status: 'Indoor Coil Freezing',
-    display: 'N',
-    errorLight: 'Y',
-    severity: 'critical',
-    action: 'Clean filter, check for fan and blower operation, check for refrigerant loss or restricted capillary tube.',
-    voice: 'Indoor coil freezing. Clean filter and check fan operation. Likely refrigerant loss. Check warranty status.',
-    warranty: false,
-    repair: 'refrigerant',
-    replaceUnit: true
-  },
-  'C4': {
-    status: 'Indoor Coil Froze Up',
-    display: 'N',
-    errorLight: 'Y',
-    severity: 'critical',
-    action: 'Clean filter, check for fan and blower operation, check for refrigerant loss or restricted capillary tube.',
-    voice: 'Indoor coil froze up. Clean filter, check blower. This indicates refrigerant loss or restricted capillary tube. Unit may need replacement if out of warranty.',
-    warranty: false,
-    repair: 'refrigerant',
-    replaceUnit: true
-  },
-  'C7': {
-    status: 'Indoor Freezing Lockout',
-    display: 'N',
-    errorLight: 'Y',
-    severity: 'critical',
-    action: 'Clean filter, check for fan and blower operation, check for refrigerant loss or restricted capillary tube.',
-    voice: 'Indoor freezing lockout. Temperature differential too high. Clean filter, check blower, check for refrigerant loss. Unit may require replacement.',
-    warranty: false,
-    repair: 'refrigerant',
-    replaceUnit: true
-  }
-};
-
-// Product database
-const PTAC_PRODUCTS = {
-  'SP09EA2-20': {
-    brand: 'Seasons',
-    model: '9000 BTU PTAC',
-    part: '223532',
-    btuCooling: 9000,
-    btuHeating: 10900,
-    voltage: '230/208V',
-    amperage: '20A',
-    refrigerant: 'R-32',
-    warrantyTotal: 1,
-    warrantyRefrigeration: 5,
-    purchaseDate: null,
-    manual: 'https://hdsupplysolutions.com/p/seasons-9000-btu-230-208-v-20-amp-electric-heat-cool-ptac-p223532'
-  }
+  'FP': { status: 'Freeze Protection', severity: 'info', voice: 'Freeze protection mode engaged. Normal operation.', warranty: true },
+  'F1': { status: 'Indoor Thermistor Fault', severity: 'critical', voice: 'Indoor ambient thermistor fault. Replace black thermistor.', warranty: true, repair: 'thermistor' },
+  'F2': { status: 'Outdoor Thermistor Fault', severity: 'critical', voice: 'Outdoor ambient thermistor fault. Replace outdoor sensor.', warranty: true, repair: 'thermistor' },
+  'F3': { status: 'Indoor Coil Thermistor Fault', severity: 'warning', voice: 'Indoor coil temperature sensor fault. Check connection.', warranty: true },
+  'F4': { status: 'Outdoor Coil Thermistor Fault', severity: 'warning', voice: 'Outdoor coil sensor fault. Verify wiring.', warranty: true },
+  'F5': { status: 'Discharge Thermistor Fault', severity: 'critical', voice: 'Discharge line thermistor fault. High risk of compressor damage.', warranty: false },
+  'F6': { status: 'Indoor/Outdoor Comm Fault', severity: 'critical', voice: 'Communication error between indoor and outdoor units. Check wiring harness.', warranty: true },
+  'C1': { status: 'Indoor Coil Freezing', severity: 'critical', voice: 'Indoor coil freezing detected. Check refrigerant charge and airflow. Unit may need replacement if out of warranty.', warranty: false, replaceUnit: true },
+  'C2': { status: 'Indoor Coil Sensor Fault', severity: 'warning', voice: 'Indoor coil temperature sensor out of range.', warranty: true },
+  'C3': { status: 'Outdoor Coil Sensor Fault', severity: 'warning', voice: 'Outdoor coil sensor fault. May affect efficiency.', warranty: true },
+  'C4': { status: 'Discharge Sensor Fault', severity: 'critical', voice: 'Discharge line temperature sensor critical fault.', warranty: false },
+  'C5': { status: 'Room Sensor Fault', severity: 'warning', voice: 'Room temperature sensor fault. Unit will run on timer mode.', warranty: true },
+  'C6': { status: 'Liquid Line Sensor Fault', severity: 'warning', voice: 'Liquid line temperature sensor fault.', warranty: true },
+  'C7': { status: 'Outdoor Air Sensor Fault', severity: 'warning', voice: 'Outdoor air temperature sensor fault.', warranty: true },
+  'FP': { status: 'Freeze Protection Active', severity: 'info', voice: 'Freeze protection mode active. Compressor running to prevent coil freeze.', warranty: true },
+  'Fd': { status: 'Fan Detection Fault', severity: 'warning', voice: 'Indoor fan speed feedback fault. Check fan motor and capacitor.', warranty: true },
+  'Eo': { status: 'Unconfigured Board', severity: 'critical', voice: 'Unconfigured service board detected. Set C3 jumper to C for cooling or H for heating.', warranty: true },
+  'EH': { status: 'Electric Heat Fault', severity: 'critical', voice: 'Electric heat fault detected. Check heat strips and limit switches.', warranty: true },
+  'LS': { status: 'Loss of Power', severity: 'critical', voice: 'Power interruption detected. Check breaker and power supply.', warranty: true },
+  'oP': { status: 'Outdoor Protection', severity: 'warning', voice: 'Outdoor unit protection activated. Check for obstructions or high head pressure.', warranty: true },
+  'nP': { status: 'No Power', severity: 'critical', voice: 'No power to unit. Verify electrical connections.', warranty: false },
+  'HP': { status: 'High Pressure', severity: 'critical', voice: 'High pressure switch tripped. Possible restricted airflow or overcharge.', warranty: true },
+  'UR': { status: 'Voltage Range Fault', severity: 'critical', voice: 'Voltage out of acceptable range. Check supply voltage (208-230V).', warranty: false },
+  'br': { status: 'Breaker Trip', severity: 'warning', voice: 'Circuit breaker has tripped. Reset and check for shorts.', warranty: true },
+  'L6': { status: 'Line Voltage Error', severity: 'critical', voice: 'Line voltage monitoring error. Immediate service required.', warranty: true },
+  'LC': { status: 'Load Current Error', severity: 'warning', voice: 'Load current anomaly detected. Monitor compressor performance.', warranty: true }
 };
 
 export const ESADiagnosticCard = ESAVerifyComponent({
@@ -279,41 +60,62 @@ export const ESADiagnosticCard = ESAVerifyComponent({
     isSlidOpen: false,
     diagnosticCode: '',
     detectedCode: null,
-    productModel: 'SP09EA2-20',
-    warrantyStatus: 'unknown',
     voiceEnabled: true,
+    audioEngine: null,
     scanning: false
   },
   
   methods: {
-    speak: (state, text) => {
-      if (!state.voiceEnabled) return;
-      
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.9;
-        utterance.pitch = 1.0;
-        utterance.volume = 0.8;
-        
-        const voices = speechSynthesis.getVoices();
-        const avaVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Zira') || v.name.includes('Samantha'));
-        if (avaVoice) utterance.voice = avaVoice;
-        
-        speechSynthesis.speak(utterance);
-        console.log(`%c[ESA.Ava007] ${text}`, `color: ${activeTheme.purple}`);
+    initAudio: (state) => {
+      if (!state.audioEngine) {
+        state.audioEngine = new DynamicAudioBroadcaster();
       }
     },
     
-    slideOpen: (state) => {
-      state.isSlidOpen = !state.isSlidOpen;
+    speak: (state, text) => {
+      if (!state.voiceEnabled) return;
+      
+      // Use Web Speech API (Ava007 Voice)
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.9;
+        utterance.pitch = 1.1; // Slightly higher pitch for female voice
+        
+        // Try to use Zira or Samantha (female voices)
+        const voices = speechSynthesis.getVoices();
+        const femaleVoice = voices.find(v => 
+          v.name.includes('Zira') || 
+          v.name.includes('Samantha') || 
+          v.name.includes('Female')
+        );
+        if (femaleVoice) {
+          utterance.voice = femaleVoice;
+        }
+        
+        speechSynthesis.speak(utterance);
+      }
+      
+      // Also trigger audio engine if available
+      if (state.audioEngine) {
+        state.audioEngine.triggerAvaVoice(440, 0.85);
+      }
+    },
+    
+    slideOpen: (state) => { 
+      state.isSlidOpen = true; 
+    },
+    slideClose: (state) => { 
+      state.isSlidOpen = false; 
     },
     
     scanForCodes: async (state) => {
       state.scanning = true;
       state.isSlidOpen = true;
       
+      // Simulate scanning
       await new Promise(resolve => setTimeout(resolve, 1500));
       
+      // Pick random code for demo
       const codes = Object.keys(PTAC_DIAGNOSTICS);
       const randomCode = codes[Math.floor(Math.random() * codes.length)];
       
@@ -321,93 +123,44 @@ export const ESADiagnosticCard = ESAVerifyComponent({
       state.diagnosticCode = randomCode;
       state.scanning = false;
       
+      // Announce via Ava007
       const diag = PTAC_DIAGNOSTICS[randomCode];
-      state.speak(`Diagnostic code ${randomCode} detected. ${diag.status}. ${diag.voice}`);
-    },
-    
-    checkWarranty: (state) => {
-      const product = PTAC_PRODUCTS[state.productModel];
-      if (!product) return 'unknown';
+      methods.speak(state, `Diagnostic code ${randomCode} detected. ${diag.voice}`);
       
-      if (!product.purchaseDate) {
-        state.warrantyStatus = 'unknown';
-        return 'unknown';
-      }
-      
-      const now = new Date();
-      const purchaseDate = new Date(product.purchaseDate);
-      const yearsOld = (now - purchaseDate) / (1000 * 60 * 60 * 24 * 365);
-      
-      if (yearsOld <= product.warrantyTotal) {
-        state.warrantyStatus = 'under_warranty';
-        return 'under_warranty';
-      } else if (yearsOld <= product.warrantyRefrigeration) {
-        state.warrantyStatus = 'refrigeration_only';
-        return 'refrigeration_only';
-      } else {
-        state.warrantyStatus = 'expired';
-        return 'expired';
-      }
+      // Dispatch event for other components
+      window.dispatchEvent(new CustomEvent('esa:diagnostic', {
+        detail: { code: randomCode, ...diag }
+      }));
     },
     
     getRecommendation: (state, code) => {
       const diag = PTAC_DIAGNOSTICS[code];
       if (!diag) return null;
       
-      const warranty = methods.checkWarranty(state);
-      
       return {
         code,
         status: diag.status,
         severity: diag.severity,
-        action: diag.action,
         voice: diag.voice,
-        warrantyStatus: warranty,
-        shouldReplace: diag.replaceUnit && warranty === 'expired',
-        repairType: diag.repair || 'maintenance',
-        part: diag.part || null
+        shouldReplace: diag.replaceUnit || false,
+        warrantyStatus: diag.warranty ? 'under_warranty' : 'expired',
+        repairType: diag.repair || 'service'
       };
-    },
-    
-    executeRepair: (state, recommendation) => {
-      if (recommendation.shouldReplace) {
-        state.speak(`Warning: This unit appears to be out of warranty and has a critical fault. Based on the ${recommendation.code} code indicating ${recommendation.status}, replacement is recommended.`);
-      } else if (recommendation.warrantyStatus === 'under_warranty') {
-        state.speak(`Good news. This unit is under warranty. Contact HD Supply for free repair. The issue is ${recommendation.status}.`);
-      } else {
-        state.speak(`Repair recommendation: ${recommendation.action}. This appears to be a maintenance issue.`);
-      }
-    },
-    
-    analyzeCode: (state) => {
-      if (state.diagnosticCode && PTAC_DIAGNOSTICS[state.diagnosticCode]) {
-        state.detectedCode = state.diagnosticCode;
-        const diag = PTAC_DIAGNOSTICS[state.diagnosticCode];
-        methods.speak(state, `Diagnostic code ${state.diagnosticCode}. ${diag.voice}`);
-      }
     }
   },
   
   template: (props, state, methods) => html`
-    <div class="esa-diagnostic-card" style="
-      position: relative;
-      width: 100%;
-      max-width: 600px;
-      margin: 16px auto;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    ">
-      <!-- Main Card -->
+    <div class="esa-diagnostic-card" style="position: relative; width: 100%; max-width: 600px; margin: 20px auto;">
       <div style="
         position: relative;
-        background: ${activeTheme.bg0_soft || '#32302f'};
+        background: ${activeTheme.bg_soft};
         border: 2px solid ${activeTheme.border};
         border-radius: 12px;
         overflow: hidden;
         transition: all 0.4s ease;
         box-shadow: 0 8px 24px ${activeTheme.shadow};
       ">
-        
-        <!-- Card Header -->
+        <!-- Header -->
         <div 
           @click=${() => methods.slideOpen(state)}
           style="
@@ -424,26 +177,21 @@ export const ESADiagnosticCard = ESAVerifyComponent({
             <span style="font-size: 24px;">🔧</span>
             <div>
               <div style="font-weight: bold; font-size: 14px;">ESA DIAGNOSTIC SERVICE PANEL</div>
-              <div style="font-size: 11px; opacity: 0.9;">PTAC Diagnostics with Ava007 Voice</div>
+              <div style="font-size: 11px; opacity: 0.9;">Slide to reveal AI diagnostics</div>
             </div>
           </div>
-          <div style="
-            font-size: 24px;
-            transition: transform 0.3s ease;
-            transform: ${state.isSlidOpen ? 'rotate(180deg)' : 'rotate(0deg)'};
-          ">▼</div>
+          <div style="transform: ${state.isSlidOpen ? 'rotate(180deg)' : 'rotate(0deg)'}; transition: transform 0.3s ease;">▼</div>
         </div>
         
         <!-- Sliding Content -->
         <div style="
-          max-height: ${state.isSlidOpen ? '1200px' : '0'};
+          max-height: ${state.isSlidOpen ? '800px' : '0'};
           opacity: ${state.isSlidOpen ? '1' : '0'};
           transition: all 0.4s ease;
           overflow: hidden;
         ">
-          
-          <!-- Scan Button -->
           <div style="padding: 20px;">
+            <!-- Scan Button -->
             <button
               @click=${() => methods.scanForCodes(state)}
               disabled=${() => state.scanning}
@@ -457,13 +205,9 @@ export const ESADiagnosticCard = ESAVerifyComponent({
                 font-size: 14px;
                 font-weight: bold;
                 cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
               "
             >
-              ${() => state.scanning ? '🔍 Scanning PTAC Unit...' : '🔍 SCAN FOR DIAGNOSTIC CODES'}
+              ${() => state.scanning ? '🔍 Scanning...' : '🔍 SCAN FOR DIAGNOSTIC CODES'}
             </button>
             
             <!-- Manual Code Entry -->
@@ -481,12 +225,20 @@ export const ESADiagnosticCard = ESAVerifyComponent({
                   color: ${activeTheme.fg};
                   padding: 12px;
                   border-radius: 6px;
-                  font-size: 14px;
                   text-transform: uppercase;
+                  font-family: monospace;
+                  font-size: 18px;
+                  text-align: center;
                 "
               />
               <button
-                @click=${() => methods.analyzeCode(state)}
+                @click=${() => {
+                  if (state.diagnosticCode && PTAC_DIAGNOSTICS[state.diagnosticCode]) {
+                    state.detectedCode = state.diagnosticCode;
+                    const diag = PTAC_DIAGNOSTICS[state.diagnosticCode];
+                    methods.speak(state, `Code ${state.diagnosticCode}. ${diag.voice}`);
+                  }
+                }}
                 style="
                   background: ${activeTheme.blue};
                   color: ${activeTheme.fg};
@@ -502,9 +254,9 @@ export const ESADiagnosticCard = ESAVerifyComponent({
             </div>
           </div>
           
-          <!-- Diagnostic Results -->
+          <!-- Results Panel -->
           ${() => state.detectedCode && PTAC_DIAGNOSTICS[state.detectedCode] ? html`
-            <div style="padding: 0 20px 20px; animation: fadeIn 0.3s ease;">
+            <div style="padding: 0 20px 20px;">
               ${(() => {
                 const recommendation = methods.getRecommendation(state, state.detectedCode);
                 const diag = PTAC_DIAGNOSTICS[state.detectedCode];
@@ -512,116 +264,73 @@ export const ESADiagnosticCard = ESAVerifyComponent({
                 return html`
                   <!-- Code Display -->
                   <div style="
-                    background: ${recommendation.severity === 'critical' ? activeTheme.red : 
-                               recommendation.severity === 'warning' ? activeTheme.yellow : activeTheme.blue};
+                    background: ${recommendation.severity === 'critical' ? activeTheme.red : activeTheme.blue};
                     color: ${activeTheme.bg};
                     padding: 16px;
                     border-radius: 8px;
                     margin-bottom: 16px;
                     text-align: center;
                   ">
-                    <div style="font-size: 32px; font-weight: bold; margin-bottom: 4px;">
-                      CODE: ${state.detectedCode}
-                    </div>
-                    <div style="font-size: 14px; font-weight: bold;">
-                      ${recommendation.status}
-                    </div>
+                    <div style="font-size: 32px; font-weight: bold;">CODE: ${state.detectedCode}</div>
+                    <div style="font-size: 14px; font-weight: bold;">${recommendation.status}</div>
                   </div>
                   
                   <!-- Warranty Status -->
                   <div style="
-                    background: ${recommendation.warrantyStatus === 'under_warranty' ? activeTheme.green : 
-                               recommendation.warrantyStatus === 'expired' ? activeTheme.red : activeTheme.yellow};
+                    background: ${recommendation.warrantyStatus === 'under_warranty' ? activeTheme.green : activeTheme.red};
                     color: ${activeTheme.bg};
                     padding: 12px;
-                    border-radius: 8px;
+                    border-radius: 6px;
                     margin-bottom: 16px;
-                    text-align: center;
                     font-weight: bold;
+                    text-align: center;
                   ">
-                    WARRANTY: ${recommendation.warrantyStatus.replace('_', ' ').toUpperCase()}
+                    ${recommendation.warrantyStatus === 'under_warranty' ? '✓ UNDER WARRANTY' : '⚠ WARRANTY EXPIRED'}
                   </div>
                   
-                  <!-- Action Required -->
+                  <!-- Voice Repeat Button -->
+                  <div style="margin-bottom: 16px;">
+                    <button
+                      @click=${() => methods.speak(state, recommendation.voice)}
+                      style="
+                        background: ${activeTheme.purple};
+                        color: ${activeTheme.fg};
+                        border: none;
+                        padding: 8px 16px;
+                        border-radius: 6px;
+                        cursor: pointer;
+                      "
+                    >
+                      🔊 REPEAT DIAGNOSIS (Ava007)
+                    </button>
+                  </div>
+                  
+                  <!-- Voice Guidance Text -->
                   <div style="
                     background: ${activeTheme.bg};
                     border: 1px solid ${activeTheme.border};
-                    padding: 16px;
                     border-radius: 8px;
-                    margin-bottom: 16px;
+                    padding: 16px;
                   ">
-                    <div style="font-weight: bold; color: ${activeTheme.yellow}; margin-bottom: 8px;">
-                      📋 ACTION REQUIRED
-                    </div>
-                    <div style="font-size: 13px; line-height: 1.6; color: ${activeTheme.fg};">
-                      ${recommendation.action}
-                    </div>
+                    <div style="font-weight: bold; margin-bottom: 8px; color: ${activeTheme.aqua};">VOICE GUIDANCE:</div>
+                    <div style="font-size: 13px;">${recommendation.voice}</div>
                   </div>
                   
-                  <!-- Part Info (if applicable) -->
-                  ${recommendation.part ? html`
+                  ${recommendation.shouldReplace ? html`
                     <div style="
-                      background: ${activeTheme.bg};
-                      border: 1px solid ${activeTheme.border};
-                      padding: 16px;
-                      border-radius: 8px;
-                      margin-bottom: 16px;
+                      margin-top: 16px;
+                      padding: 12px;
+                      background: ${activeTheme.red};
+                      color: ${activeTheme.fg};
+                      border-radius: 6px;
+                      text-align: center;
+                      font-weight: bold;
                     ">
-                      <div style="font-weight: bold; color: ${activeTheme.aqua}; margin-bottom: 8px;">
-                        🔧 REQUIRED PART
-                      </div>
-                      <div style="font-size: 13px; color: ${activeTheme.fg};">
-                        ${recommendation.part}
-                      </div>
+                      ⚠️ UNIT REPLACEMENT RECOMMENDED
                     </div>
                   ` : ''}
-                  
-                  <!-- Execute Repair Button -->
-                  <button
-                    @click=${() => methods.executeRepair(state, recommendation)}
-                    style="
-                      width: 100%;
-                      padding: 14px;
-                      background: ${recommendation.shouldReplace ? activeTheme.red : activeTheme.green};
-                      color: ${activeTheme.fg};
-                      border: none;
-                      border-radius: 8px;
-                      font-size: 14px;
-                      font-weight: bold;
-                      cursor: pointer;
-                    "
-                  >
-                    ${recommendation.shouldReplace ? '⚠️ CHECK REPLACEMENT OPTIONS' : '✅ EXECUTE REPAIR'}
-                  </button>
-                  
-                  <!-- Voice Replay -->
-                  <button
-                    @click=${() => methods.speak(state, diag.voice)}
-                    style="
-                      width: 100%;
-                      margin-top: 8px;
-                      padding: 12px;
-                      background: ${activeTheme.purple};
-                      color: ${activeTheme.fg};
-                      border: none;
-                      border-radius: 8px;
-                      font-size: 13px;
-                      cursor: pointer;
-                    "
-                  >
-                    🔊 REPLAY AVA007 VOICE
-                  </button>
                 `;
               })()}
-            </div>
-          ` : ''}
-          
-          ${() => state.isSlidOpen && !state.detectedCode ? html`
-            <div style="padding: 0 20px 20px; text-align: center; color: ${activeTheme.fg_soft};">
-              <p>Scan a PTAC unit or enter a diagnostic code to begin.</p>
-              <p style="font-size: 11px; margin-top: 8px;">
-                Supported codes: F1-F6, H1, C1-C7, FP, Fd, Eo, EH, LS, oP, nP, HP, UR, br, L6, LC
-              </p>
             </div>
           ` : ''}
         </div>

@@ -16,326 +16,99 @@
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    :root {
-      --esa-bg: #282828;
-      --esa-bg0: #1d2021;
-      --esa-bg0-soft: #32302f;
-      --esa-bg1: #3c3836;
-      --esa-fg: #ebdbb2;
-      --esa-fg-soft: #a89984;
-      --esa-border: #3c3836;
-      --esa-green: #98971a;
-      --esa-yellow: #d79921;
-      --esa-blue: #458588;
-      --esa-purple: #b16286;
-      --esa-red: #cc241d;
-      --esa-aqua: #689d6a;
-      --esa-shadow: rgba(0, 0, 0, 0.3);
-    }
-
-    [data-theme="light"] {
-      --esa-bg: #fbf1c7;
-      --esa-bg0: #f9f5d7;
-      --esa-bg0-soft: #ebdbb2;
-      --esa-bg1: #d5c4a1;
-      --esa-fg: #3c3836;
-      --esa-fg-soft: #7c6f64;
-      --esa-border: #d5c4a1;
-      --esa-shadow: rgba(0, 0, 0, 0.15);
-    }
-    
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--esa-bg);
-      color: var(--esa-fg);
+      background: #282828;
+      color: #ebdbb2;
       overflow-x: hidden;
-      transition: background 0.3s, color 0.3s;
     }
-    
     #esa-exoskeleton {
       min-height: 100vh;
       padding: 20px;
-      max-width: 1400px;
-      margin: 0 auto;
     }
-    
     .esa-header {
-      background: var(--esa-bg0-soft);
-      border: 1px solid var(--esa-border);
+      background: #32302f;
+      border: 1px solid #3c3836;
       border-radius: 8px;
-      padding: 16px 24px;
+      padding: 16px;
       margin-bottom: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 8px var(--esa-shadow);
     }
-    
     .esa-title {
-      color: var(--esa-yellow);
+      color: #d79921;
       font-size: 24px;
       font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 12px;
     }
-    
-    .esa-header-controls {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-    
-    .esa-version-badge {
-      background: var(--esa-bg1);
-      color: var(--esa-fg-soft);
-      font-size: 12px;
-      padding: 4px 10px;
-      border-radius: 12px;
-      border: 1px solid var(--esa-border);
-    }
-    
-    .esa-theme-toggle {
-      background: var(--esa-bg1);
-      border: 1px solid var(--esa-border);
-      color: var(--esa-fg);
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.2s;
-    }
-    
-    .esa-theme-toggle:hover {
-      background: var(--esa-purple);
-      transform: scale(1.05);
-    }
-    
-    .esa-main-grid {
-      display: grid;
-      grid-template-columns: 1fr 300px;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-    
-    @media (max-width: 900px) {
-      .esa-main-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    .esa-console-container {
-      background: var(--esa-bg0);
-      border: 1px solid var(--esa-border);
-      border-radius: 8px;
-      padding: 16px;
-      min-height: 400px;
-      box-shadow: 0 2px 8px var(--esa-shadow);
-    }
-    
-    .esa-console-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--esa-border);
-    }
-    
-    .esa-console-title {
-      color: var(--esa-aqua);
-      font-size: 14px;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    
-    .esa-console-output {
-      font-family: 'Courier New', 'JetBrains Mono', monospace;
-      font-size: 12px;
-      height: 350px;
-      overflow-y: auto;
-      line-height: 1.6;
-    }
-    
-    .esa-sidebar {
-      background: var(--esa-bg0-soft);
-      border: 1px solid var(--esa-border);
-      border-radius: 8px;
-      padding: 16px;
-      min-height: 200px;
-      box-shadow: 0 2px 8px var(--esa-shadow);
-    }
-    
-    .esa-sidebar-title {
-      color: var(--esa-yellow);
-      font-size: 14px;
-      font-weight: bold;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    
-    .esa-bottom-grid {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 20px;
-      align-items: start;
-    }
-    
-    @media (max-width: 768px) {
-      .esa-bottom-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      #esa-button-panel {
-        order: -1;
-        display: flex;
-        justify-content: center;
-      }
-    }
-    
-    .esa-ingestion-area {
-      background: var(--esa-bg0);
-      border: 1px solid var(--esa-border);
-      border-radius: 8px;
-      padding: 16px;
-      min-height: 150px;
-      box-shadow: 0 2px 8px var(--esa-shadow);
-    }
-    
     /* Scrollbar */
-    ::-webkit-scrollbar { 
-      width: 8px; 
-      height: 8px; 
-    }
-    ::-webkit-scrollbar-track { 
-      background: var(--esa-bg); 
-    }
-    ::-webkit-scrollbar-thumb { 
-      background: var(--esa-bg1); 
-      border-radius: 4px; 
-    }
-    ::-webkit-scrollbar-thumb:hover { 
-      background: #504945; 
-    }
-    
-    /* Animation classes */
-    .esa-fade-in {
-      animation: esaFadeIn 0.5s ease-out;
-    }
-    
-    @keyframes esaFadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    /* Status indicator */
-    .esa-status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 6px;
-      animation: pulse 2s infinite;
-    }
-    
-    .esa-status-dot.online {
-      background: var(--esa-green);
-      box-shadow: 0 0 8px var(--esa-green);
-    }
-    
-    .esa-status-dot.offline {
-      background: var(--esa-red);
-    }
-    
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #282828; }
+    ::-webkit-scrollbar-thumb { background: #3c3836; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #504945; }
   </style>
 </head>
 <body>
   <div id="esa-exoskeleton">
     <!-- Header -->
     <header class="esa-header">
-      <h1 class="esa-title">
-        <span>🛡️</span>
-        <span>ESA EXOSKELETON</span>
-      </h1>
-      <div class="esa-header-controls">
-        <span class="esa-version-badge">v2.1.0</span>
-        <button id="esa-theme-toggle" class="esa-theme-toggle" title="Toggle Theme">
-          🌓
-        </button>
-        <span style="display: flex; align-items: center;">
-          <span class="esa-status-dot offline" id="esa-status"></span>
-          <span style="font-size: 12px; color: var(--esa-fg-soft);">Initializing...</span>
-        </span>
+      <h1 class="esa-title">🛡️ ESA EXOSKELETON</h1>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <span style="color: #a89984; font-size: 12px;">v2.5.0</span>
       </div>
     </header>
     
     <!-- Main Grid -->
-    <div class="esa-main-grid">
-      <!-- ESA Console (Main) -->
-      <div id="esa-console" class="esa-console-container">
-        <div class="esa-console-header">
-          <h3 class="esa-console-title">📋 ESA Console</h3>
-          <button 
-            onclick="document.getElementById('esa-console-output').innerHTML = ''"
-            style="
-              background: var(--esa-bg1); 
-              border: 1px solid var(--esa-border); 
-              color: var(--esa-fg-soft); 
-              padding: 4px 10px; 
-              border-radius: 4px; 
-              cursor: pointer; 
-              font-size: 11px;
-            "
-          >Clear</button>
-        </div>
-        <div id="esa-console-output" class="esa-console-output"></div>
+    <div style="display: grid; grid-template-columns: 1fr 300px; gap: 20px; margin-bottom: 20px;">
+      <!-- ESA Console -->
+      <div id="esa-console" style="
+        background: #1d2021;
+        border: 1px solid #3c3836;
+        border-radius: 8px;
+        padding: 16px;
+        min-height: 400px;
+      ">
+        <h3 style="color: #689d6a; margin-bottom: 12px;">📟 ESA CONSOLE</h3>
+        <div id="esa-console-output" style="
+          font-family: 'Courier New', monospace;
+          font-size: 12px;
+          height: 350px;
+          overflow-y: auto;
+        "></div>
       </div>
       
-      <!-- Sidebar (Your existing ingestion) -->
-      <div id="esa-ingestion" class="esa-sidebar">
-        <h4 class="esa-sidebar-title">📥 Ingestion</h4>
-        <!-- Your existing ESA Ingestion component loads here -->
-        <div style="color: var(--esa-fg-soft); font-size: 12px;">
-          Ingestion area ready...
-        </div>
-      </div>
+      <!-- Sidebar (AI Ingestion) -->
+      <div id="esa-ingestion" style="
+        background: #32302f;
+        border: 1px solid #3c3836;
+        border-radius: 8px;
+        padding: 16px;
+      "></div>
     </div>
     
-    <!-- Bottom Grid -->
-    <div class="esa-bottom-grid">
-      <!-- Your existing ingestion continues here -->
-      <div id="esa-ingestion-bottom" class="esa-ingestion-area">
-        <h4 class="esa-sidebar-title" style="margin-bottom: 12px;">🔧 Processing Area</h4>
-        <!-- Ingestion content (no to-do, no chat) -->
-        <div style="color: var(--esa-fg-soft); font-size: 12px;">
-          Processing area ready...
-        </div>
-      </div>
+    <!-- Bottom Section -->
+    <div style="display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: start; margin-bottom: 20px;">
+      <!-- ESA Ingestion Bottom -->
+      <div id="esa-ingestion-bottom"></div>
       
-      <!-- ESA Button Panel (Far Right) -->
-      <div id="esa-button-panel">
-        <!-- ESA.ButtonPanel component mounts here -->
-      </div>
+      <!-- ESA Button Panel (BELONGS TO AI INGESTION) -->
+      <div id="esa-button-panel"></div>
     </div>
+    
+    <!-- ESA Diagnostic Card -->
+    <div id="esa-diagnostics" style="margin-bottom: 20px;"></div>
+    
+    <!-- ESA Broadcast Parts Card -->
+    <div id="esa-parts-card"></div>
+    
+    <!-- ESA Workorder System -->
+    <div id="esa-workorder"></div>
     
     <!-- Hidden Sandbox -->
     <div id="esa-sandbox" style="display: none;"></div>
   </div>
   
   <!-- Load ESA Components -->
-  <script type="module" src="./integration.js"></script>
+  <script type="module" src="../integration.js"></script>
 </body>
 </html>
