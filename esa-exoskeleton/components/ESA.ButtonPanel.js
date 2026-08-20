@@ -1,7 +1,25 @@
 /**
  * ESA.ButtonPanel.js
- * AI Button + Stacked Attachments (Far Right Position)
- * Camera capture + Text input + PDF/Text file upload
+ * ============================================
+ * AI INGESTION CHAT BOX COMPONENT
+ * ============================================
+ * 
+ * OWNER: AI Ingestion Chat Box
+ * 
+ * Features:
+ * - Camera capture (2s auto-capture)
+ * - Text input
+ * - PDF/Text file upload
+ * - Image preview with clear
+ * 
+ * Connections:
+ * → AI Ingestion Chat Box (PARENT)
+ * → Lens/Camera Integration
+ * → GSAP Transport (capture:image, capture:file)
+ * → Ava007 Voice (via Ingestion)
+ * 
+ * NOTE: This component BELONGS TO the AI Ingestion Box.
+ * All captures/attachments flow THROUGH Ingestion.
  */
 
 import { reactive, html } from 'https://esm.sh/@arrow-js/core';
@@ -10,7 +28,8 @@ import { ESAVerifyComponent } from './ESA.VerifiedWrapper.js';
 
 export const ESAButtonPanel = ESAVerifyComponent({
   name: 'ButtonPanel',
-  version: '1.0.0',
+  version: '1.1.0',
+  owner: 'AI-Ingestion-Chat-Box',  // ← BELONGS TO INGESTION
   verified: false,
   
   state: {

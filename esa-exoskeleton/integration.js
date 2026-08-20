@@ -4,26 +4,36 @@
  * 
  * ARCHITECTURE (GSAP is TRANSPORT, not animation):
  * 
- * ┌─────────────────────────────────────┐
- * │      CYBERNETIC AVA007             │
- * └──────────────┬──────────────────────┘
- *                │ intent
- *                ▼
- * ┌─────────────────────────────────────┐
- * │    GSAP TRANSPORT LAYER            │  ← ESAGSAPTransport
- * │    • Tween atoms (state sync)      │
- * │    • Temporal orchestrator         │
- * │    • Bandwidth-efficient transport │
- * └──────────────┬──────────────────────┘
- *                │
- *                ▼
- * ┌─────────────────────────────────────┐
- * │   ARROW.JS SANDBOX (components)     │  ← ESASandboxManager
- * │   • ESA.workorder                  │
- * │   • ESA.InvPartsCard-B             │
- * │   • ESA.DiagnosticCard             │
- * │   • ESA.ButtonPanel                │
- * └─────────────────────────────────────┘
+ * ┌─────────────────────────────────────────────────────────┐
+ * │                  CYBERNETIC AVA007                      │
+ * │              (Voice belongs to AI INGESTION)            │
+ * └──────────────────────┬──────────────────────────────────┘
+ *                         │ intent
+ *                         ▼
+ * ┌─────────────────────────────────────────────────────────┐
+ * │              GSAP TRANSPORT LAYER                       │  ← ESAGSAPTransport
+ * │              • Tween atoms (state sync)                 │
+ * │              • Temporal orchestrator                    │
+ * │              • Bandwidth-efficient transport            │
+ * └──────────────────────┬──────────────────────────────────┘
+ *                         │
+ *                         ▼
+ * ┌─────────────────────────────────────────────────────────┐
+ * │            ARROW.JS SANDBOX (components)                │  ← ESASandboxManager
+ * │                                                         │
+ * │  ┌─────────────────────────────────────────────────┐   │
+ * │  │  AI INGESTION CHAT BOX                           │   │
+ * │  │  ├─ ESA.ButtonPanel  (Camera/Upload)             │   │
+ * │  │  └─ Ava007 Voice    (Speech Synthesis)           │   │
+ * │  └─────────────────────────────────────────────────┘   │
+ * │                                                         │
+ * │  • ESA.workorder                                       │
+ * │  • ESA.InvPartsCard-B                                  │
+ * │  • ESA.Ptac-B (Service Broadcasting)                   │
+ * │  • ESA.DiagnosticCard                                  │
+ * └─────────────────────────────────────────────────────────┘
+ * 
+ * KEY: Button + Voice BELONG TO AI Ingestion Box!
  */
 
 import { ESAButtonPanel } from './components/ESA.ButtonPanel.js';
@@ -38,9 +48,18 @@ import { activeTheme, toggleTheme } from './config/gruvbox-colors.js';
 
 // Global ESA namespace
 window.ESA = {
-  version: '2.1.0',
+  version: '2.2.0',
   initialized: false,
-  ingestion: null,
+  
+  // AI INGESTION CHAT BOX (owns Button + Voice)
+  ingestion: {
+    instance: null,
+    components: {
+      buttonPanel: null,   // ESA.ButtonPanel belongs HERE
+      voice: null          // Ava007 Voice belongs HERE
+    }
+  },
+  
   duckDB: null,
   sandbox: null,
   
@@ -57,16 +76,32 @@ window.ESA = {
     buttonPanel: null
   },
   
-  // Expose methods for external components to hook into
-  registerIngestion: (ingestionInstance) => {
-    window.ESA.ingestion = ingestionInstance;
-    logToConsole('[ESA] Ingestion component registered', 'success');
+  // Register AI Ingestion Chat Box (owns Button + Voice!)
+  registerIngestion: (ingestionInstance, options = {}) => {
+    window.ESA.ingestion.instance = ingestionInstance;
+    
+    // Register Voice if provided (Ava007 belongs to Ingestion!)
+    if (options.voice) {
+      window.ESA.ingestion.components.voice = options.voice;
+      console.log(`%c[ESA] 🎤 Ava007 Voice registered with AI Ingestion`, 
+        `color: ${activeTheme?.purple || '#b16286'}`);
+    }
+    
+    // Link ButtonPanel to Ingestion (already mounted)
+    if (window.ESA.components.buttonPanel) {
+      window.ESA.ingestion.components.buttonPanel = window.ESA.components.buttonPanel;
+    }
+    
+    logToConsole('[ESA] ✅ AI INGESTION CHAT BOX registered (owns Button + Voice)', 'success');
     
     // Send through GSAP Transport
     if (window.ESA.transport) {
       window.ESA.transport.send('component:register', 1, {
         source: 'ESA.registerIngestion',
-        metadata: { component: 'ingestion' }
+        metadata: { 
+          component: 'ai-ingestion',
+          owns: ['buttonPanel', 'voice']  // ← KEY: Ingestion owns these!
+        }
       });
     }
   },
@@ -468,8 +503,14 @@ async function mountWorkorder(transport) {
 }
 
 /**
- * Mount ESA.ButtonPanel (far right position)
- * Registers with GSAP Transport for capture/attachment events
+ * Mount ESA.ButtonPanel → AI INGESTION CHAT BOX
+ * ============================================
+ * THIS COMPONENT BELONGS TO AI INGESTION!
+ * 
+ * - Camera captures flow TO Ingestion
+ * - File attachments flow TO Ingestion  
+ * - All events registered with GSAP Transport
+ * - Voice (Ava007) triggered via Ingestion
  */
 async function mountButtonPanel(transport) {
   const buttonContainer = document.getElementById('esa-button-panel');
@@ -525,16 +566,25 @@ async function mountButtonPanel(transport) {
     buttonContainer.appendChild(buttonComponent);
     window.ESA.components.buttonPanel = buttonComponent;
     
+    // 🔑 KEY: Also register with AI INGESTION (this component BELONGS to Ingestion!)
+    if (window.ESA.ingestion && window.ESA.ingestion.components) {
+      window.ESA.ingestion.components.buttonPanel = buttonComponent;
+      console.log(`%c[ESA.ButtonPanel] 📦 Registered with AI Ingestion Chat Box`, 
+        `color: ${activeTheme.aqua}`);
+    }
+    
     // Register with GSAP Transport
     if (transport) {
       transport.registerComponent('ESA.ButtonPanel', buttonContainer, [
         'capture:image',
         'capture:file',
+        'ingestion:input',  // ← All captures are Ingestion inputs!
         'component:mount'
       ]);
     }
     
-    logToConsole('      ✓ ButtonPanel mounted (via GSAP Transport)', 'success');
+    logToConsole('      ✓ ButtonPanel mounted → AI INGESTION BOX (via GSAP Transport)', 'success');
+    logToConsole('         📌 Owner: AI Ingestion Chat Box', 'info');
   } catch (error) {
     logToConsole('      ⚠ ButtonPanel mount error: ' + error.message, 'warning');
   }
