@@ -3,12 +3,12 @@
  * ============================================
  * Arrow.js Component Wrapper with Proper DOM Mounting
  * 
- * FIX: Arrow.js components must use mount(), not appendChild()
- * - html`...` returns a View object, not DOM Node
- * - Must use arrow.js mount() to attach to container
+ * CORRECT Arrow.js API:
+ * - html`...` returns a View object (NOT DOM Node)
+ * - View.mount(container) attaches to DOM (mount is a View METHOD, not standalone export)
  */
 
-import { component, reactive, html, mount } from 'https://esm.sh/@arrow-js/core';
+import { reactive, html } from 'https://esm.sh/@arrow-js/core';
 import { activeTheme } from '../config/gruvbox-colors.js';
 
 export function ESAVerifyComponent(config) {
@@ -24,9 +24,9 @@ export function ESAVerifyComponent(config) {
   } = config;
   
   if (!verified) {
-    console.warn(`%c[ESA.Verify] ${name} running in SANDBOX`, `color: ${activeTheme.orange}`);
+    console.warn(`[ESA.Verify] ${name} running in SANDBOX`);
   } else {
-    console.log(`%c[ESA.Verify] ✓ ${name}@${version} VERIFIED`, `color: ${activeTheme.green}`);
+    console.log(`[ESA.Verify] ✓ ${name}@${version} VERIFIED`);
   }
   
   const componentState = reactive({
@@ -67,10 +67,11 @@ export function ESAVerifyComponent(config) {
       try {
         const view = createView(initialProps);
         
-        // Use Arrow.js mount() to properly attach the view
-        const cleanup = mount(container, view);
+        // CORRECT: Use View.mount() method (Arrow.js API)
+        // view.mount(container) returns an unmount function
+        const cleanup = view.mount(container);
         
-        console.log(`%c[ESA.Verify] ${name} mounted successfully`, `color: ${activeTheme.green}`);
+        console.log(`[ESA.Verify] ${name} mounted successfully`);
         
         return {
           unmount: cleanup,
@@ -99,7 +100,7 @@ export function ESAVerifyComponent(config) {
      */
     ESAVerify: () => {
       componentState._esa.verified = true;
-      console.log(`%c[ESA.Verify] ✓ ${name} now VERIFIED`, `color: ${activeTheme.green}`);
+      console.log(`[ESA.Verify] ✓ ${name} now VERIFIED`);
     }
   };
 }
