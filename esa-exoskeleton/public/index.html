@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ESA EXOSKELETON v2.5.1</title>
   
+  <!-- Cache Busting: Force fresh load -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  
   <!-- GSAP (GreenSock Animation Platform) - TRANSPORT LAYER -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   
@@ -312,7 +317,7 @@
     }
   </script>
   
-  <!-- MAIN APPLICATION MODULE -->
-  <script type="module" src="./integration.js"></script>
+  <!-- MAIN APPLICATION MODULE (with cache buster) -->
+  <script type="module" src="./integration.js?v=251"></script>
 </body>
 </html>
