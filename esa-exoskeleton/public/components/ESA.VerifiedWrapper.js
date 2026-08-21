@@ -3,9 +3,10 @@
  * ============================================
  * Arrow.js Component Wrapper with Proper DOM Mounting
  * 
- * CORRECT Arrow.js API:
- * - html`...` returns a View object (NOT DOM Node)
- * - View.mount(container) attaches to DOM (mount is a View METHOD, not standalone export)
+ * CORRECT Arrow.js API (v1.0.x):
+ * - html`...` returns a FUNCTION (View), not an object
+ * - Mount by CALLING the view function: view(container)
+ * - The view function renders the template into the container
  */
 
 import { reactive, html } from 'https://esm.sh/@arrow-js/core';
@@ -47,7 +48,7 @@ export function ESAVerifyComponent(config) {
       lifecycle.onMount(propsData, componentState);
     }
     
-    // Return the template view
+    // Return the template view (which is a function)
     return template(propsData, componentState, methods);
   };
   
@@ -67,14 +68,22 @@ export function ESAVerifyComponent(config) {
       try {
         const view = createView(initialProps);
         
-        // CORRECT: Use View.mount() method (Arrow.js API)
-        // view.mount(container) returns an unmount function
-        const cleanup = view.mount(container);
+        // CORRECT Arrow.js v1.0.x API:
+        // html`...` returns a FUNCTION - call it with container to mount
+        if (typeof view === 'function') {
+          view(container);
+        } else {
+          console.error(`[ESA.Verify] ${name}: Template did not return a valid View function`);
+          return null;
+        }
         
         console.log(`[ESA.Verify] ${name} mounted successfully`);
         
         return {
-          unmount: cleanup,
+          unmount: () => { 
+            // Arrow.js handles cleanup internally
+            container.innerHTML = ''; 
+          },
           state: componentState,
           container
         };
