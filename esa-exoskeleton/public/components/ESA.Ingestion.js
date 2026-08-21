@@ -153,22 +153,14 @@ export const ESAIngestion = ESAVerifyComponent({
               <option value="Agent-X">Agent-X</option>
             </select>
             
-            <div style="
-              width: 8px; height: 8px; border-radius: 50%;
-              background: ${state.audioInitialized ? '#98971a' : '#928374'};
-              box-shadow: 0 0 6px ${state.audioInitialized ? '#98971a' : 'transparent'};
-            "></div>
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: #928374; box-shadow: 0 0 6px transparent;"></div>
           </div>
         </div>
         
         <!-- Messages -->
         <div style="flex: 1; overflow-y: auto; margin-bottom: 12px; padding-right: 8px;">
           ${() => state.messages.map(msg => html`
-            <div style="
-              margin: 8px 0; padding: 10px 14px; border-radius: 8px;
-              background: ${msg.role === 'user' ? '#264244' : '#3c3836'};
-              color: #ebdbb2; font-size: 12px; line-height: 1.5;
-            ">
+            <div style="margin: 8px 0; padding: 10px 14px; border-radius: 8px; background: #3c3836; color: #ebdbb2; font-size: 12px; line-height: 1.5;">
               <div style="font-weight: bold; margin-bottom: 4px; font-size: 10px; opacity: 0.8;">
                 ${msg.role === 'user' ? '👤 OPERATOR' : `🤖 ${state.assignedAgent}`}
               </div>
