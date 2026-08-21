@@ -1,8 +1,8 @@
 /**
  * integration.js
- * ESA EXOSKELETON - Component Wiring
+ * ESA EXOSKELETON - Production Component Wiring
  * 
- * Renders actual ESA modules (not dev information)
+ * Loads and mounts all ESA modules silently
  */
 
 // ============================================
@@ -32,39 +32,14 @@ function showError(message) {
 // MAIN INITIALIZATION
 // ============================================
 async function initESAExoskeleton() {
-  console.log('[ESA] Initializing...');
-  
-  // Setup minimal console logging
-  const consoleOutput = document.getElementById('esa-console-output');
-  let logMessage = null;
-  
-  if (consoleOutput) {
-    logMessage = (msg, type = 'info') => {
-      const colors = { info: '#ebdbb2', success: '#98971a', error: '#cc241d', warning: '#d79921' };
-      try {
-        const div = document.createElement('div');
-        div.style.color = colors[type] || colors.info;
-        div.style.margin = '2px 0';
-        div.style.fontFamily = "'Courier New', monospace";
-        div.style.fontSize = '11px';
-        div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-        consoleOutput.appendChild(div);
-        consoleOutput.scrollTop = consoleOutput.scrollHeight;
-      } catch (e) {}
-    };
-  } else {
-    logMessage = (msg) => console.log(`[ESA] ${msg}`);
-  }
-  
-  // Initialize ESA namespace
+  // Initialize ESA namespace (minimal, no dev output)
   window.ESA = window.ESA || { 
-    version: '2.5.2', 
+    version: '3.0.0', 
     initialized: false,
     errors: [],
     ingestion: { instance: null, components: {} },
     components: {},
-    mountedComponents: [],
-    log: logMessage
+    mountedComponents: []
   };
   
   // ============================================
@@ -73,8 +48,6 @@ async function initESAExoskeleton() {
   let ESAIngestion, ESAButtonPanel, ESADiagnosticCard, ESAInvPartsCardB, ESAWorkorder, themeModule;
   
   try {
-    logMessage('Loading ESA modules...', 'info');
-    
     const [
       ingestionModule,
       buttonModule,
@@ -98,32 +71,24 @@ async function initESAExoskeleton() {
     ESAWorkorder = workorderModule.status === 'fulfilled' ? workorderModule.value.ESAWorkorder : null;
     themeModule = themeMod.status === 'fulfilled' ? themeMod.value : null;
     
-    // Log failures quietly
+    // Log failures silently
     if (ingestionModule.status === 'rejected') {
-      logMessage(`Ingestion: ${ingestionModule.reason?.message}`, 'error');
       window.ESA.errors.push({ component: 'Ingestion', error: ingestionModule.reason });
     }
     if (buttonModule.status === 'rejected') {
-      logMessage(`ButtonPanel: ${buttonModule.reason?.message}`, 'error');
       window.ESA.errors.push({ component: 'ButtonPanel', error: buttonModule.reason });
     }
     if (diagnosticModule.status === 'rejected') {
-      logMessage(`DiagnosticCard: ${diagnosticModule.reason?.message}`, 'error');
       window.ESA.errors.push({ component: 'DiagnosticCard', error: diagnosticModule.reason });
     }
     if (partsModule.status === 'rejected') {
-      logMessage(`InvPartsCard: ${partsModule.reason?.message}`, 'error');
       window.ESA.errors.push({ component: 'InvPartsCard', error: partsModule.reason });
     }
     if (workorderModule.status === 'rejected') {
-      logMessage(`Workorder: ${workorderModule.reason?.message}`, 'error');
       window.ESA.errors.push({ component: 'Workorder', error: workorderModule.reason });
     }
     
-    logMessage('Modules loaded', 'success');
-    
   } catch (err) {
-    logMessage(`Import error: ${err.message}`, 'error');
     window.ESA.errors.push({ phase: 'import', error: err });
   }
   
@@ -143,8 +108,6 @@ async function initESAExoskeleton() {
   // 1. AI INGESTION CHAT BOX
   if (ESAIngestion && typeof ESAIngestion.mount === 'function') {
     try {
-      logMessage('Mounting AI Ingestion...', 'info');
-      
       const ingestionContainer = document.getElementById('esa-ingestion');
       if (ingestionContainer) {
         ingestionContainer.innerHTML = '';
@@ -159,93 +122,35 @@ async function initESAExoskeleton() {
             window.dispatchEvent(new CustomEvent('esa:ingestion-file', { detail: { file, type } }));
           };
           
-          // Initialize SoundPanels separately (Arrow.js can't nest views)
+          // Initialize SoundPanels and event listeners after mount
           if (mountResult.state && typeof mountResult.state.initSoundPanels === 'function') {
             setTimeout(() => {
               mountResult.state.initSoundPanels(mountResult.state, ingestionContainer);
             }, 100);
           }
-          
-          logMessage('✓ AI Ingestion ready', 'success');
-        } else {
-          logMessage('✗ Ingestion mount failed', 'error');
         }
       }
     } catch (err) {
-      logMessage(`Ingestion error: ${err.message}`, 'error');
       window.ESA.errors.push({ component: 'Ingestion', phase: 'mount', error: err });
     }
   }
   
-  // 2. DIAGNOSTIC CARD
-  if (ESADiagnosticCard && typeof ESADiagnosticCard.mount === 'function') {
-    try {
-      const diagnosticContainer = document.getElementById('esa-diagnostics');
-      if (diagnosticContainer) {
-        diagnosticContainer.innerHTML = '';
-        const mountResult = ESADiagnosticCard.mount(diagnosticContainer);
-        if (mountResult) {
-          window.ESA.components.diagnosticCard = mountResult;
-          window.ESA.mountedComponents.push(mountResult);
-          logMessage('✓ Diagnostic Card ready', 'success');
-        }
-      }
-    } catch (err) {
-      logMessage(`Diagnostic error: ${err.message}`, 'error');
-    }
-  }
-  
-  // 3. BROADCAST PARTS CARD
-  if (ESAInvPartsCardB && typeof ESAInvPartsCardB.mount === 'function') {
-    try {
-      const partsCardContainer = document.getElementById('esa-parts-card');
-      if (partsCardContainer) {
-        partsCardContainer.innerHTML = '';
-        const mountResult = ESAInvPartsCardB.mount(partsCardContainer);
-        if (mountResult) {
-          window.ESA.components.invPartsCard = mountResult;
-          window.ESA.mountedComponents.push(mountResult);
-          logMessage('✓ Parts Card ready', 'success');
-        }
-      }
-    } catch (err) {
-      logMessage(`Parts error: ${err.message}`, 'error');
-    }
-  }
-  
-  // 4. WORKORDER SYSTEM
-  if (ESAWorkorder && typeof ESAWorkorder.mount === 'function') {
-    try {
-      const workorderContainer = document.getElementById('esa-workorder');
-      if (workorderContainer) {
-        workorderContainer.innerHTML = '';
-        const mountResult = ESAWorkorder.mount(workorderContainer);
-        if (mountResult) {
-          window.ESA.components.workorder = mountResult;
-          window.ESA.mountedComponents.push(mountResult);
-          logMessage('✓ Workorder ready', 'success');
-        }
-      }
-    } catch (err) {
-      logMessage(`Workorder error: ${err.message}`, 'error');
-    }
-  }
-  
-  // 5. BUTTON PANEL
+  // 2. BUTTON PANEL
   if (ESAButtonPanel && typeof ESAButtonPanel.mount === 'function') {
     try {
       const buttonContainer = document.getElementById('esa-button-panel');
       if (buttonContainer) {
         buttonContainer.innerHTML = '';
+        buttonContainer.style.background = 'transparent';
+        buttonContainer.style.border = 'none';
+        buttonContainer.style.padding = '0';
         
         const mountResult = ESAButtonPanel.mount(buttonContainer, {
           onCapture: (file) => {
-            logMessage(`Image: ${file.name}`, 'success');
             window.dispatchEvent(new CustomEvent('esa:capture', { detail: { file, type: 'image' } }));
             if (window.ESA.ingestion?.handleFile) window.ESA.ingestion.handleFile(file, 'image');
           },
           onAttachment: (file, type) => {
-            logMessage(`${type}: ${file.name}`, 'warning');
             window.dispatchEvent(new CustomEvent('esa:attachment', { detail: { file, type } }));
             if (window.ESA.ingestion?.handleFile) window.ESA.ingestion.handleFile(file, type);
           }
@@ -255,22 +160,71 @@ async function initESAExoskeleton() {
           window.ESA.components.buttonPanel = mountResult;
           window.ESA.mountedComponents.push(mountResult);
           if (window.ESA.ingestion?.components) window.ESA.ingestion.components.buttonPanel = mountResult;
-          logMessage('✓ Button Panel ready', 'success');
         }
       }
     } catch (err) {
-      logMessage(`ButtonPanel error: ${err.message}`, 'error');
+      window.ESA.errors.push({ component: 'ButtonPanel', phase: 'mount', error: err });
     }
   }
   
-  // 6. GSAP ANIMATIONS
+  // 3. DIAGNOSTIC CARD
+  if (ESADiagnosticCard && typeof ESADiagnosticCard.mount === 'function') {
+    try {
+      const diagnosticContainer = document.getElementById('esa-diagnostics');
+      if (diagnosticContainer) {
+        diagnosticContainer.innerHTML = '';
+        const mountResult = ESADiagnosticCard.mount(diagnosticContainer);
+        if (mountResult) {
+          window.ESA.components.diagnosticCard = mountResult;
+          window.ESA.mountedComponents.push(mountResult);
+        }
+      }
+    } catch (err) {
+      window.ESA.errors.push({ component: 'DiagnosticCard', phase: 'mount', error: err });
+    }
+  }
+  
+  // 4. BROADCAST PARTS CARD
+  if (ESAInvPartsCardB && typeof ESAInvPartsCardB.mount === 'function') {
+    try {
+      const partsCardContainer = document.getElementById('esa-parts-card');
+      if (partsCardContainer) {
+        partsCardContainer.innerHTML = '';
+        const mountResult = ESAInvPartsCardB.mount(partsCardContainer);
+        if (mountResult) {
+          window.ESA.components.invPartsCard = mountResult;
+          window.ESA.mountedComponents.push(mountResult);
+        }
+      }
+    } catch (err) {
+      window.ESA.errors.push({ component: 'InvPartsCard', phase: 'mount', error: err });
+    }
+  }
+  
+  // 5. WORKORDER SYSTEM
+  if (ESAWorkorder && typeof ESAWorkorder.mount === 'function') {
+    try {
+      const workorderContainer = document.getElementById('esa-workorder');
+      if (workorderContainer) {
+        workorderContainer.innerHTML = '';
+        const mountResult = ESAWorkorder.mount(workorderContainer);
+        if (mountResult) {
+          window.ESA.components.workorder = mountResult;
+          window.ESA.mountedComponents.push(mountResult);
+        }
+      }
+    } catch (err) {
+      window.ESA.errors.push({ component: 'Workorder', phase: 'mount', error: err });
+    }
+  }
+  
+  // 6. GSAP ANIMATIONS (subtle entrance)
   try {
     if (typeof gsap !== 'undefined') {
-      gsap.from('#esa-console', { duration: 0.6, opacity: 0, y: 15, ease: 'power2.out' });
-      gsap.from('#esa-ingestion', { duration: 0.6, opacity: 0, y: 15, delay: 0.1, ease: 'power2.out' });
-      gsap.from('#esa-diagnostics', { duration: 0.6, opacity: 0, y: 15, delay: 0.2, ease: 'power2.out' });
-      gsap.from('#esa-parts-card', { duration: 0.6, opacity: 0, y: 15, delay: 0.25, ease: 'power2.out' });
-      gsap.from('#esa-workorder', { duration: 0.6, opacity: 0, y: 15, delay: 0.3, ease: 'power2.out' });
+      gsap.from('#esa-ingestion', { duration: 0.5, opacity: 0, y: 20, ease: 'power2.out' });
+      gsap.from('#esa-diagnostics', { duration: 0.5, opacity: 0, y: 20, delay: 0.1, ease: 'power2.out' });
+      gsap.from('#esa-parts-card', { duration: 0.5, opacity: 0, y: 20, delay: 0.15, ease: 'power2.out' });
+      gsap.from('#esa-workorder', { duration: 0.5, opacity: 0, y: 20, delay: 0.2, ease: 'power2.out' });
     }
   } catch (err) {
     // Animations non-critical
@@ -280,14 +234,6 @@ async function initESAExoskeleton() {
   // COMPLETE
   // ============================================
   window.ESA.initialized = true;
-  
-  logMessage('──────────────────────────────', 'info');
-  logMessage('ESA SYSTEMS READY', 'success');
-  logMessage(`Components: ${window.ESA.mountedComponents.length}/5 loaded`, 'info');
-  
-  if (window.ESA.errors.length > 0) {
-    logMessage(`Warnings: ${window.ESA.errors.length}`, 'warning');
-  }
   
   // Dispatch ready event
   window.dispatchEvent(new CustomEvent('esa:ready', { 
@@ -316,13 +262,13 @@ try {
     document.addEventListener('DOMContentLoaded', () => {
       initESAExoskeleton().catch(err => {
         console.error('[ESA] Fatal:', err);
-        showError(`Failed to initialize: ${err.message}`);
+        showError(`System initialization failed: ${err.message}`);
       });
     });
   } else {
     initESAExoskeleton().catch(err => {
       console.error('[ESA] Fatal:', err);
-      showError(`Failed to initialize: ${err.message}`);
+      showError(`System initialization failed: ${err.message}`);
     });
   }
 } catch (err) {

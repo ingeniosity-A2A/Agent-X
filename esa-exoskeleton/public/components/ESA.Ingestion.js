@@ -222,7 +222,7 @@ export const ESAIngestion = ESAVerifyComponent({
             style="flex: 1; background: #282828; border: 1px solid #3c3836; color: #ebdbb2; padding: 10px 14px; border-radius: 6px; font-size: 12px; outline: none;"
           />
           <button
-            @click=${() => { methods.initAudio(state); methods.sendMessage(state, state.inputValue); }}
+            id="esa-send-button"
             style="background: #98971a; color: #282828; border: none; padding: 0 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;"
           >
             SEND

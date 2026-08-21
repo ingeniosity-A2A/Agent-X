@@ -24,7 +24,7 @@
       min-height: 100vh;
     }
     
-    /* Loading Screen - shown BEFORE JS loads */
+    /* Loading Screen - PRODUCTION STYLE */
     #esa-loading {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -40,13 +40,14 @@
     #esa-loading.hidden {
       opacity: 0;
       visibility: hidden;
+      pointer-events: none;
     }
     
     .esa-loader {
-      width: 80px;
-      height: 80px;
-      border: 4px solid #3c3836;
-      border-top: 4px solid #d79921;
+      width: 60px;
+      height: 60px;
+      border: 3px solid #3c3836;
+      border-top: 3px solid #d79921;
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
@@ -56,18 +57,25 @@
       100% { transform: rotate(360deg); }
     }
     
-    .esa-loading-text {
-      margin-top: 24px;
-      color: #a89984;
-      font-size: 14px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
+    .esa-loading-brand {
+      margin-top: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
     }
     
-    .esa-loading-version {
-      margin-top: 8px;
-      color: #504945;
-      font-size: 11px;
+    .esa-loading-title {
+      color: #d79921;
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 3px;
+    }
+    
+    .esa-loading-subtitle {
+      color: #a89984;
+      font-size: 12px;
+      letter-spacing: 1px;
     }
     
     /* Error Screen */
@@ -82,19 +90,28 @@
     }
     
     #esa-error.visible {
-      display: block;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .esa-error-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
     }
     
     .esa-error-title {
       color: #cc241d;
-      font-size: 24px;
-      margin-bottom: 16px;
+      font-size: 20px;
+      margin-bottom: 12px;
+      font-weight: bold;
     }
     
     .esa-error-message {
       color: #ebdbb2;
       font-size: 14px;
-      max-width: 600px;
+      max-width: 500px;
       margin: 0 auto 24px;
       line-height: 1.6;
     }
@@ -108,6 +125,7 @@
       font-weight: bold;
       border-radius: 6px;
       cursor: pointer;
+      transition: background 0.2s;
     }
     
     .esa-error-retry:hover {
@@ -131,7 +149,7 @@
       background: #32302f;
       border: 1px solid #3c3836;
       border-radius: 8px;
-      padding: 16px;
+      padding: 16px 24px;
       margin-bottom: 20px;
       display: flex;
       justify-content: space-between;
@@ -140,8 +158,36 @@
     
     .esa-title {
       color: #d79921;
-      font-size: 24px;
+      font-size: 22px;
       font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .esa-status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: #1d2021;
+      border: 1px solid #3c3836;
+      border-radius: 20px;
+      font-size: 11px;
+      color: #689d6a;
+    }
+    
+    .esa-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #689d6a;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
     
     /* Scrollbar */
@@ -150,124 +196,85 @@
     ::-webkit-scrollbar-thumb { background: #3c3836; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #504945; }
     
-    /* Console Output */
-    #esa-console-output {
-      font-family: 'Courier New', 'JetBrains Mono', monospace;
-      font-size: 12px;
-      height: 350px;
-      overflow-y: auto;
+    /* Component Containers - CLEAN, NO FALLBACK TEXT */
+    [id^="esa-"] {
+      background: #32302f;
+      border: 1px solid #3c3836;
+      border-radius: 12px;
+      padding: 16px;
+      min-height: 100px;
     }
     
-    /* Fallback static content (shown if JS fails) */
-    .esa-fallback {
-      background: #1d2021;
-      border: 1px solid #cc241d;
-      border-radius: 8px;
-      padding: 24px;
-      margin: 20px 0;
-      text-align: center;
-    }
-    
-    .esa-fallback-title {
-      color: #cc241d;
-      font-size: 18px;
-      margin-bottom: 12px;
-    }
-    
-    .esa-fallback-text {
-      color: #a89984;
-      font-size: 13px;
-    }
+    /* Hidden utility */
+    .esa-hidden { display: none !important; }
   </style>
 </head>
 <body>
-  <!-- LOADING SCREEN -->
+  <!-- LOADING SCREEN - PRODUCTION BRANDING -->
   <div id="esa-loading">
     <div class="esa-loader"></div>
-    <div class="esa-loading-text">Initializing ESA Systems</div>
-    <div class="esa-loading-version">Please wait...</div>
+    <div class="esa-loading-brand">
+      <div class="esa-loading-title">ESA EXOSKELETON</div>
+      <div class="esa-loading-subtitle">Enterprise Service Assistant</div>
+    </div>
   </div>
   
   <!-- ERROR SCREEN -->
   <div id="esa-error">
-    <div class="esa-error-title">⚠ ESA Initialization Failed</div>
+    <div class="esa-error-icon">⚠️</div>
+    <div class="esa-error-title">System Initialization Failed</div>
     <div class="esa-error-message" id="esa-error-message">
-      The ESA Exoskeleton system failed to load. This may be due to a network issue or module loading error.
+      The ESA Exoskeleton failed to load. Please check your connection and try again.
     </div>
-    <button class="esa-error-retry" onclick="location.reload()">🔄 Reload Page</button>
+    <button class="esa-error-retry" onclick="location.reload()">Reload System</button>
   </div>
   
   <!-- MAIN APPLICATION -->
   <div id="esa-exoskeleton">
     <!-- Header -->
     <header class="esa-header">
-      <h1 class="esa-title">🛡️ ESA EXOSKELETON</h1>
-      <div style="display: flex; gap: 12px; align-items: center;">
-        <span style="color: #689d6a; font-size: 10px;">● SYSTEM ONLINE</span>
+      <h1 class="esa-title">
+        <span>🛡️</span>
+        <span>ESA EXOSKELETON</span>
+      </h1>
+      <div class="esa-status-badge">
+        <div class="esa-status-dot"></div>
+        <span>SYSTEM ONLINE</span>
       </div>
     </header>
     
-    <!-- Main Grid -->
-    <div style="display: grid; grid-template-columns: 1fr 300px; gap: 20px; margin-bottom: 20px;">
-      <!-- ESA Console -->
-      <div id="esa-console" style="
-        background: #1d2021;
-        border: 1px solid #3c3836;
-        border-radius: 8px;
-        padding: 16px;
-        min-height: 400px;
-      ">
-        <h3 style="color: #689d6a; margin-bottom: 12px;">📟 ESA CONSOLE</h3>
-        <div id="esa-console-output"></div>
+    <!-- Main Grid: Ingestion + Console (HIDDEN CONSOLE - DEV REMOVED) -->
+    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 20px; margin-bottom: 20px;">
+      <!-- AI INGESTION CHAT BOX -->
+      <div id="esa-ingestion">
+        <!-- Component mounts here - no fallback text -->
       </div>
       
-      <!-- Sidebar (AI Ingestion) -->
-      <div id="esa-ingestion" style="
-        background: #32302f;
-        border: 1px solid #3c3836;
-        border-radius: 8px;
-        padding: 16px;
-      ">
-        <div class="esa-fallback" id="esa-ingestion-fallback">
-          <div class="esa-fallback-title">AI INGESTION</div>
-          <div class="esa-fallback-text">Loading component...</div>
-        </div>
+      <!-- Button Panel (belongs to Ingestion -->
+      <div id="esa-button-panel" style="display: flex; align-items: flex-start; justify-content: center; padding-top: 32px;">
+        <!-- Button panel mounts here -->
       </div>
     </div>
     
-    <!-- Bottom Section -->
-    <div style="display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: start; margin-bottom: 20px;">
-      <!-- ESA Ingestion Bottom -->
-      <div id="esa-ingestion-bottom"></div>
-      
-      <!-- ESA Button Panel (BELONGS TO AI INGESTION) -->
-      <div id="esa-button-panel">
-        <div class="esa-fallback" style="padding: 12px;">
-          <div style="color: #a89984; font-size: 11px;">BUTTON PANEL</div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- ESA Diagnostic Card -->
+    <!-- Diagnostic Card -->
     <div id="esa-diagnostics" style="margin-bottom: 20px;"></div>
     
-    <!-- ESA Broadcast Parts Card -->
-    <div id="esa-parts-card"></div>
+    <!-- Parts Card -->
+    <div id="esa-parts-card" style="margin-bottom: 20px;"></div>
     
-    <!-- ESA Workorder System -->
-    <div id="esa-workorder"></div>
+    <!-- Workorder System -->
+    <div id="esa-workorder" style="margin-bottom: 20px;"></div>
     
-    <!-- Hidden Sandbox -->
-    <div id="esa-sandbox" style="display: none;"></div>
+    <!-- Hidden Sandbox (for dynamic components) -->
+    <div id="esa-sandbox" class="esa-hidden"></div>
   </div>
   
-  <!-- ERROR HANDLING SCRIPT (loads first, synchronously) -->
+  <!-- ERROR HANDLING SCRIPT -->
   <script>
-    // Global error handler
     window.ESA_ERRORS = [];
     
     window.addEventListener('error', function(e) {
-      console.error('[ESA] Global error:', e.message, e.filename, e.lineno);
+      console.error('[ESA]', e.message);
       window.ESA_ERRORS.push({
         message: e.message,
         file: e.filename,
@@ -276,43 +283,38 @@
       });
     });
     
-    // Unhandled promise rejection handler
     window.addEventListener('unhandledrejection', function(e) {
-      console.error('[ESA] Unhandled rejection:', e.reason);
+      console.error('[ESA] Promise:', e.reason);
       window.ESA_ERRORS.push({
         message: 'Promise: ' + (e.reason?.message || e.reason),
-        type: 'unhandledrejection',
         timestamp: new Date().toISOString()
       });
     });
     
-    // Timeout fallback (if modules take too long)
+    // Timeout fallback
     setTimeout(function() {
       var loading = document.getElementById('esa-loading');
       var exoskeleton = document.getElementById('esa-exoskeleton');
       
       if (loading && !loading.classList.contains('hidden')) {
-        console.warn('[ESA] Initialization timeout - showing app anyway');
         loading.classList.add('hidden');
         if (exoskeleton) exoskeleton.classList.add('visible');
       }
-    }, 8000); // 8 second timeout
+    }, 8000);
   </script>
   
-  <!-- DuckDB WASM (optional - non-critical) -->
+  <!-- DuckDB WASM (optional) -->
   <script type="module">
     try {
       import('https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.28.0/+esm')
         .then(mod => {
           window.duckdb = mod.default || mod;
-          console.log('[ESA] DuckDB WASM loaded (optional)');
         })
-        .catch(err => {
-          console.warn('[ESA] DuckDB WASM not available (non-critical):', err.message);
+        .catch(() => {
           window.duckdb = null;
         });
     } catch (e) {
-      console.warn('[ESA] DuckDB import failed:', e.message);
+      window.duckdb = null;
     }
   </script>
   
