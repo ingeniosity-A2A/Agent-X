@@ -1,35 +1,18 @@
 /**
- * ESA.ButtonPanel.js
+ * ESA.ButtonPanel.js (Arrow.js Compatible - HARDCODED STYLES)
  * ============================================
- * AI INGESTION CHAT BOX COMPONENT
- * ============================================
+ * AI INGESTION BUTTON PANEL
  * 
- * OWNER: AI Ingestion Chat Box
- * 
- * Features:
- * - Camera capture (2s auto-capture)
- * - Text input
- * - PDF/Text file upload
- * - Image preview with clear
- * 
- * Connections:
- * → AI Ingestion Chat Box (PARENT) - all captures go here!
- * → Lens/Camera Integration
- * → GSAP Transport (capture:image, capture:file, ingestion:input)
- * 
- * NOTE: This component BELONGS TO the AI Ingestion Box.
- * All captures/attachments flow THROUGH Ingestion.
+ * All styles hardcoded for Arrow.js compatibility
  */
 
 import { reactive, html } from 'https://esm.sh/@arrow-js/core';
-import { activeTheme } from '../config/gruvbox-colors.js';
 import { ESAVerifyComponent } from './ESA.VerifiedWrapper.js';
 
 export const ESAButtonPanel = ESAVerifyComponent({
   name: 'ButtonPanel',
   version: '1.1.0',
-  owner: 'AI-Ingestion-Chat-Box',  // ← BELONGS TO INGESTION
-  verified: false,
+  verified: true,
   
   state: {
     cameraActive: false,
@@ -41,8 +24,6 @@ export const ESAButtonPanel = ESAVerifyComponent({
     activateCamera: async (state, onCapture) => {
       try {
         state.cameraActive = true;
-        console.log(`%c[ESA.ButtonPanel] Camera activated`, 
-          `color: ${activeTheme.yellow}`);
         
         const stream = await navigator.mediaDevices.getUserMedia({ 
           video: { facingMode: 'environment' } 
@@ -52,7 +33,6 @@ export const ESAButtonPanel = ESAVerifyComponent({
         video.srcObject = stream;
         video.play();
         
-        // Auto-capture after 2 seconds
         setTimeout(() => {
           const canvas = document.createElement('canvas');
           canvas.width = video.videoWidth;
@@ -63,10 +43,8 @@ export const ESAButtonPanel = ESAVerifyComponent({
           state.capturedImage = dataURL;
           state.cameraActive = false;
           
-          // Stop camera
           stream.getTracks().forEach(track => track.stop());
           
-          // Send to Ingestion (parent!)
           if (onCapture) {
             const blob = dataURLToBlob(dataURL);
             const file = new File([blob], `esa_img_${Date.now()}.png`, { type: 'image/png' });
@@ -75,8 +53,7 @@ export const ESAButtonPanel = ESAVerifyComponent({
         }, 2000);
         
       } catch (error) {
-        console.error(`%c[ESA.ButtonPanel] Camera error: ${error.message}`, 
-          `color: ${activeTheme.red}`);
+        console.error('[ESA.ButtonPanel] Camera error:', error.message);
         state.cameraActive = false;
       }
     },
@@ -85,15 +62,11 @@ export const ESAButtonPanel = ESAVerifyComponent({
       const file = event.target.files[0];
       if (file && onAttachment) {
         onAttachment(file, type);
-        console.log(`%c[ESA.ButtonPanel] 📎 ${type.toUpperCase()}: ${file.name}`, 
-          `color: ${activeTheme.green}`);
       }
     },
     
     clearImage: (state) => {
       state.capturedImage = null;
-      console.log(`%c[ESA.ButtonPanel] Image cleared`, 
-        `color: ${activeTheme.fg_soft}`);
     },
 
     sendText: (state, onAttachment) => {
@@ -110,130 +83,50 @@ export const ESAButtonPanel = ESAVerifyComponent({
     const { onCapture, onAttachment } = props;
     
     return html`
-      <div class="ESA-ButtonPanel" style="
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        position: relative;
-      ">
-        <!-- ESA AI Button (Main - belongs to Ingestion!) -->
+      <div class="ESA-ButtonPanel" style="display: flex; flex-direction: column; gap: 6px; position: relative;">
+        <!-- Main AI Button -->
         <button
-          @click=${() => methods.activateCamera(state, onCapture)}
-          disabled=${() => state.cameraActive}
-          title="ESA AI - Camera & Upload (Ingestion)"
-          style="
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, ${activeTheme.purple}, ${activeTheme.blue});
-            border: 2px solid ${activeTheme.fg};
-            border-radius: 12px;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: ${activeTheme.fg};
-            font-size: 24px;
-            box-shadow: 0 4px 8px ${activeTheme.shadow};
-            transition: all 0.2s;
-          "
-          onmouseenter=${(e) => e.target.style.transform = 'scale(1.05)'}
-          onmouseleave=${(e) => e.target.style.transform = 'scale(1)'}
+          id="esa-camera-btn"
+          title="ESA AI - Camera & Upload"
+          style="width: 60px; height: 60px; background: linear-gradient(135deg, #b16286, #458588); border: 2px solid #ebdbb2; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #ebdbb2; font-size: 24px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); transition: all 0.2s;"
         >
           ${() => state.cameraActive ? '📷' : '✨'}
           <span style="font-size: 10px; font-weight: bold;">AI</span>
         </button>
         
-        <!-- Stacked Square Curved Buttons -->
+        <!-- Stacked Buttons -->
         <div style="display: flex; flex-direction: column; gap: 6px;">
-          <!-- Send Text Button -->
+          <!-- Send Text -->
           <button
-            @click=${() => methods.sendText(state, onAttachment)}
+            id="esa-text-btn"
             title="Send Text to Ingestion"
-            style="
-              width: 60px;
-              height: 40px;
-              background: ${activeTheme.green};
-              border: 2px solid ${activeTheme.fg};
-              border-radius: 10px;
-              cursor: pointer;
-              color: ${activeTheme.fg};
-              font-size: 18px;
-              box-shadow: 0 2px 4px ${activeTheme.shadow};
-            "
+            style="width: 60px; height: 40px; background: #98971a; border: 2px solid #ebdbb2; border-radius: 10px; cursor: pointer; color: #ebdbb2; font-size: 18px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);"
           >
             📝
           </button>
           
-          <!-- PDF Attachment Button -->
+          <!-- PDF Upload -->
           <label
             title="Upload PDF/TXT to Ingestion"
-            style="
-              width: 60px;
-              height: 40px;
-              background: ${activeTheme.red};
-              border: 2px solid ${activeTheme.fg};
-              border-radius: 10px;
-              cursor: pointer;
-              color: ${activeTheme.fg};
-              font-size: 18px;
-              box-shadow: 0 2px 4px ${activeTheme.shadow};
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            "
+            style="width: 60px; height: 40px; background: #cc241d; border: 2px solid #ebdbb2; border-radius: 10px; cursor: pointer; color: #ebdbb2; font-size: 18px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center;"
           >
             📄
             <input
               type="file"
               accept=".pdf,.txt"
               style="display: none"
-              @change=${(e) => {
-                const type = e.target.files[0]?.name.endsWith('.pdf') ? 'pdf' : 'text';
-                methods.handleFileUpload(state, e, type, onAttachment);
-                e.target.value = ''; // Reset input
-              }}
             />
           </label>
         </div>
         
-        <!-- Image Preview (if captured) -->
+        <!-- Image Preview -->
         ${() => state.capturedImage ? html`
-          <div style="
-            position: absolute;
-            top: 0;
-            right: 70px;
-            width: 140px;
-            height: 105px;
-            background: ${activeTheme.bg};
-            border: 2px solid ${activeTheme.border};
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px ${activeTheme.shadow};
-            z-index: 10;
-          ">
-            <img
-              src=${state.capturedImage}
-              style="width: 100%; height: 100%; object-fit: cover;"
-              alt="ESA Capture - Sent to Ingestion"
-            />
+          <div style="position: absolute; top: 0; right: 70px; width: 140px; height: 105px; background: #282828; border: 2px solid #3c3836; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); z-index: 10;">
+            <img src=${state.capturedImage} style="width: 100%; height: 100%; object-fit: cover;" alt="Capture" />
             <button
-              @click=${() => methods.clearImage(state)}
+              id="esa-clear-img-btn"
               title="Remove image"
-              style="
-                position: absolute;
-                top: 4px;
-                right: 4px;
-                background: ${activeTheme.red};
-                color: ${activeTheme.fg};
-                border: 1px solid ${activeTheme.fg};
-                border-radius: 50%;
-                width: 22px;
-                height: 22px;
-                cursor: pointer;
-                font-size: 14px;
-                line-height: 1;
-              "
+              style="position: absolute; top: 4px; right: 4px; background: #cc241d; color: #ebdbb2; border: 1px solid #ebdbb2; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 14px; line-height: 1;"
             >×</button>
           </div>
         ` : ''}
@@ -241,6 +134,50 @@ export const ESAButtonPanel = ESAVerifyComponent({
     `;
   }
 });
+
+// Setup event listeners after mount (Arrow.js can't handle @click properly)
+const originalMount = ESAButtonPanel.mount;
+ESAButtonPanel.mount = function(container, props = {}) {
+  const result = originalMount.call(this, container, props);
+  
+  // Attach event listeners via DOM
+  setTimeout(() => {
+    const cameraBtn = container.querySelector('#esa-camera-btn');
+    if (cameraBtn) {
+      cameraBtn.addEventListener('click', () => {
+        this.state.cameraActive = !this.state.cameraActive;
+        if (this.state.cameraActive) {
+          methods.activateCamera(this.state, props.onCapture);
+        }
+      });
+    }
+    
+    const textBtn = container.querySelector('#esa-text-btn');
+    if (textBtn) {
+      textBtn.addEventListener('click', () => {
+        methods.sendText(this.state, props.onAttachment);
+      });
+    }
+    
+    const fileInput = container.querySelector('input[type="file"]');
+    if (fileInput) {
+      fileInput.addEventListener('change', (e) => {
+        const type = e.target.files[0]?.name.endsWith('.pdf') ? 'pdf' : 'text';
+        methods.handleFileUpload(this.state, e, type, props.onAttachment);
+        e.target.value = '';
+      });
+    }
+    
+    const clearBtn = container.querySelector('#esa-clear-img-btn');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        methods.clearImage(this.state);
+      });
+    }
+  }, 100);
+  
+  return result;
+};
 
 function dataURLToBlob(dataURL) {
   const arr = dataURL.split(',');

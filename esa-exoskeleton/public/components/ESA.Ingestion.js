@@ -1,10 +1,10 @@
 /**
- * ESA.Ingestion.js (Arrow.js Compatible - No Nested Views)
+ * ESA.Ingestion.js (Arrow.js Compatible - HARDCODED STYLES)
  * ============================================
  * AI INGESTION CHAT BOX (PARENT COMPONENT)
  * 
- * ARROW.JS LIMITATION: Cannot embed view functions via ${} in templates!
- * Solution: SoundPanels mount to separate containers, not embedded in template.
+ * ARROW.JS COMPATIBILITY: All styles MUST be hardcoded!
+ * No ${} in style attributes. No dynamic form bindings.
  */
 
 import { reactive, html } from 'https://esm.sh/@arrow-js/core';
@@ -15,12 +15,6 @@ export const ESAIngestion = ESAVerifyComponent({
   name: 'Ingestion',
   version: '3.0.0',
   verified: true,
-  
-  owns: {
-    buttonPanel: true,
-    voice: true,
-    soundPanel: true
-  },
   
   state: {
     messages: [
@@ -34,7 +28,6 @@ export const ESAIngestion = ESAVerifyComponent({
     audioEngine: null,
     audioInitialized: false,
     systemStatus: 'ready',
-    // Container refs for SoundPanels (mounted separately)
     leftSoundPanelContainer: null,
     rightSoundPanelContainer: null
   },
@@ -116,12 +109,11 @@ export const ESAIngestion = ESAVerifyComponent({
       return { initialized: state.audioInitialized, ...state.audioEngine.getStatus() };
     },
     
-    // Called after mount to set up SoundPanels and event listeners
     initSoundPanels: async (state, container) => {
       try {
         const { ESASoundPanel } = await import('./ESA.SoundPanel.js');
         
-        // Set up select change handler (Arrow.js can't handle @change on select)
+        // Set up event listeners via DOM (Arrow.js can't handle @change on select)
         const agentSelect = container.querySelector('#esa-agent-select');
         if (agentSelect) {
           agentSelect.addEventListener('change', (e) => {
@@ -129,7 +121,6 @@ export const ESAIngestion = ESAVerifyComponent({
           });
         }
         
-        // Set up input handlers (Arrow.js can't handle @input on input)
         const chatInput = container.querySelector('#esa-chat-input');
         if (chatInput) {
           chatInput.addEventListener('input', (e) => {
@@ -140,6 +131,13 @@ export const ESAIngestion = ESAVerifyComponent({
           });
           chatInput.addEventListener('focus', () => {
             methods.initAudio(state);
+          });
+        }
+        
+        const sendButton = container.querySelector('#esa-send-button');
+        if (sendButton) {
+          sendButton.addEventListener('click', () => {
+            methods.sendMessage(state, state.inputValue);
           });
         }
         
@@ -166,14 +164,13 @@ export const ESAIngestion = ESAVerifyComponent({
           container.appendChild(rightContainer);
         }
         
-        // Mount SoundPanels to their containers
+        // Mount SoundPanels
         ESASoundPanel.mount(leftContainer, { side: 'left', audioEngine: state.audioEngine });
         ESASoundPanel.mount(rightContainer, { side: 'right', audioEngine: state.audioEngine });
         
         state.leftSoundPanelContainer = leftContainer;
         state.rightSoundPanelContainer = rightContainer;
         
-        console.log('[ESA.Ingestion] SoundPanels and event listeners initialized');
       } catch (e) {
         console.error('[ESA.Ingestion] Init error:', e);
       }
@@ -182,21 +179,17 @@ export const ESAIngestion = ESAVerifyComponent({
   
   template: (props, state, methods) => html`
     <div class="esa-ingestion-layout" style="display: flex; align-items: stretch; gap: 20px; width: 100%; padding: 10px;">
-      <!-- Chat Core (SoundPanels will be mounted separately) -->
+      <!-- Chat Core -->
       <div class="esa-ingestion-core" style="flex: 1; display: flex; flex-direction: column; background: #32302f; border: 1px solid #3c3836; border-radius: 12px; padding: 16px; min-height: 320px;">
         <!-- Header -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #3c3836;">
           <span style="color: #689d6a; font-weight: bold; font-size: 13px;">💬 ESA INGESTION AI</span>
           <div style="display: flex; gap: 10px; align-items: center;">
-            <select 
-              id="esa-agent-select"
-              style="background: #282828; color: #ebdbb2; border: 1px solid #3c3836; border-radius: 4px; padding: 4px 8px; font-size: 11px; outline: none;"
-            >
+            <select id="esa-agent-select" style="background: #282828; color: #ebdbb2; border: 1px solid #3c3836; border-radius: 4px; padding: 4px 8px; font-size: 11px; outline: none;">
               <option value="Ava007">Ava007</option>
               <option value="Core-Q2">Core-Q²</option>
               <option value="Agent-X">Agent-X</option>
             </select>
-            
             <div style="width: 8px; height: 8px; border-radius: 50%; background: #928374;"></div>
           </div>
         </div>
@@ -206,7 +199,7 @@ export const ESAIngestion = ESAVerifyComponent({
           ${() => state.messages.map(msg => html`
             <div style="margin: 8px 0; padding: 10px 14px; border-radius: 8px; background: #3c3836; color: #ebdbb2; font-size: 12px; line-height: 1.5;">
               <div style="font-weight: bold; margin-bottom: 4px; font-size: 10px; opacity: 0.8;">
-                ${msg.role === 'user' ? '👤 OPERATOR' : `🤖 ${state.assignedAgent}`}
+                ${msg.role === 'user' ? '👤 OPERATOR' : '🤖 Ava007'}
               </div>
               <div>${msg.content}</div>
             </div>

@@ -3,116 +3,130 @@
  * ============================================
  * DAILY MAINTENANCE CHECKLIST MODULE
  * 
- * Features:
- * - 6 tabs matching paper checklist sections
- * - Gruvbox gradient sidebar (red, yellow, green, aqua, purple, orange)
- * - Interactive checkboxes with strike-through
- * - Live progress counts per tab and header
- * - Header fields: Date/Shift/Employee/Manager
- * - Notes tab with Green Shield tracking table
+ * 6-Tab Digitized Paper Form:
+ * 1. Shift Start & Setup (Red)
+ * 2. Shift Walk-Through (Yellow)
+ * 3. Unit Maintenance (Green)
+ * 4. End-of-Day Procedures (Aqua)
+ * 5. Safety & Green Shield (Purple)
+ * 6. Shift Notes & Log (Orange)
  * 
- * All styles hardcoded for Arrow.js compatibility
+ * ARROW.JS COMPATIBILITY: All styles MUST be hardcoded!
+ * No ${} in style attributes. Event listeners via post-mount DOM.
  */
 
 import { reactive, html } from 'https://esm.sh/@arrow-js/core';
 import { ESAVerifyComponent } from './ESA.VerifiedWrapper.js';
 
 // ============================================
-// CHECKLIST DATA - Transcribed from paper form
+// CHECKLIST DATA DEFINITION
 // ============================================
 const CHECKLIST_SECTIONS = [
   {
     id: 'shift-start',
     label: 'Shift Start & Setup',
-    icon: '🌅',
-    color: '#cc241d', // Gruvbox red
+    color: '#cc241d',      // Gruvbox red
     colorLight: '#fb4934',
-    tasks: [
-      { id: 'ss-1', text: 'Review previous shift handoff notes', sop: 'Read logbook entries from outgoing technician' },
-      { id: 'ss-2', text: 'Verify tool kit completeness', sop: 'Count all tools against inventory sheet' },
-      { id: 'ss-3', text: 'Check PPE availability and condition', sop: 'Inspect gloves, safety glasses, hard hat' },
-      { id: 'ss-4', text: 'Review scheduled work orders for shift', sop: 'Prioritize by urgency and location' },
-      { id: 'ss-5', text: 'Confirm radio/communication device charged', sop: 'Test transmit/receive function' },
-      { id: 'ss-6', text: 'Sign in on time clock / digital log', sop: 'Record actual start time' },
-      { id: 'ss-7', text: 'Brief with supervisor on priority items', sop: 'Note any safety concerns or alerts' },
-      { id: 'ss-8', text: 'Review any open Green Shield tickets', sop: 'Check ticket status and updates' }
+    icon: '🌅',
+    items: [
+      { id: 'ss1', text: 'Review previous shift handoff notes and outstanding issues' },
+      { id: 'ss2', text: 'Verify all tools and equipment are accounted for in toolkit' },
+      { id: 'ss3', text: 'Check inventory levels of commonly used parts and consumables' },
+      { id: 'ss4', text: 'Inspect personal protective equipment (PPE) - replace if damaged' },
+      { id: 'ss5', text: 'Test communication devices (radio, phone, tablet)' },
+      { id: 'ss6', text: 'Log into work order system and review assigned tasks' },
+      { id: 'ss7', text: 'Confirm vehicle/fleet check complete (if applicable)' },
+      { id: 'ss8', text: 'Review any safety bulletins or procedure updates' },
+      { id: 'ss9', text: 'Check emergency exit routes are clear and unobstructed' },
+      { id: 'ss10', text: 'Verify first aid kit is fully stocked and accessible' }
     ]
   },
   {
-    id: 'equipment-inspect',
-    label: 'Equipment Inspection',
-    icon: '🔧',
-    color: '#d79921', // Gruvbox yellow
+    id: 'walkthrough',
+    label: 'Shift Walk-Through',
+    color: '#d79921',      // Gruvbox yellow
     colorLight: '#fabd2f',
-    tasks: [
-      { id: 'ei-1', text: 'Inspect PTAC units in assigned area', sop: 'Visual check for damage, leaks, debris' },
-      { id: 'ei-2', text: 'Check filter condition on all units', sop: 'Replace if dirty (>30% blocked)' },
-      { id: 'ei-3', text: 'Verify thermostat calibration', sop: 'Compare to reference thermometer ±2°F' },
-      { id: 'ei-4', text: 'Inspect electrical connections', sop: 'Look for discoloration, loose wires' },
-      { id: 'ei-5', text: 'Check refrigerant lines for oil stains', sop: 'Indicates potential leak point' },
-      { id: 'ei-6', text: 'Test unit startup/shutdown sequence', sop: 'Verify smooth operation, no errors' },
-      { id: 'ei-7', text: 'Document serial numbers of new units', sop: 'Add to asset database' },
-      { id: 'ei-8', text: 'Photograph any damage found', sop: 'Upload to workorder with timestamp' }
+    icon: '🚶',
+    items: [
+      { id: 'wt1', text: 'Walk assigned zone/area - note any visible damage or hazards' },
+      { id: 'wt2', text: 'Check all HVAC units for unusual noises or vibrations' },
+      { id: 'wt3', text: 'Inspect electrical panels - ensure no warning indicators active' },
+      { id: 'wt4', text: 'Verify plumbing fixtures - check for leaks or drips' },
+      { id: 'wt5', text: 'Test emergency lighting and exit signs in walkway' },
+      { id: 'wt6', text: 'Inspect fire extinguisher locations - gauge in green zone' },
+      { id: 'wt7', text: 'Check door closures and automatic door operations' },
+      { id: 'wt8', text: 'Note any new work orders needed from observations' },
+      { id: 'wt9', text: 'Verify security cameras are operational in area' },
+      { id: 'wt10', text: 'Document any housekeeping or cleaning needs observed' }
     ]
   },
   {
-    id: 'safety-checks',
-    label: 'Safety Checks',
-    icon: '⚠️',
-    color: '#98971a', // Gruvbox green
+    id: 'unit-maint',
+    label: 'Unit Maintenance',
+    color: '#98971a',      // Gruvbox green
     colorLight: '#b8bb26',
-    tasks: [
-      { id: 'sc-1', text: 'Verify lockout/tagout procedures followed', sop: 'Check LOTO log for active locks' },
-      { id: 'sc-2', text: 'Inspect fire extinguisher locations', sop: 'Ensure accessible, gauge in green' },
-      { id: 'sc-3', text: 'Check emergency exit pathways clear', sop: 'No obstructions, signage visible' },
-      { id: 'sc-4', text: 'Verify chemical storage compliance', sop: 'MSDS sheets posted, containers labeled' },
-      { id: 'sc-5', text: 'Inspect ladder and fall protection gear', sop: 'No cracks, straps intact' },
-      { id: 'sc-6', text: 'Confirm first aid kit stocked', sop: 'Check expiration dates on supplies' },
-      { id: 'sc-7', text: 'Review area for slip/trip hazards', sop: 'Cords secured, floors dry' },
-      { id: 'sc-8', text: 'Report any near-miss incidents', sop: 'Complete incident report form' }
+    icon: '🔧',
+    items: [
+      { id: 'um1', text: 'Review PM schedule for due preventive maintenance tasks' },
+      { id: 'um2', text: 'Complete filter replacements per schedule (document part #'s)' },
+      { id: 'um3', text: 'Check and tighten all electrical connections on serviced units' },
+      { id: 'um4', text: 'Inspect belts, pulleys, and rotating components for wear' },
+      { id: 'um5', text: 'Lubricate bearings and moving parts per OEM specifications' },
+      { id: 'um6', text: 'Clean condenser coils - record before/after photos if required' },
+      { id: 'um7', text: 'Check refrigerant levels and pressures on HVAC equipment' },
+      { id: 'um8', text: 'Test safety switches and limit controls' },
+      { id: 'um9', text: 'Calibrate thermostats and sensors as needed' },
+      { id: 'um10', text: 'Document all readings (amps, volts, temps) in log' },
+      { id: 'um11', text: 'Replace any worn or suspect components proactively' },
+      { id: 'um12', text: 'Run test cycle after maintenance - verify normal operation' }
     ]
   },
   {
-    id: 'preventive-maint',
-    label: 'Preventive Maintenance',
-    icon: '🛠️',
-    color: '#689d6a', // Gruvbox aqua
+    id: 'end-of-day',
+    label: 'End-of-Day Procedures',
+    color: '#689d6a',      // Gruvbox aqua
     colorLight: '#8ec07c',
-    tasks: [
-      { id: 'pm-1', text: 'Clean condenser coils on schedule', sop: 'Use coil cleaner, rinse thoroughly' },
-      { id: 'pm-2', text: 'Check and tighten electrical panels', sop: 'Torque to spec, note any hot spots' },
-      { id: 'pm-3', text: 'Lubricate fan motors as required', sop: 'Use specified lubricant type' },
-      { id: 'pm-4', text: 'Test safety switches and cutouts', sop: 'Verify proper trip points' },
-      { id: 'pm-5', text: 'Inspect drain pans and clear clogs', sop: 'Use approved cleaner, flush line' },
-      { id: 'pm-6', text: 'Check belt tension and alignment', sop: 'Deflect ½" per foot of span' },
-      { id: 'pm-7', text: 'Record amp draw on compressors', sop: 'Compare to nameplate rating' },
-      { id: 'pm-8', text: 'Replace filters per PM schedule', sop: 'Log replacement date and tech ID' }
+    icon: '🌙',
+    items: [
+      { id: 'eod1', text: 'Complete all open work orders or document status for handoff' },
+      { id: 'eod2', text: 'Return all borrowed tools to proper storage locations' },
+      { id: 'eod3', text: 'Secure all access points and lock up sensitive areas' },
+      { id: 'eod4', text: 'Submit parts requisition for any low-stock items noticed' },
+      { id: 'eod5', text: 'Complete time sheet / labor hours documentation' },
+      { id: 'eod6', text: 'Write shift handoff notes for incoming technician' },
+      { id: 'eod7', text: 'Report any unresolved safety concerns to supervisor' },
+      { id: 'eod8', text: 'Charge / dock all portable devices and battery equipment' },
+      { id: 'eod9', text: 'Dispose of waste materials properly (recycle where applicable)' },
+      { id: 'eod10', text: 'Sign out of all systems and turn over badge/keys' }
     ]
   },
   {
-    id: 'documentation',
-    label: 'Documentation',
-    icon: '📋',
-    color: '#b16286', // Gruvbox purple
+    id: 'safety',
+    label: 'Safety & Green Shield',
+    color: '#b16286',      // Gruvbox purple
     colorLight: '#d3869b',
-    tasks: [
-      { id: 'doc-1', text: 'Complete work order paperwork', sop: 'All fields filled, signatures obtained' },
-      { id: 'doc-2', text: 'Update equipment history logs', sop: 'Record repairs, parts used, hours' },
-      { id: 'doc-3', text: 'Submit parts requisition forms', sop: 'Include part numbers and quantities' },
-      { id: 'doc-4', text: 'Photograph completed work', sop: 'Before/after shots for warranty' },
-      { id: 'doc-5', text: 'File customer signature on completion', sop: 'Explain work performed, get sign-off' },
-      { id: 'doc-6', text: 'Enter time against correct cost codes', sop: 'Work order #, task code, hours' },
-      { id: 'doc-7', text: 'Submit expense receipts', op: 'Mileage, materials, parking' },
-      { id: 'doc-8', text: 'Prepare shift handoff notes', sop: 'Outstanding issues, pending orders' }
+    icon: '🛡️',
+    items: [
+      { id: 'sf1', text: 'Complete required safety observation / near-miss report' },
+      { id: 'sf2', text: 'Verify LOTO (Lock Out Tag Out) procedures followed' },
+      { id: 'sf3', text: 'Check that all hazard signage is visible and current' },
+      { id: 'sf4', text: 'Confirm SDS (Safety Data Sheets) accessible for chemicals used' },
+      { id: 'sf5', text: 'Report any PPE deficiencies or replacement needs' },
+      { id: 'sf6', text: 'Document any environmental spills or containment actions' },
+      { id: 'sf7', text: 'Verify Green Shield compliance for sustainable practices' },
+      { id: 'sf8', text: 'Check energy conservation measures are being followed' },
+      { id: 'sf9', text: 'Attend or complete required safety training module' },
+      { id: 'sf10', text: 'Sign off on daily safety acknowledgment form' }
     ]
   },
   {
-    id: 'shift-notes',
+    id: 'notes',
     label: 'Shift Notes & Log',
-    icon: '📝',
-    color: '#d65d0e', // Gruvbox orange
+    color: '#d65d0e',      // Gruvbox orange
     colorLight: '#fe8019',
-    tasks: [] // This tab uses the notes table instead
+    icon: '📝',
+    isNotesTab: true,
+    items: []  // Notes tab uses custom table UI instead of checkboxes
   }
 ];
 
@@ -123,526 +137,523 @@ export const ESAMaintenanceChecklist = ESAVerifyComponent({
   
   state: {
     activeTab: 'shift-start',
-    date: new Date().toISOString().split('T')[0],
-    shift: 'Day',
-    employeeName: '',
-    managerSignoff: '',
-    completedTasks: {},
-    notes: [],
-    currentNote: { targetArea: '', cycle: '', actions: '', partsUsed: '' }
+    headerData: {
+      date: '',
+      shift: 'Day',
+      employeeName: '',
+      managerSignoff: ''
+    },
+    checkedItems: {},       // { 'ss1': true, 'ss2': false, ... }
+    notesEntries: [         // For the notes tab table
+      { id: 1, targetArea: '', cycle: '', actions: '', partsUsed: '', timestamp: '' }
+    ],
+    shiftNotes: ''
   },
   
   methods: {
-    toggleTask: (state, sectionId, taskId) => {
-      const key = `${sectionId}-${taskId}`;
-      state.completedTasks[key] = !state.completedTasks[key];
+    toggleItem: (state, itemId) => {
+      state.checkedItems[itemId] = !state.checkedItems[itemId];
     },
     
-    isTaskCompleted: (state, sectionId, taskId) => {
-      const key = `${sectionId}-${taskId}`;
-      return !!state.completedTasks[key];
+    getCheckedCount: (state, sectionId) => {
+      const section = CHECKLIST_SECTIONS.find(s => s.id === sectionId);
+      if (!section || section.isNotesTab) return '-';
+      return section.items.filter(item => state.checkedItems[item.id]).length;
+    },
+    
+    getTotalCount: (state, sectionId) => {
+      const section = CHECKLIST_SECTIONS.find(s => s.id === sectionId);
+      if (!section || section.isNotesTab) return '-';
+      return section.items.length;
     },
     
     getSectionProgress: (state, sectionId) => {
       const section = CHECKLIST_SECTIONS.find(s => s.id === sectionId);
-      if (!section || section.tasks.length === 0) return { done: 0, total: 0, percent: 0 };
-      
-      const done = section.tasks.filter(t => 
-        state.completedTasks[`${sectionId}-${t.id}`]
-      ).length;
-      
-      return {
-        done,
-        total: section.tasks.length,
-        percent: Math.round((done / section.tasks.length) * 100)
-      };
+      if (!section || section.isNotesTab) return 0;
+      const checked = section.items.filter(item => state.checkedItems[item.id]).length;
+      return Math.round((checked / section.items.length) * 100);
     },
     
-    getTotalProgress: (state) => {
-      let totalDone = 0;
-      let totalTasks = 0;
-      
+    getOverallProgress: (state) => {
+      let total = 0;
+      let checked = 0;
       CHECKLIST_SECTIONS.forEach(section => {
-        totalTasks += section.tasks.length;
-        totalDone += section.tasks.filter(t => 
-          state.completedTasks[`${section.id}-${t.id}`]
-        ).length;
+        if (!section.isNotesTab) {
+          total += section.items.length;
+          checked += section.items.filter(item => state.checkedItems[item.id]).length;
+        }
       });
-      
-      return {
-        done: totalDone,
-        total: totalTasks,
-        percent: totalTasks > 0 ? Math.round((totalDone / totalTasks) * 100) : 0
-      };
+      return total > 0 ? Math.round((checked / total) * 100) : 0;
     },
     
-    addNote: (state) => {
-      if (state.currentNote.targetArea || state.currentNote.actions) {
-        state.notes.push({
-          ...state.currentNote,
-          timestamp: new Date().toISOString()
-        });
-        state.currentNote = { targetArea: '', cycle: '', actions: '', partsUsed: '' };
+    addNoteRow: (state) => {
+      const newId = state.notesEntries.length + 1;
+      state.notesEntries.push({
+        id: newId,
+        targetArea: '',
+        cycle: '',
+        actions: '',
+        partsUsed: '',
+        timestamp: new Date().toLocaleTimeString()
+      });
+    },
+    
+    removeNoteRow: (state, rowId) => {
+      state.notesEntries = state.notesEntries.filter(entry => entry.id !== rowId);
+    },
+    
+    updateNoteField: (state, rowId, field, value) => {
+      const entry = state.notesEntries.find(e => e.id === rowId);
+      if (entry) {
+        entry[field] = value;
       }
     },
     
-    clearNote: (state) => {
-      state.currentNote = { targetArea: '', cycle: '', actions: '', partsUsed: '' };
+    initEventListeners: (state, container) => {
+      // Tab switching
+      const tabButtons = container.querySelectorAll('.mc-tab-btn');
+      tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tabId = btn.getAttribute('data-tab');
+          state.activeTab = tabId;
+          
+          // Update active states visually
+          tabButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          
+          // Show/hide tab content
+          container.querySelectorAll('.mc-tab-content').forEach(content => {
+            content.style.display = 'none';
+          });
+          const activeContent = container.querySelector(`[data-content="${tabId}"]`);
+          if (activeContent) {
+            activeContent.style.display = 'block';
+          }
+        });
+      });
+      
+      // Checkbox toggling
+      container.querySelectorAll('.mc-checkbox').forEach(cb => {
+        cb.addEventListener('change', (e) => {
+          const itemId = e.target.getAttribute('data-item-id');
+          if (itemId) {
+            state.checkedItems[itemId] = e.target.checked;
+            
+            // Toggle strikethrough on label
+            const label = container.querySelector(`[data-label-for="${itemId}"]`);
+            if (label) {
+              label.style.textDecoration = e.target.checked ? 'line-through' : 'none';
+              label.style.opacity = e.target.checked ? '0.6' : '1';
+            }
+            
+            // Update progress badges
+            methods.updateProgressBadges(state, container);
+          }
+        });
+      });
+      
+      // Header input fields
+      const dateInput = container.querySelector('#mc-date-input');
+      if (dateInput) {
+        dateInput.value = new Date().toISOString().split('T')[0];
+        state.headerData.date = dateInput.value;
+        dateInput.addEventListener('change', (e) => {
+          state.headerData.date = e.target.value;
+        });
+      }
+      
+      const shiftSelect = container.querySelector('#mc-shift-select');
+      if (shiftSelect) {
+        shiftSelect.value = state.headerData.shift;
+        shiftSelect.addEventListener('change', (e) => {
+          state.headerData.shift = e.target.value;
+        });
+      }
+      
+      const empInput = container.querySelector('#mc-employee-input');
+      if (empInput) {
+        empInput.addEventListener('input', (e) => {
+          state.headerData.employeeName = e.target.value;
+        });
+      }
+      
+      const mgrInput = container.querySelector('#mc-manager-input');
+      if (mgrInput) {
+        mgrInput.addEventListener('input', (e) => {
+          state.headerData.managerSignoff = e.target.value;
+        });
+      }
+      
+      // Notes textarea
+      const notesTextarea = container.querySelector('#mc-shift-notes');
+      if (notesTextarea) {
+        notesTextarea.addEventListener('input', (e) => {
+          state.shiftNotes = e.target.value;
+        });
+      }
+      
+      // Add note row button
+      const addRowBtn = container.querySelector('#mc-add-row-btn');
+      if (addRowBtn) {
+        addRowBtn.addEventListener('click', () => {
+          methods.addNoteRow(state);
+          methods.renderNotesTable(state, container);
+        });
+      }
+      
+      // Initialize first tab as active
+      const firstTab = container.querySelector('.mc-tab-btn[data-tab="shift-start"]');
+      if (firstTab) firstTab.classList.add('active');
+      
+      const firstContent = container.querySelector('.mc-tab-content[data-content="shift-start"]');
+      if (firstContent) firstContent.style.display = 'block';
     },
     
-    removeNote: (state, index) => {
-      state.notes.splice(index, 1);
+    updateProgressBadges: (state, container) => {
+      CHECKLIST_SECTIONS.forEach(section => {
+        if (!section.isNotesTab) {
+          const badge = container.querySelector(`[data-progress-badge="${section.id}"]`);
+          if (badge) {
+            const checked = section.items.filter(item => state.checkedItems[item.id]).length;
+            badge.textContent = `${checked}/${section.items.length}`;
+          }
+        }
+      });
+      
+      // Update overall progress bar
+      const overallBar = container.querySelector('#mc-overall-progress-bar');
+      const overallText = container.querySelector('#mc-overall-progress-text');
+      if (overallBar && overallText) {
+        const progress = methods.getOverallProgress(state);
+        overallBar.style.width = `${progress}%`;
+        overallText.textContent = `${progress}% Complete`;
+      }
     },
     
-    switchTab: (state, tabId) => {
-      state.activeTab = tabId;
+    renderNotesTable: (state, container) => {
+      const tbody = container.querySelector('#mc-notes-tbody');
+      if (!tbody) return;
+      
+      tbody.innerHTML = '';
+      
+      state.notesEntries.forEach(entry => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="padding: 8px; border: 1px solid #3c3836; background: #282828;">
+            <input type="text" data-field="targetArea" data-row-id="${entry.id}" 
+                   value="${entry.targetArea}" placeholder="Area name..."
+                   style="width: 100%; background: #32302f; color: #ebdbb2; border: 1px solid #3c3836; 
+                          border-radius: 4px; padding: 6px 8px; font-size: 11px; outline: none;" />
+          </td>
+          <td style="padding: 8px; border: 1px solid #3c3836; background: #282828;">
+            <input type="text" data-field="cycle" data-row-id="${entry.id}" 
+                   value="${entry.cycle}" placeholder="Cycle #..."
+                   style="width: 100%; background: #32302f; color: #ebdbb2; border: 1px solid #3c3836; 
+                          border-radius: 4px; padding: 6px 8px; font-size: 11px; outline: none;" />
+          </td>
+          <td style="padding: 8px; border: 1px solid #3c3836; background: #282828;">
+            <textarea data-field="actions" data-row-id="${entry.id}" 
+                      placeholder="Actions taken..."
+                      style="width: 100%; background: #32302f; color: #ebdbb2; border: 1px solid #3c3836; 
+                             border-radius: 4px; padding: 6px 8px; font-size: 11px; outline: none; 
+                             resize: vertical; min-height: 40px;">${entry.actions}</textarea>
+          </td>
+          <td style="padding: 8px; border: 1px solid #3c3836; background: #282828;">
+            <input type="text" data-field="partsUsed" data-row-id="${entry.id}" 
+                   value="${entry.partsUsed}" placeholder="Part #s used..."
+                   style="width: 100%; background: #32302f; color: #ebdbb2; border: 1px solid #3c3836; 
+                          border-radius: 4px; padding: 6px 8px; font-size: 11px; outline: none;" />
+          </td>
+          <td style="padding: 8px; border: 1px solid #3c3836; background: #282828; text-align: center;">
+            ${state.notesEntries.length > 1 ? `
+              <button data-delete-row="${entry.id}" 
+                      style="background: #cc241d; color: #ebdbb2; border: none; border-radius: 4px; 
+                             padding: 4px 10px; cursor: pointer; font-size: 10px;">
+                ✕
+              </button>
+            ` : '-'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+        
+        // Attach event listeners to new inputs
+        tr.querySelectorAll('input, textarea').forEach(input => {
+          input.addEventListener('input', (e) => {
+            const rowId = parseInt(e.target.getAttribute('data-row-id'));
+            const field = e.target.getAttribute('data-field');
+            methods.updateNoteField(state, rowId, field, e.target.value);
+          });
+        });
+        
+        // Delete button
+        const deleteBtn = tr.querySelector('[data-delete-row]');
+        if (deleteBtn) {
+          deleteBtn.addEventListener('click', () => {
+            const rowId = parseInt(deleteBtn.getAttribute('data-delete-row'));
+            methods.removeNoteRow(state, rowId);
+            methods.renderNotesTable(state, container);
+          });
+        }
+      });
     }
   },
   
-  template: (props, state, methods) => {
-    const totalProgress = methods.getTotalProgress(state);
-    const activeSection = CHECKLIST_SECTIONS.find(s => s.id === state.activeTab);
-    
-    return html`
-      <div class="esa-maintenance-checklist" style="display: flex; gap: 0; background: #282828; border: 2px solid #3c3836; border-radius: 16px; overflow: hidden; min-height: 500px;">
-        
-        <!-- SIDEBAR TABS -->
-        <div style="width: 200px; background: #1d2021; border-right: 1px solid #3c3836; display: flex; flex-direction: column;">
-          
-          <!-- Gradient Rail -->
-          <div style="height: 4px; background: linear-gradient(180deg, #cc241d 0%, #d79921 20%, #98971a 40%, #689d6a 60%, #b16286 80%, #d65d0e 100%);"></div>
-          
-          <!-- Tab Buttons -->
-          <div style="flex: 1; padding: 12px 0; display: flex; flex-direction: column; gap: 4px;">
-            ${CHECKLIST_SECTIONS.map(section => {
-              const isActive = state.activeTab === section.id;
-              const progress = methods.getSectionProgress(state, section.id);
-              
-              return html`
-                <button
-                  class="esa-checklist-tab"
-                  data-tab="${section.id}"
-                  style="
-                    display: flex; align-items: center; gap: 10px;
-                    padding: 12px 16px;
-                    background: ${isActive ? '#32302f' : 'transparent'};
-                    border: none;
-                    border-left: 3px solid ${isActive ? section.color : 'transparent'};
-                    cursor: pointer;
-                    text-align: left;
-                    transition: all 0.2s;
-                  "
-                >
-                  <span style="font-size: 18px;">${section.icon}</span>
-                  <span style="flex: 1; font-size: 11px; font-weight: ${isActive ? 'bold' : 'normal'}; color: #ebdbb2; line-height: 1.3;">
-                    ${section.label}
-                  </span>
-                  ${section.tasks.length > 0 ? html`
-                    <span style="
-                      font-size: 9px; padding: 2px 6px; border-radius: 10px;
-                      background: ${progress.done === progress.total ? '#98971a' : '#3c3836'};
-                      color: ${progress.done === progress.total ? '#282828' : '#a89984'};
-                      font-weight: bold;
-                      min-width: 28px; text-align: center;
-                    ">
-                      ${progress.done}/${progress.total}
-                    </span>
-                  ` : ''}
-                </button>
-              `;
-            })}
+  template: (props, state, methods) => html`
+    <div class="mc-container" style="display: flex; flex-direction: column; width: 100%; min-height: 500px; background: #282828; border-radius: 12px; overflow: hidden;">
+      
+      <!-- HEADER SECTION -->
+      <div style="background: #32302f; border-bottom: 1px solid #3c3836; padding: 16px 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 24px;">📋</span>
+            <span style="color: #d79921; font-weight: bold; font-size: 16px; letter-spacing: 1px;">DAILY MAINTENANCE CHECKLIST</span>
           </div>
-          
-          <!-- Total Progress -->
-          <div style="padding: 16px; border-top: 1px solid #3c3836; background: #282828;">
-            <div style="font-size: 10px; color: #a89984; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">Total Progress</div>
-            <div style="height: 8px; background: #3c3836; border-radius: 4px; overflow: hidden;">
-              <div style="width: ${totalProgress.percent}%; height: 100%; background: linear-gradient(90deg, #98971a, #689d6a); border-radius: 4px; transition: width 0.3s;"></div>
-            </div>
-            <div style="font-size: 12px; color: #ebdbb2; margin-top: 6px; font-weight: bold;">
-              ${totalProgress.done} / ${totalProgress.total} tasks (${totalProgress.percent}%)
+          <!-- Overall Progress -->
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="color: #a89984; font-size: 11px;">Overall:</span>
+            <div style="width: 120px; height: 18px; background: #1d2021; border-radius: 9px; overflow: hidden; position: relative;">
+              <div id="mc-overall-progress-bar" style="height: 100%; background: linear-gradient(90deg, #98971a, #689d6a); border-radius: 9px; transition: width 0.3s ease; width: 0%;"></div>
+              <span id="mc-overall-progress-text" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 9px; color: #ebdbb2; font-weight: bold;">0%</span>
             </div>
           </div>
         </div>
         
-        <!-- MAIN CONTENT AREA -->
-        <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-          
-          <!-- HEADER SECTION -->
-          <div style="padding: 20px 24px; background: #32302f; border-bottom: 1px solid #3c3836;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-              <h2 style="color: #d79921; font-size: 18px; margin: 0; display: flex; align-items: center; gap: 10px;">
-                <span>📋</span>
-                <span>DAILY MAINTENANCE CHECKLIST</span>
-              </h2>
-              <div style="font-size: 11px; color: #a89984; background: #282828; padding: 4px 12px; border-radius: 12px;">
-                ${activeSection?.icon || ''} ${activeSection?.label || ''}
-              </div>
-            </div>
-            
-            <!-- Header Fields -->
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
-              <div>
-                <label style="font-size: 10px; color: #a89984; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">Date</label>
-                <input
-                  type="date"
-                  id="esa-cl-date"
-                  value="${state.date}"
-                  style="width: 100%; background: #282828; border: 1px solid #3c3836; color: #ebdbb2; padding: 8px 10px; border-radius: 6px; font-size: 12px; outline: none;"
-                />
-              </div>
-              <div>
-                <label style="font-size: 10px; color: #a89984; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">Shift</label>
-                <select
-                  id="esa-cl-shift"
-                  style="width: 100%; background: #282828; border: 1px solid #3c3836; color: #ebdbb2; padding: 8px 10px; border-radius: 6px; font-size: 12px; outline: none;"
-                >
-                  <option value="Day" ${state.shift === 'Day' ? 'selected' : ''}>Day Shift</option>
-                  <option value="Swing" ${state.shift === 'Swing' ? 'selected' : ''}>Swing Shift</option>
-                  <option value="Night" ${state.shift === 'Night' ? 'selected' : ''}>Night Shift</option>
-                </select>
-              </div>
-              <div>
-                <label style="font-size: 10px; color: #a89984; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">Employee Name</label>
-                <input
-                  type="text"
-                  id="esa-cl-employee"
-                  placeholder="Enter name..."
-                  value="${state.employeeName}"
-                  style="width: 100%; background: #282828; border: 1px solid #3c3836; color: #ebdbb2; padding: 8px 10px; border-radius: 6px; font-size: 12px; outline: none;"
-                />
-              </div>
-              <div>
-                <label style="font-size: 10px; color: #a89984; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">Manager Sign-off</label>
-                <input
-                  type="text"
-                  id="esa-cl-manager"
-                  placeholder="Signature..."
-                  value="${state.managerSignoff}"
-                  style="width: 100%; background: #282828; border: 1px solid #3c3836; color: #ebdbb2; padding: 8px 10px; border-radius: 6px; font-size: 12px; outline: none;"
-                />
-              </div>
-            </div>
+        <!-- Header Fields -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+          <div>
+            <label style="display: block; color: #a89984; font-size: 10px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Date</label>
+            <input type="date" id="mc-date-input" 
+                   style="width: 100%; background: #282828; color: #ebdbb2; border: 1px solid #3c3836; 
+                          border-radius: 6px; padding: 8px 10px; font-size: 12px; outline: none;" />
           </div>
-          
-          <!-- TAB CONTENT -->
-          <div style="flex: 1; overflow-y: auto; padding: 24px;">
-            
-            ${state.activeTab === 'shift-notes' ? html`
-              <!-- NOTES TAB CONTENT -->
-              <div>
-                <h3 style="color: #d65d0e; font-size: 14px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-                  <span>📝</span> Shift Notes & Green Shield Tracking Log
-                </h3>
-                
-                <!-- Add Note Form -->
-                <div style="background: #32302f; border: 1px solid #3c3836; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
-                  <div style="font-size: 12px; font-weight: bold; color: #ebdbb2; margin-bottom: 12px;">Log New Entry</div>
-                  
-                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-                    <div>
-                      <label style="font-size: 10px; color: #a89984; display: block; margin-bottom: 4px;">Target Area / Cycle</label>
-                      <input
-                        type="text"
-                        id="esa-note-area"
-                        placeholder="e.g., Building A - Floor 3"
-                        value="${state.currentNote.targetArea}"
-                        style="width: 100%; background: #282828; border: 1px solid #3c3836; color: #ebdbb2; padding: 8px 10px; border-radius: 6px; font-size: 12px; outline: none;"
-                      />
-                    </div>
-                    <div>
-                      <label style="font-size: 10px; color: #a89984; display: block; margin-bottom: 4px;">Cycle #</label>
-                      <input
-                        type="text"
-                        id="esa-note-cycle"
-                        placeholder="e.g., CYCLE-001"
-                        value="${state.currentNote.cycle}"
-                        style="width: 100%; background: #282828; border: 1px solid #3c3836; color: #ebdbb2; padding: 8px 10px; border-radius: 6px; font-size: 12px; outline: none;"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div style="margin-bottom: 12px;">
-                    <label style="font-size: 10px; color: #a89984; display: block; margin-bottom: 4px;">Actions Logged</label>
-                    <textarea
-                      id="esa-note-actions"
-                      placeholder="Describe actions taken..."
-                      rows="3"
-                      style="width: 100%; background: #282828; border: 1px solid #3c3836; color: #ebdbb2; padding: 8px 10px; border-radius: 6px; font-size: 12px; outline: none; resize: vertical; font-family: inherit;"
-                    >${state.currentNote.actions}</textarea>
-                  </div>
-                  
-                  <div style="margin-bottom: 12px;">
-                    <label style="font-size: 10px; color: #a89984; display: block; margin-bottom: 4px;">Parts Used</label>
-                    <input
-                      type="text"
-                      id="esa-note-parts"
-                      placeholder="List parts consumed..."
-                      value="${state.currentNote.partsUsed}"
-                      style="width: 100%; background: #282828; border: 1px solid #3c3836; color: #ebdbb2; padding: 8px 10px; border-radius: 6px; font-size: 12px; outline: none;"
-                    />
-                  </div>
-                  
-                  <div style="display: flex; gap: 8px;">
-                    <button
-                      id="esa-add-note-btn"
-                      style="background: #d65d0e; color: #282828; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;"
-                    >
-                      ➕ Add Entry
-                    </button>
-                    <button
-                      id="esa-clear-note-btn"
-                      style="background: transparent; color: #a89984; border: 1px solid #3c3836; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 12px;"
-                    >
-                      Clear
-                    </button>
-                  </div>
-                </div>
-                
-                <!-- Notes List -->
-                <div>
-                  <div style="font-size: 12px; font-weight: bold; color: #ebdbb2; margin-bottom: 12px;">
-                    Logged Entries (${state.notes.length})
-                  </div>
-                  
-                  ${state.notes.length === 0 ? html`
-                    <div style="text-align: center; padding: 40px; color: #a89984; font-size: 13px; background: #32302f; border-radius: 8px; border: 1px dashed #3c3836;">
-                      No entries logged yet.<br/>Use the form above to add your first entry.
-                    </div>
-                  ` : html`
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
-                      ${state.notes.map((note, index) => html`
-                        <div style="background: #32302f; border: 1px solid #3c3836; border-left: 3px solid #d65d0e; border-radius: 8px; padding: 16px; position: relative;">
-                          <button
-                            class="esa-delete-note-btn"
-                            data-index="${index}"
-                            style="position: absolute; top: 12px; right: 12px; background: transparent; color: #cc241d; border: none; cursor: pointer; font-size: 16px; padding: 4px;"
-                          >✕</button>
-                          
-                          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-                            <div>
-                              <span style="font-size: 10px; color: #a89984;">Target Area:</span>
-                              <div style="color: #ebdbb2; font-weight: bold;">${note.targetArea || '-'}</div>
-                            </div>
-                            <div>
-                              <span style="font-size: 10px; color: #a89984;">Cycle:</span>
-                              <div style="color: #ebdbb2; font-weight: bold;">${note.cycle || '-'}</div>
-                            </div>
-                          </div>
-                          
-                          ${note.actions ? html`
-                            <div style="margin-bottom: 8px;">
-                              <span style="font-size: 10px; color: #a89984;">Actions:</span>
-                              <div style="color: #ebdbb2; font-size: 13px; margin-top: 4px;">${note.actions}</div>
-                            </div>
-                          ` : ''}
-                          
-                          ${note.partsUsed ? html`
-                            <div>
-                              <span style="font-size: 10px; color: #a89984;">Parts Used:</span>
-                              <div style="color: #689d6a; font-size: 13px; margin-top: 4px;">${note.partsUsed}</div>
-                            </div>
-                          ` : ''}
-                          
-                          <div style="margin-top: 8px; font-size: 10px; color: #504945;">
-                            ${new Date(note.timestamp).toLocaleString()}
-                          </div>
-                        </div>
-                      `)}
-                    </div>
-                  `}
-                </div>
-              </div>
-            ` : html`
-              <!-- CHECKLIST TAB CONTENT -->
-              <div>
-                ${activeSection && activeSection.tasks.length > 0 ? html`
-                  <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
-                    <div style="flex: 1; height: 4px; background: #3c3836; border-radius: 2px; overflow: hidden;">
-                      <div style="width: ${methods.getSectionProgress(state, state.activeTab).percent}%; height: 100%; background: ${activeSection.color}; border-radius: 2px; transition: width 0.3s;"></div>
-                    </div>
-                    <span style="font-size: 12px; font-weight: bold; color: ${activeSection.color};">
-                      ${methods.getSectionProgress(state, state.activeTab).percent}% Complete
-                    </span>
-                  </div>
-                  
-                  <div style="display: flex; flex-direction: column; gap: 8px;">
-                    ${activeSection.tasks.map(task => {
-                      const isDone = methods.isTaskCompleted(state, state.activeTab, task.id);
-                      
-                      return html`
-                        <div
-                          class="esa-task-item"
-                          data-task="${task.id}"
-                          style="
-                            display: flex; align-items: flex-start; gap: 12px;
-                            padding: 14px 16px;
-                            background: #32302f;
-                            border: 1px solid #3c3836;
-                            border-radius: 8px;
-                            cursor: pointer;
-                            transition: all 0.2s;
-                            ${isDone ? 'opacity: 0.7;' : ''}
-                          "
-                        >
-                          <!-- Checkbox -->
-                          <div
-                            class="esa-checkbox"
-                            data-task="${task.id}"
-                            style="
-                              width: 22px; height: 22px; min-width: 22px;
-                              border: 2px solid ${isDone ? activeSection.color : '#504945'};
-                              border-radius: 4px;
-                              display: flex; align-items: center; justify-content: center;
-                              background: ${isDone ? activeSection.color : 'transparent'};
-                              transition: all 0.2s;
-                              margin-top: 2px;
-                            "
-                          >
-                            ${isDone ? html`<span style="color: #282828; font-size: 14px; font-weight: bold;">✓</span>` : ''}
-                          </div>
-                          
-                          <!-- Task Content -->
-                          <div style="flex: 1;">
-                            <div style="
-                              font-size: 13px; color: #ebdbb2; font-weight: 500;
-                              ${isDone ? 'text-decoration: line-through; color: #a89984;' : ''}
-                            ">
-                              ${task.text}
-                            </div>
-                            <div style="font-size: 11px; color: #504945; margin-top: 4px; font-style: italic;">
-                              📌 ${task.sop}
-                            </div>
-                          </div>
-                        </div>
-                      `;
-                    })}
-                  </div>
-                ` : html`
-                  <div style="text-align: center; padding: 60px 20px; color: #a89984;">
-                    <div style="font-size: 48px; margin-bottom: 16px;">📋</div>
-                    <div>Select a section from the sidebar to view checklist items.</div>
-                  </div>
-                `}
-              </div>
-            `}
+          <div>
+            <label style="display: block; color: #a89984; font-size: 10px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Shift</label>
+            <select id="mc-select" 
+                    style="width: 100%; background: #282828; color: #ebdbb2; border: 1px solid #3c3836; 
+                           border-radius: 6px; padding: 8px 10px; font-size: 12px; outline: none;">
+              <option value="Day">Day Shift (6AM-2PM)</option>
+              <option value="Swing">Swing Shift (2PM-10PM)</option>
+              <option value="Night">Night Shift (10PM-6AM)</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; color: #a89984; font-size: 10px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Employee Name</label>
+            <input type="text" id="mc-employee-input" placeholder="Enter your name..." 
+                   style="width: 100%; background: #282828; color: #ebdbb2; border: 1px solid #3c3836; 
+                          border-radius: 6px; padding: 8px 10px; font-size: 12px; outline: none;" />
+          </div>
+          <div>
+            <label style="display: block; color: #a89984; font-size: 10px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Manager Sign-off</label>
+            <input type="text" id="mc-manager-input" placeholder="Manager initials..." 
+                   style="width: 100%; background: #282828; color: #ebdbb2; border: 1px solid #3c3836; 
+                          border-radius: 6px; padding: 8px 10px; font-size: 12px; outline: none;" />
           </div>
         </div>
       </div>
-    `;
+      
+      <!-- MAIN CONTENT: TAB SIDEBAR + PANEL -->
+      <div style="display: flex; flex: 1; min-height: 400px;">
+        
+        <!-- TAB SIDEBAR -->
+        <div style="width: 200px; background: #1d2021; border-right: 1px solid #3c3836; padding: 12px 0; display: flex; flex-direction: column; gap: 4px;">
+          ${() => CHECKLIST_SECTIONS.map(section => html`
+            <button class="mc-tab-btn" data-tab="${section.id}"
+                    style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 16px; 
+                           background: transparent; border: none; border-left: 3px solid transparent; 
+                           color: #a89984; font-size: 11px; font-weight: 500; text-align: left; 
+                           cursor: pointer; transition: all 0.2s ease;">
+              <!-- Color Dot -->
+              <span style="width: 10px; height: 10px; border-radius: 50%; background: ${section.color}; 
+                           box-shadow: 0 0 8px ${section.color}40; flex-shrink: 0;"></span>
+              
+              <!-- Label + Badge -->
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                <span style="display: flex; align-items: center; gap: 6px;">
+                  <span>${section.icon}</span>
+                  <span>${section.label}</span>
+                </span>
+                ${!section.isNotesTab ? html`
+                  <span data-progress-badge="${section.id}" 
+                        style="font-size: 9px; color: #665c54; margin-left: 22px;">
+                    ${methods.getCheckedCount(state, section.id)}/${methods.getTotalCount(state, section.id)}
+                  </span>
+                ` : ''}
+              </div>
+            </button>
+          `)}
+        </div>
+        
+        <!-- TAB CONTENT PANEL -->
+        <div style="flex: 1; padding: 20px; overflow-y: auto; background: #282828;">
+          
+          ${() => CHECKLIST_SECTIONS.map(section => html`
+            <div class="mc-tab-content" data-content="${section.id}" 
+                 style="display: none;">
+              
+              ${section.isNotesTab ? html`
+                <!-- NOTES TAB CONTENT -->
+                <div style="margin-bottom: 16px;">
+                  <h3 style="color: ${section.color}; font-size: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <span>${section.icon}</span>
+                    <span>Shift Notes & Green Shield Log</span>
+                  </h3>
+                  
+                  <!-- Freeform Notes Textarea -->
+                  <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #a89984; font-size: 11px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                      General Shift Notes
+                    </label>
+                    <textarea id="mc-shift-notes" rows="4" placeholder="Enter general shift observations, issues, or notes here..."
+                              style="width: 100%; background: #32302f; color: #ebdbb2; border: 1px solid #3c3836; 
+                                     border-radius: 8px; padding: 12px; font-size: 12px; outline: none; 
+                                     resize: vertical; line-height: 1.5;"></textarea>
+                  </div>
+                  
+                  <!-- Actions Logged Table -->
+                  <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                      <label style="color: #a89984; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">
+                        Actions Logged & Parts Used
+                      </label>
+                      <button id="mc-add-row-btn"
+                              style="background: ${section.color}; color: #282828; border: none; 
+                                     border-radius: 6px; padding: 6px 14px; font-size: 11px; 
+                                     cursor: pointer; font-weight: bold;">
+                        + Add Row
+                      </button>
+                    </div>
+                    
+                    <div style="overflow-x: auto; border: 1px solid #3c3836; border-radius: 8px;">
+                      <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                        <thead>
+                          <tr style="background: #32302f;">
+                            <th style="padding: 10px 12px; text-align: left; color: #d79921; border: 1px solid #3c3836; font-weight: 600;">Target Area / Location</th>
+                            <th style="padding: 10px 12px; text-align: left; color: #d79921; border: 1px solid #3c3836; font-weight: 600;">Cycle / Run #</th>
+                            <th style="padding: 10px 12px; text-align: left; color: #d79921; border: 1px solid #3c3836; font-weight: 600;">Actions Logged</th>
+                            <th style="padding: 10px 12px; text-align: left; color: #d79921; border: 1px solid #3c3836; font-weight: 600;">Parts Used</th>
+                            <th style="padding: 10px 12px; text-align: center; color: #d79921; border: 1px solid #3c3836; font-weight: 600; width: 60px;"></th>
+                          </tr>
+                        </thead>
+                        <tbody id="mc-notes-tbody">
+                          <!-- Rows rendered dynamically by renderNotesTable() -->
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              ` : html`
+                <!-- CHECKLIST TAB CONTENT -->
+                <div>
+                  <h3 style="color: ${section.color}; font-size: 14px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                    <span>${section.icon}</span>
+                    <span>${section.label}</span>
+                    <span style="margin-left: auto; font-size: 11px; color: #665c54; font-weight: normal;">
+                      ${methods.getCheckedCount(state, section.id)} / ${methods.getTotalCount(state, section.id)} completed
+                    </span>
+                  </h3>
+                  
+                  <!-- Progress Bar for Section -->
+                  <div style="width: 100%; height: 6px; background: #32302f; border-radius: 3px; margin-bottom: 20px; overflow: hidden;">
+                    <div style="width: ${methods.getSectionProgress(state, section.id)}%; height: 100%; 
+                                background: linear-gradient(90deg, ${section.color}, ${section.colorLight}); 
+                                border-radius: 3px; transition: width 0.3s ease;"></div>
+                  </div>
+                  
+                  <!-- Checklist Items -->
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                    ${() => section.items.map(item => html`
+                      <div class="mc-checklist-item" 
+                           style="display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; 
+                                  background: #32302f; border: 1px solid #3c3836; border-radius: 8px; 
+                                  cursor: pointer; transition: all 0.15s ease;"
+                           data-item-container="${item.id}">
+                        
+                        <!-- Custom Checkbox -->
+                        <div style="position: relative; flex-shrink: 0; margin-top: 2px;">
+                          <input type="checkbox" 
+                                 class="mc-checkbox" 
+                                 id="mc-cb-${item.id}" 
+                                 data-item-id="${item.id}"
+                                 ${state.checkedItems[item.id] ? 'checked' : ''}
+                                 style="appearance: none; -webkit-appearance: none; width: 18px; height: 18px; 
+                                        background: #282828; border: 2px solid ${section.color}; border-radius: 4px; 
+                                        cursor: pointer; position: relative; transition: all 0.15s ease;" />
+                          
+                          <!-- Checkmark overlay (CSS only) -->
+                          <style>
+                            #mc-cb-${item.id}:checked::after {
+                              content: '';
+                              position: absolute;
+                              top: 2px; left: 2px;
+                              width: 10px; height: 10px;
+                              background: ${section.color};
+                              border-radius: 2px;
+                            }
+                          </style>
+                        </div>
+                        
+                        <!-- Item Text -->
+                        <label for="mc-cb-${item.id}" 
+                               data-label-for="${item.id}"
+                               style="flex: 1; font-size: 12px; line-height: 1.5; color: #ebdbb2; 
+                                      cursor: pointer; ${state.checkedItems[item.id] ? 'text-decoration: line-through; opacity: 0.6;' : ''}">
+                          ${item.text}
+                        </label>
+                      </div>
+                    `)}
+                  </div>
+                </div>
+              `}
+            </div>
+          `)}
+          
+        </div>
+      </div>
+      
+      <!-- FOOTER STATUS BAR -->
+      <div style="background: #32302f; border-top: 1px solid #3c3836; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; gap: 20px; font-size: 10px; color: #665c54;">
+          <span>📅 ${state.headerData.date || 'No date selected'}</span>
+          <span>🕐 ${state.headerData.shift || 'Day'} Shift</span>
+          <span>👤 ${state.headerData.employeeName || 'Not signed in'}</span>
+        </div>
+        <div style="font-size: 10px; color: #689d6a;">
+          ✓ Auto-saved to session
+        </div>
+      </div>
+    </div>
+  `,
+  
+  mounted: (props, state, methods, container) => {
+    // Initialize event listeners after DOM is ready
+    setTimeout(() => {
+      try {
+        methods.initEventListeners(state, container);
+        methods.renderNotesTable(state, container);
+        methods.updateProgressBadges(state, container);
+        
+        // Set default date
+        const dateInput = container.querySelector('#mc-date-input');
+        if (dateInput) {
+          dateInput.value = new Date().toISOString().split('T')[0];
+          state.headerData.date = dateInput.value;
+        }
+        
+        // Fix the select ID mismatch
+        const shiftSelect = container.querySelector('#mc-select');
+        if (shiftSelect) {
+          shiftSelect.id = 'mc-shift-select';
+          shiftSelect.addEventListener('change', (e) => {
+            state.headerData.shift = e.target.value;
+          });
+        }
+        
+      } catch (err) {
+        console.error('[ESA.MaintenanceChecklist] Init error:', err);
+        window.ESA?.errors?.push({ component: 'MaintenanceChecklist', phase: 'init', error: err });
+      }
+    }, 100);
   }
 });
-
-// Setup event listeners after mount (Arrow.js compatibility)
-const origChecklistMount = ESAMaintenanceChecklist.mount;
-ESAMaintenanceChecklist.mount = function(container) {
-  const result = origChecklistMount.call(this, container);
-  
-  setTimeout(() => {
-    const componentState = this.state;
-    
-    // Tab switching
-    container.querySelectorAll('.esa-checklist-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        const tabId = tab.dataset.tab;
-        methods.switchTab(componentState, tabId);
-        
-        // Update active tab styling
-        container.querySelectorAll('.esa-checklist-tab').forEach(t => {
-          const isActive = t.dataset.tab === tabId;
-          t.style.background = isActive ? '#32302f' : 'transparent';
-          t.style.borderLeftColor = isActive ? 
-            (CHECKLIST_SECTIONS.find(s => s.id === tabId)?.color || '#98971a') : 
-            'transparent';
-        });
-      });
-    });
-    
-    // Task checkbox clicks
-    container.querySelectorAll('.esa-task-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const taskId = item.dataset.task;
-        methods.toggleTask(componentState, componentState.activeTab, taskId);
-      });
-    });
-    
-    // Header field updates
-    const dateInput = container.querySelector('#esa-cl-date');
-    if (dateInput) {
-      dateInput.addEventListener('change', (e) => {
-        componentState.date = e.target.value;
-      });
-    }
-    
-    const shiftSelect = container.querySelector('#esa-cl-shift');
-    if (shiftSelect) {
-      shiftSelect.addEventListener('change', (e) => {
-        componentState.shift = e.target.value;
-      });
-    }
-    
-    const employeeInput = container.querySelector('#esa-cl-employee');
-    if (employeeInput) {
-      employeeInput.addEventListener('input', (e) => {
-        componentState.employeeName = e.target.value;
-      });
-    }
-    
-    const managerInput = container.querySelector('#esa-cl-manager');
-    if (managerInput) {
-      managerInput.addEventListener('input', (e) => {
-        componentState.managerSignoff = e.target.value;
-      });
-    }
-    
-    // Notes tab functionality
-    const addNoteBtn = container.querySelector('#esa-add-note-btn');
-    if (addNoteBtn) {
-      addNoteBtn.addEventListener('click', () => {
-        // Gather form values
-        const areaInput = container.querySelector('#esa-note-area');
-        const cycleInput = container.querySelector('#esa-note-cycle');
-        const actionsInput = container.querySelector('#esa-note-actions');
-        const partsInput = container.querySelector('#esa-note-parts');
-        
-        if (areaInput) componentState.currentNote.targetArea = areaInput.value;
-        if (cycleInput) componentState.currentNote.cycle = cycleInput.value;
-        if (actionsInput) componentState.currentNote.actions = actionsInput.value;
-        if (partsInput) componentState.currentNote.partsUsed = partsInput.value;
-        
-        methods.addNote(componentState);
-        
-        // Clear inputs
-        if (areaInput) areaInput.value = '';
-        if (cycleInput) cycleInput.value = '';
-        if (actionsInput) actionsInput.value = '';
-        if (partsInput) partsInput.value = '';
-      });
-    }
-    
-    const clearNoteBtn = container.querySelector('#esa-clear-note-btn');
-    if (clearNoteBtn) {
-      clearNoteBtn.addEventListener('click', () => {
-        methods.clearNote(componentState);
-        const inputs = ['esa-note-area', 'esa-note-cycle', 'esa-note-actions', 'esa-note-parts'];
-        inputs.forEach(id => {
-          const input = container.querySelector(`#${id}`);
-          if (input) input.value = '';
-        });
-      });
-    }
-    
-    // Delete note buttons
-    container.addEventListener('click', (e) => {
-      if (e.target.classList.contains('esa-delete-note-btn')) {
-        const index = parseInt(e.target.dataset.index);
-        methods.removeNote(componentState, index);
-      }
-    });
-    
-  }, 150);
-  
-  return result;
-};
 
 export default ESAMaintenanceChecklist;
