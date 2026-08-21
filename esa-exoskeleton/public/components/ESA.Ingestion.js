@@ -1,19 +1,19 @@
 /**
- * ESA.Ingestion.js (Arrow.js Fully Compatible)
+ * ESA.Ingestion.js (Arrow.js Compatible - No Nested Views)
  * ============================================
  * AI INGESTION CHAT BOX (PARENT COMPONENT)
  * 
- * ARROW.JS COMPATIBILITY: No ${} allowed in style attributes!
- * All styles are hardcoded or use CSS classes.
+ * ARROW.JS LIMITATION: Cannot embed view functions via ${} in templates!
+ * Solution: SoundPanels mount to separate containers, not embedded in template.
  */
 
 import { reactive, html } from 'https://esm.sh/@arrow-js/core';
 import { ESAVerifyComponent } from './ESA.VerifiedWrapper.js';
-import { ESASoundPanel, DynamicAudioBroadcaster } from './ESA.SoundPanel.js';
+import { DynamicAudioBroadcaster } from './ESA.SoundPanel.js';
 
 export const ESAIngestion = ESAVerifyComponent({
   name: 'Ingestion',
-  version: '2.7.0',
+  version: '3.0.0',
   verified: true,
   
   owns: {
@@ -33,7 +33,10 @@ export const ESAIngestion = ESAVerifyComponent({
     assignedAgent: 'Ava007',
     audioEngine: null,
     audioInitialized: false,
-    systemStatus: 'ready'
+    systemStatus: 'ready',
+    // Container refs for SoundPanels (mounted separately)
+    leftSoundPanelContainer: null,
+    rightSoundPanelContainer: null
   },
   
   methods: {
@@ -111,17 +114,54 @@ export const ESAIngestion = ESAVerifyComponent({
     getAudioStatus: (state) => {
       if (!state.audioEngine) return { initialized: false };
       return { initialized: state.audioInitialized, ...state.audioEngine.getStatus() };
+    },
+    
+    // Called after mount to set up SoundPanels
+    initSoundPanels: async (state, container) => {
+      try {
+        const { ESASoundPanel } = await import('./ESA.SoundPanel.js');
+        
+        // Find or create left panel container
+        let leftContainer = container.querySelector('#esa-soundpanel-left');
+        if (!leftContainer) {
+          leftContainer = document.createElement('div');
+          leftContainer.id = 'esa-soundpanel-left';
+          leftContainer.style.cssText = 'flex: 0 0 220px;';
+          // Insert before the core
+          const core = container.querySelector('.esa-ingestion-core');
+          if (core) {
+            container.insertBefore(leftContainer, core);
+          } else {
+            container.appendChild(leftContainer);
+          }
+        }
+        
+        // Find or create right panel container
+        let rightContainer = container.querySelector('#esa-soundpanel-right');
+        if (!rightContainer) {
+          rightContainer = document.createElement('div');
+          rightContainer.id = 'esa-soundpanel-right';
+          rightContainer.style.cssText = 'flex: 0 0 220px;';
+          container.appendChild(rightContainer);
+        }
+        
+        // Mount SoundPanels to their containers
+        ESASoundPanel.mount(leftContainer, { side: 'left', audioEngine: state.audioEngine });
+        ESASoundPanel.mount(rightContainer, { side: 'right', audioEngine: state.audioEngine });
+        
+        state.leftSoundPanelContainer = leftContainer;
+        state.rightSoundPanelContainer = rightContainer;
+        
+        console.log('[ESA.Ingestion] SoundPanels mounted separately');
+      } catch (e) {
+        console.error('[ESA.Ingestion] SoundPanel init error:', e);
+      }
     }
   },
   
   template: (props, state, methods) => html`
     <div class="esa-ingestion-layout" style="display: flex; align-items: stretch; gap: 20px; width: 100%; padding: 10px;">
-      <!-- Left Sound Panel -->
-      <div style="flex: 0 0 220px;">
-        ${ESASoundPanel.view({ side: 'left', audioEngine: state.audioEngine })}
-      </div>
-      
-      <!-- Chat Core -->
+      <!-- Chat Core (SoundPanels will be mounted separately) -->
       <div class="esa-ingestion-core" style="flex: 1; display: flex; flex-direction: column; background: #32302f; border: 1px solid #3c3836; border-radius: 12px; padding: 16px; min-height: 320px;">
         <!-- Header -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #3c3836;">
@@ -178,12 +218,8 @@ export const ESAIngestion = ESAVerifyComponent({
           <span>${state.systemStatus.toUpperCase()}</span>
         </div>
       </div>
-      
-      <!-- Right Sound Panel -->
-      <div style="flex: 0 0 220px;">
-        ${ESASoundPanel.view({ side: 'right', audioEngine: state.audioEngine })}
-      </div>
-    `
+    </div>
+  `
 });
 
 export default ESAIngestion;

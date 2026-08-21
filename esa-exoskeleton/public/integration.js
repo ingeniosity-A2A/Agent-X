@@ -159,6 +159,13 @@ async function initESAExoskeleton() {
             window.dispatchEvent(new CustomEvent('esa:ingestion-file', { detail: { file, type } }));
           };
           
+          // Initialize SoundPanels separately (Arrow.js can't nest views)
+          if (mountResult.state && typeof mountResult.state.initSoundPanels === 'function') {
+            setTimeout(() => {
+              mountResult.state.initSoundPanels(mountResult.state, ingestionContainer);
+            }, 100);
+          }
+          
           logMessage('✓ AI Ingestion ready', 'success');
         } else {
           logMessage('✗ Ingestion mount failed', 'error');
