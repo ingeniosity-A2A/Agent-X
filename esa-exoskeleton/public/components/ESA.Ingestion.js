@@ -116,10 +116,32 @@ export const ESAIngestion = ESAVerifyComponent({
       return { initialized: state.audioInitialized, ...state.audioEngine.getStatus() };
     },
     
-    // Called after mount to set up SoundPanels
+    // Called after mount to set up SoundPanels and event listeners
     initSoundPanels: async (state, container) => {
       try {
         const { ESASoundPanel } = await import('./ESA.SoundPanel.js');
+        
+        // Set up select change handler (Arrow.js can't handle @change on select)
+        const agentSelect = container.querySelector('#esa-agent-select');
+        if (agentSelect) {
+          agentSelect.addEventListener('change', (e) => {
+            state.assignedAgent = e.target.value;
+          });
+        }
+        
+        // Set up input handlers (Arrow.js can't handle @input on input)
+        const chatInput = container.querySelector('#esa-chat-input');
+        if (chatInput) {
+          chatInput.addEventListener('input', (e) => {
+            state.inputValue = e.target.value;
+          });
+          chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') methods.sendMessage(state, state.inputValue);
+          });
+          chatInput.addEventListener('focus', () => {
+            methods.initAudio(state);
+          });
+        }
         
         // Find or create left panel container
         let leftContainer = container.querySelector('#esa-soundpanel-left');
@@ -127,7 +149,6 @@ export const ESAIngestion = ESAVerifyComponent({
           leftContainer = document.createElement('div');
           leftContainer.id = 'esa-soundpanel-left';
           leftContainer.style.cssText = 'flex: 0 0 220px;';
-          // Insert before the core
           const core = container.querySelector('.esa-ingestion-core');
           if (core) {
             container.insertBefore(leftContainer, core);
@@ -152,9 +173,9 @@ export const ESAIngestion = ESAVerifyComponent({
         state.leftSoundPanelContainer = leftContainer;
         state.rightSoundPanelContainer = rightContainer;
         
-        console.log('[ESA.Ingestion] SoundPanels mounted separately');
+        console.log('[ESA.Ingestion] SoundPanels and event listeners initialized');
       } catch (e) {
-        console.error('[ESA.Ingestion] SoundPanel init error:', e);
+        console.error('[ESA.Ingestion] Init error:', e);
       }
     }
   },
@@ -168,7 +189,7 @@ export const ESAIngestion = ESAVerifyComponent({
           <span style="color: #689d6a; font-weight: bold; font-size: 13px;">💬 ESA INGESTION AI</span>
           <div style="display: flex; gap: 10px; align-items: center;">
             <select 
-              @change=${(e) => state.assignedAgent = e.target.value}
+              id="esa-agent-select"
               style="background: #282828; color: #ebdbb2; border: 1px solid #3c3836; border-radius: 4px; padding: 4px 8px; font-size: 11px; outline: none;"
             >
               <option value="Ava007">Ava007</option>
@@ -196,9 +217,7 @@ export const ESAIngestion = ESAVerifyComponent({
         <div style="display: flex; gap: 8px;">
           <input
             type="text"
-            @input=${(e) => state.inputValue = e.target.value}
-            @keydown=${(e) => { if (e.key === 'Enter') methods.sendMessage(state, state.inputValue); }}
-            @focus=${() => methods.initAudio(state)}
+            id="esa-chat-input"
             placeholder="Chat with assigned agent..."
             style="flex: 1; background: #282828; border: 1px solid #3c3836; color: #ebdbb2; padding: 10px 14px; border-radius: 6px; font-size: 12px; outline: none;"
           />
