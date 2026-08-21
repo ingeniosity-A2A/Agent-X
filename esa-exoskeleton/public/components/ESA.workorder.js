@@ -615,6 +615,6 @@ export const ESAWorkorder = ESAVerifyComponent({
       </div>
     </div>
   `
-}).component;
+});
 
 export default ESAWorkorder;

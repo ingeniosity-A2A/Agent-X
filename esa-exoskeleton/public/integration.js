@@ -35,6 +35,8 @@
  * └─────────────────────────────────────────────────────────┘
  * 
  * KEY: Button Panel + Voice BELONG TO AI Ingestion Box!
+ * 
+ * FIX v2.5.1: Using Arrow.js mount() instead of appendChild()
  */
 
 // ============================================
@@ -67,7 +69,7 @@ function showError(message) {
 async function initESAExoskeleton() {
   const startTime = performance.now();
   
-  console.log('%c[ESA] 🚀 Initializing ESA EXOSKELETON v2.5.0...', 
+  console.log('%c[ESA] 🚀 Initializing ESA EXOSKELETON v2.5.1...', 
     'color: #689d6a; font-weight: bold');
   
   // Setup console logging first
@@ -99,7 +101,7 @@ async function initESAExoskeleton() {
     };
     
     logMessage('╔════════════════════════════════════════════════════╗', 'info');
-    logMessage('║       ESA EXOSKELETON v2.5.0 INITIALIZING         ║', 'info');
+    logMessage('║       ESA EXOSKELETON v2.5.1 INITIALIZING         ║', 'info');
     logMessage('╠════════════════════════════════════════════════════╣', 'info');
     logMessage('║  Button + Voice → AI INGESTION CHAT BOX          ║', 'info');
     logMessage('╚════════════════════════════════════════════════════╝', 'info');
@@ -110,7 +112,7 @@ async function initESAExoskeleton() {
   
   // Initialize ESA namespace
   window.ESA = window.ESA || { 
-    version: '2.5.0', 
+    version: '2.5.1', 
     initialized: false,
     errors: [],
     
@@ -130,6 +132,9 @@ async function initESAExoskeleton() {
       workorder: null
     },
     
+    // Mounted component references (for cleanup)
+    mountedComponents: [],
+    
     log: logMessage
   };
   
@@ -138,7 +143,6 @@ async function initESAExoskeleton() {
   // ============================================
   let ESAIngestion, ESAButtonPanel, ESADiagnosticCard, ESAInvPartsCardB, ESAWorkorder, themeModule;
   
-  // Try to load Arrow.js and components
   try {
     logMessage('[LOAD] Importing Arrow.js from esm.sh...', 'info');
     
@@ -207,124 +211,140 @@ async function initESAExoskeleton() {
   };
   
   // ============================================
-  // MOUNT COMPONENTS (with individual error handling)
+  // MOUNT COMPONENTS USING ARROW.JS MOUNT()
   // ============================================
   
   // 1. AI INGESTION CHAT BOX
-  if (ESAIngestion) {
+  if (ESAIngestion && typeof ESAIngestion.mount === 'function') {
     try {
       logMessage('[1/6] Mounting AI INGESTION CHAT BOX...', 'info');
       
       const ingestionContainer = document.getElementById('esa-ingestion');
       if (ingestionContainer) {
-        // Remove fallback
-        const fallback = ingestionContainer.querySelector('.esa-fallback');
-        if (fallback) fallback.remove();
-        
+        // Clear fallback
         ingestionContainer.innerHTML = '';
-        const ingestionComponent = ESAIngestion();
-        ingestionContainer.appendChild(ingestionComponent);
         
-        window.ESA.ingestion.instance = ingestionComponent;
-        window.ESA.ingestion.components.voice = ingestionComponent.state?.audioEngine || null;
+        // Use Arrow.js mount() via our wrapper
+        const mountResult = ESAIngestion.mount(ingestionContainer);
         
-        window.ESA.ingestion.handleFile = (file, type) => {
-          if (ingestionComponent.state) {
+        if (mountResult) {
+          window.ESA.ingestion.instance = mountResult;
+          window.ESA.ingestion.components.voice = mountResult.state?.audioEngine || null;
+          window.ESA.mountedComponents.push(mountResult);
+          
+          // Expose handleFile method for ButtonPanel
+          window.ESA.ingestion.handleFile = (file, type) => {
             window.dispatchEvent(new CustomEvent('esa:ingestion-file', {
               detail: { file, type }
             }));
-          }
-        };
-        
-        logMessage('      ✓ AI INGESTION mounted (owns Button + Voice)', 'success');
+          };
+          
+          logMessage('      ✓ AI INGESTION mounted (owns Button + Voice)', 'success');
+        } else {
+          logMessage('      ✗ AI INGESTION mount returned null', 'error');
+        }
       }
     } catch (err) {
       logMessage(`[ERROR] Ingestion mount failed: ${err.message}`, 'error');
+      console.error('[ESA] Ingestion mount error:', err);
       window.ESA.errors.push({ component: 'Ingestion', phase: 'mount', error: err });
     }
   } else {
-    logMessage('[SKIP] Ingestion component not available', 'warning');
+    logMessage('[SKIP] Ingestion component not available or missing mount()', 'warning');
   }
   
   // 2. DIAGNOSTIC CARD
-  if (ESADiagnosticCard) {
+  if (ESADiagnosticCard && typeof ESADiagnosticCard.mount === 'function') {
     try {
       logMessage('[2/6] Mounting Diagnostic Card...', 'info');
       
       const diagnosticContainer = document.getElementById('esa-diagnostics');
       if (diagnosticContainer) {
         diagnosticContainer.innerHTML = '';
-        const diagComponent = ESADiagnosticCard();
-        diagnosticContainer.appendChild(diagComponent);
-        window.ESA.components.diagnosticCard = diagComponent;
+        const mountResult = ESADiagnosticCard.mount(diagnosticContainer);
         
-        logMessage('      ✓ Diagnostic Card with Ava007 voice mounted', 'success');
+        if (mountResult) {
+          window.ESA.components.diagnosticCard = mountResult;
+          window.ESA.mountedComponents.push(mountResult);
+          logMessage('      ✓ Diagnostic Card with Ava007 voice mounted', 'success');
+        } else {
+          logMessage('      ✗ DiagnosticCard mount returned null', 'error');
+        }
       }
     } catch (err) {
       logMessage(`[ERROR] DiagnosticCard mount failed: ${err.message}`, 'error');
+      console.error('[ESA] DiagnosticCard mount error:', err);
       window.ESA.errors.push({ component: 'DiagnosticCard', phase: 'mount', error: err });
     }
   } else {
-    logMessage('[SKIP] DiagnosticCard component not available', 'warning');
+    logMessage('[SKIP] DiagnosticCard component not available or missing mount()', 'warning');
   }
   
   // 3. BROADCAST PARTS CARD
-  if (ESAInvPartsCardB) {
+  if (ESAInvPartsCardB && typeof ESAInvPartsCardB.mount === 'function') {
     try {
       logMessage('[3/6] Mounting Broadcast Parts Card...', 'info');
       
       const partsCardContainer = document.getElementById('esa-parts-card');
       if (partsCardContainer) {
         partsCardContainer.innerHTML = '';
-        const partsComponent = ESAInvPartsCardB();
-        partsCardContainer.appendChild(partsComponent);
-        window.ESA.components.invPartsCard = partsComponent;
+        const mountResult = ESAInvPartsCardB.mount(partsCardContainer);
         
-        logMessage('      ✓ Broadcast Parts Card (HD Supply #223532) mounted', 'success');
+        if (mountResult) {
+          window.ESA.components.invPartsCard = mountResult;
+          window.ESA.mountedComponents.push(mountResult);
+          logMessage('      ✓ Broadcast Parts Card (HD Supply #223532) mounted', 'success');
+        } else {
+          logMessage('      ✗ InvPartsCard mount returned null', 'error');
+        }
       }
     } catch (err) {
       logMessage(`[ERROR] InvPartsCard mount failed: ${err.message}`, 'error');
+      console.error('[ESA] InvPartsCard mount error:', err);
       window.ESA.errors.push({ component: 'InvPartsCard', phase: 'mount', error: err });
     }
   } else {
-    logMessage('[SKIP] InvPartsCard component not available', 'warning');
+    logMessage('[SKIP] InvPartsCard component not available or missing mount()', 'warning');
   }
   
   // 4. WORKORDER SYSTEM
-  if (ESAWorkorder) {
+  if (ESAWorkorder && typeof ESAWorkorder.mount === 'function') {
     try {
       logMessage('[4/6] Mounting Workorder System...', 'info');
       
       const workorderContainer = document.getElementById('esa-workorder');
       if (workorderContainer) {
         workorderContainer.innerHTML = '';
-        const workorderComponent = ESAWorkorder();
-        workorderContainer.appendChild(workorderComponent);
-        window.ESA.components.workorder = workorderComponent;
+        const mountResult = ESAWorkorder.mount(workorderContainer);
         
-        logMessage('      ✓ Unified Workorder system mounted', 'success');
+        if (mountResult) {
+          window.ESA.components.workorder = mountResult;
+          window.ESA.mountedComponents.push(mountResult);
+          logMessage('      ✓ Unified Workorder system mounted', 'success');
+        } else {
+          logMessage('      ✗ Workorder mount returned null', 'error');
+        }
       }
     } catch (err) {
       logMessage(`[ERROR] Workorder mount failed: ${err.message}`, 'error');
+      console.error('[ESA] Workorder mount error:', err);
       window.ESA.errors.push({ component: 'Workorder', phase: 'mount', error: err });
     }
   } else {
-    logMessage('[SKIP] Workorder component not available', 'warning');
+    logMessage('[SKIP] Workorder component not available or missing mount()', 'warning');
   }
   
   // 5. BUTTON PANEL (BELONGS TO INGESTION!)
-  if (ESAButtonPanel) {
+  if (ESAButtonPanel && typeof ESAButtonPanel.mount === 'function') {
     try {
       logMessage('[5/6] Mounting Button Panel → AI INGESTION...', 'info');
       
       const buttonContainer = document.getElementById('esa-button-panel');
       if (buttonContainer) {
-        // Remove fallback
-        const fallback = buttonContainer.querySelector('.esa-fallback');
-        if (fallback) fallback.remove();
-        
+        // Clear fallback
         buttonContainer.innerHTML = '';
-        const buttonComponent = ESAButtonPanel({
+        
+        const mountResult = ESAButtonPanel.mount(buttonContainer, {
           onCapture: (file) => {
             console.log(`%c[ESA] 📸 Image captured: ${file.name} → INGESTION`, 'color: #98971a');
             logMessage(`📸 Image captured: ${file.name} → Ingestion`, 'success');
@@ -352,22 +372,28 @@ async function initESAExoskeleton() {
           }
         });
         
-        buttonContainer.appendChild(buttonComponent);
-        window.ESA.components.buttonPanel = buttonComponent;
-        
-        if (window.ESA.ingestion && window.ESA.ingestion.components) {
-          window.ESA.ingestion.components.buttonPanel = buttonComponent;
+        if (mountResult) {
+          window.ESA.components.buttonPanel = mountResult;
+          window.ESA.mountedComponents.push(mountResult);
+          
+          // ALSO register with Ingestion (since it belongs there!)
+          if (window.ESA.ingestion && window.ESA.ingestion.components) {
+            window.ESA.ingestion.components.buttonPanel = mountResult;
+          }
+          
+          logMessage('      ✓ Button Panel mounted → AI INGESTION BOX', 'success');
+          logMessage('         📌 Owner: AI Ingestion Chat Box', 'info');
+        } else {
+          logMessage('      ✗ ButtonPanel mount returned null', 'error');
         }
-        
-        logMessage('      ✓ Button Panel mounted → AI INGESTION BOX', 'success');
-        logMessage('         📌 Owner: AI Ingestion Chat Box', 'info');
       }
     } catch (err) {
       logMessage(`[ERROR] ButtonPanel mount failed: ${err.message}`, 'error');
+      console.error('[ESA] ButtonPanel mount error:', err);
       window.ESA.errors.push({ component: 'ButtonPanel', phase: 'mount', error: err });
     }
   } else {
-    logMessage('[SKIP] ButtonPanel component not available', 'warning');
+    logMessage('[SKIP] ButtonPanel component not available or missing mount()', 'warning');
   }
   
   // 6. GSAP ANIMATIONS
@@ -400,7 +426,7 @@ async function initESAExoskeleton() {
   // Summary
   logMessage('', 'info');
   logMessage('╔════════════════════════════════════════════════════╗', 'success');
-  logMessage('║       ESA EXOSKELETON v2.5.0 - READY              ║', 'success');
+  logMessage('║       ESA EXOSKELETON v2.5.1 - READY              ║', 'success');
   logMessage(`║       Initialized in ${initTime}ms                    ║`, 'success');
   logMessage('║                                              ║', 'success');
   logMessage(`║  ${window.ESA.ingestion.instance ? '✅' : '⚠️'} AI Ingestion Chat Box (owns Button+Voice)  ║`, 'success');
@@ -422,6 +448,8 @@ async function initESAExoskeleton() {
     'color: #98971a; font-weight: bold');
   console.log(`%c[ESA] 📌 Button + Voice → AI Ingestion Chat Box`, 
     'color: #689d6a');
+  console.log(`%c[ESA] 📦 Components mounted: ${window.ESA.mountedComponents.length}/5`, 
+    'color: #d79921');
   
   // Dispatch ready event
   window.dispatchEvent(new CustomEvent('esa:ready', { 
@@ -429,6 +457,7 @@ async function initESAExoskeleton() {
       version: window.ESA.version,
       initTime,
       errors: window.ESA.errors.length,
+      mountedCount: window.ESA.mountedComponents.length,
       components: {
         ingestion: !!window.ESA.ingestion?.instance,
         diagnosticCard: !!window.ESA.components.diagnosticCard,

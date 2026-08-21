@@ -240,7 +240,7 @@ export const ESAButtonPanel = ESAVerifyComponent({
       </div>
     `;
   }
-}).component;
+});
 
 function dataURLToBlob(dataURL) {
   const arr = dataURL.split(',');

@@ -30,9 +30,10 @@ import { activeTheme } from '../config/gruvbox-colors.js';
 import { ESAVerifyComponent } from './ESA.VerifiedWrapper.js';
 import { ESASoundPanel, DynamicAudioBroadcaster } from './ESA.SoundPanel.js';
 
+// Export the full component wrapper with .mount() method
 export const ESAIngestion = ESAVerifyComponent({
   name: 'Ingestion',
-  version: '2.2.0',
+  version: '2.3.0',  // Bumped for mount() fix
   verified: true,
   
   // AI INGESTION OWNS THESE COMPONENTS:
@@ -211,6 +212,6 @@ export const ESAIngestion = ESAVerifyComponent({
         ${ESASoundPanel({ side: 'right', audioEngine: state.audioEngine })}
       </div>
     `
-}).component;
+});
 
 export default ESAIngestion;

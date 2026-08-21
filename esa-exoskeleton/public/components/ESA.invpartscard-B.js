@@ -501,6 +501,6 @@ export const ESAInvPartsCardB = ESAVerifyComponent({
       ` : ''}
     </div>
   `
-}).component;
+});
 
 export default ESAInvPartsCardB;

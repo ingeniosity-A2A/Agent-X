@@ -336,6 +336,6 @@ export const ESADiagnosticCard = ESAVerifyComponent({
         </div>
       </div>
     `
-}).component;
+});
 
 export default ESADiagnosticCard;

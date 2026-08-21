@@ -224,4 +224,4 @@ export const ESASoundPanel = ESAVerifyComponent({
       </div>
     `;
   }
-}).component;
+});
