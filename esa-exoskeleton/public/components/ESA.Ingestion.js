@@ -235,7 +235,7 @@ export const ESAIngestion = ESAVerifyComponent({
     ">
       <!-- Left Sound Panel: SOUND I (Inbound Mic Processing) -->
       <div style="flex: 0 0 220px;">
-        ${ESASoundPanel({ side: 'left', audioEngine: state.audioEngine })}
+        ${ESASoundPanel.view({ side: 'left', audioEngine: state.audioEngine })}
       </div>
       
       <!-- Chat Core -->
@@ -342,7 +342,7 @@ export const ESAIngestion = ESAVerifyComponent({
       
       <!-- Right Sound Panel: AVA VOICE (Synthesis & Speech Core) -->
       <div style="flex: 0 0 220px;">
-        ${ESASoundPanel({ side: 'right', audioEngine: state.audioEngine })}
+        ${ESASoundPanel.view({ side: 'right', audioEngine: state.audioEngine })}
       </div>
     `
 });

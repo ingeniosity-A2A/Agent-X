@@ -131,7 +131,10 @@ export const ESAWorkorder = ESAVerifyComponent({
     },
     
     getTotalCost: (state) => {
-      return methods.getTotalPartsCost(state) + methods.getLaborCost(state);
+      // Inline calculations to avoid circular reference
+      const partsCost = state.partsList.reduce((sum, p) => sum + (p.cost * p.qty), 0);
+      const laborCost = (state.workorderData.laborHours || 0) * 75;
+      return partsCost + laborCost;
     }
   },
   
