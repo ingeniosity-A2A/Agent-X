@@ -51,7 +51,7 @@ export const ESAIngestion = ESAVerifyComponent({
     messages: [
       { 
         role: 'assistant', 
-        content: '🛡️ ESA Ingestion Online.\n\nAssigned Agent: **Ava007**\n\nDual Audio System standing by:\n• 🎤 Sound I (Inbound Mic) — Left\n• 🔊 Ava Voice (Synthesis) — Right\n• 📡 Ava Broadcasting (Master Bus) — Active' 
+        content: '🛡️ **ESA System Online**\n\nWelcome, Operator.\n\nAll modules loaded and operational.\nSelect an agent and begin your session.' 
       }
     ],
     inputValue: '',
@@ -335,7 +335,7 @@ export const ESAIngestion = ESAVerifyComponent({
           margin-top: 8px; padding-top: 8px; border-top: 1px solid ${activeTheme.border};
           display: flex; justify-content: space-between; font-size: 9px; color: ${activeTheme.fg_soft};
         ">
-          <span>Dual Audio: ${state.audioInitialized ? '✅ ONLINE' : '⏸ STANDBY'}</span>
+          <span>System: ${state.audioInitialized ? '✅ Ready' : '⏸ Standby'}</span>
           <span>${state.systemStatus.toUpperCase()}</span>
         </div>
       </div>
