@@ -45,11 +45,10 @@ async function initESAExoskeleton() {
   // ============================================
   // LOAD COMPONENTS
   // ============================================
-  let ESAIngestion, ESAButtonPanel, ESADiagnosticCard, ESAInvPartsCardB, ESAWorkorder, ESAMaintenanceChecklist, ESATestComponent, themeModule;
+  let ESAIngestion, ESAButtonPanel, ESADiagnosticCard, ESAInvPartsCardB, ESAWorkorder, ESAMaintenanceChecklist, themeModule;
   
   try {
     const [
-      testModule,
       ingestionModule,
       buttonModule,
       diagnosticModule,
@@ -58,7 +57,6 @@ async function initESAExoskeleton() {
       checklistModule,
       themeMod
     ] = await Promise.allSettled([
-      import('./components/ESA.TestComponent.js'),
       import('./components/ESA.Ingestion.js'),
       import('./components/ESA.ButtonPanel.js'),
       import('./components/ESA.DiagnosticCard.js'),
@@ -68,7 +66,6 @@ async function initESAExoskeleton() {
       import('./config/gruvbox-colors.js')
     ]);
     
-    ESATestComponent = testModule.status === 'fulfilled' ? testModule.value.ESATestComponent : null;
     ESAIngestion = ingestionModule.status === 'fulfilled' ? ingestionModule.value.ESAIngestion : null;
     ESAButtonPanel = buttonModule.status === 'fulfilled' ? buttonModule.value.ESAButtonPanel : null;
     ESADiagnosticCard = diagnosticModule.status === 'fulfilled' ? diagnosticModule.value.ESADiagnosticCard : null;
@@ -114,48 +111,28 @@ async function initESAExoskeleton() {
   // MOUNT COMPONENTS
   // ============================================
   
-  // 1. AI INGESTION CHAT BOX (or Test Component for debugging)
-  const ingestionContainer = document.getElementById('esa-ingestion');
-  if (ingestionContainer) {
-    // Try test component first to verify Arrow.js works
-    if (ESATestComponent && typeof ESATestComponent.mount === 'function') {
-      try {
-        ingestionContainer.innerHTML = '';
-        const testResult = ESATestComponent.mount(ingestionContainer);
-        if (testResult) {
-          window.ESA.mountedComponents.push(testResult);
-          console.log('[ESA] Test component mounted successfully');
-        }
-      } catch (err) {
-        console.error('[ESA] Test component error:', err);
-        window.ESA.errors.push({ component: 'TestComponent', phase: 'mount', error: err });
-        // Fall through to try real component
-        ESAIngestion && mountIngestion(ESAIngestion, ingestionContainer);
-      }
-    } else if (ESAIngestion && typeof ESAIngestion.mount === 'function') {
-      mountIngestion(ESAIngestion, ingestionContainer);
-    }
-  }
-  
-  function mountIngestion(ESAIngestion, container) {
+  // 1. AI INGESTION CHAT BOX
+  if (ESAIngestion && typeof ESAIngestion.mount === 'function') {
     try {
-      container.innerHTML = '';
-      const mountResult = ESAIngestion.mount(container);
-      
-      if (mountResult) {
-        window.ESA.ingestion.instance = mountResult;
-        window.ESA.ingestion.components.voice = mountResult.state?.audioEngine || null;
-        window.ESA.mountedComponents.push(mountResult);
+      const ingestionContainer = document.getElementById('esa-ingestion');
+      if (ingestionContainer) {
+        ingestionContainer.innerHTML = '';
+        const mountResult = ESAIngestion.mount(ingestionContainer);
         
-        window.ESA.ingestion.handleFile = (file, type) => {
-          window.dispatchEvent(new CustomEvent('esa:ingestion-file', { detail: { file, type } }));
-        };
-        
-        // Initialize SoundPanels and event listeners after mount
-        if (mountResult.state && typeof mountResult.state.initSoundPanels === 'function') {
-          setTimeout(() => {
-            mountResult.state.initSoundPanels(mountResult.state, container);
-          }, 100);
+        if (mountResult) {
+          window.ESA.ingestion.instance = mountResult;
+          window.ESA.ingestion.components.voice = mountResult.state?.audioEngine || null;
+          window.ESA.mountedComponents.push(mountResult);
+          
+          window.ESA.ingestion.handleFile = (file, type) => {
+            window.dispatchEvent(new CustomEvent('esa:ingestion-file', { detail: { file, type } }));
+          };
+          
+          if (mountResult.state && typeof mountResult.state.initSoundPanels === 'function') {
+            setTimeout(() => {
+              mountResult.state.initSoundPanels(mountResult.state, ingestionContainer);
+            }, 100);
+          }
         }
       }
     } catch (err) {

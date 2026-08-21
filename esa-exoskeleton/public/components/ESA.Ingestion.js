@@ -1,48 +1,44 @@
 /**
- * ESA.Ingestion.js (Arrow.js Compatible - HARDCODED STYLES)
+ * ESA.Ingestion.js (Arrow.js Compatible - 100% STATIC TEMPLATE)
  * ============================================
  * AI INGESTION CHAT BOX (PARENT COMPONENT)
  * 
- * ARROW.JS COMPATIBILITY: All styles MUST be hardcoded!
- * No ${} in style attributes. No dynamic form bindings.
+ * CRITICAL: Template must contain ZERO dynamic expressions!
+ * All ${} patterns cause "Invalid HTML position" error in Arrow.js.
+ * 
+ * Pattern: Static HTML template → Post-mount DOM manipulation
  */
 
-import { reactive, html } from 'https://esm.sh/@arrow-js/core';
+import { html } from 'https://esm.sh/@arrow-js/core';
 import { ESAVerifyComponent } from './ESA.VerifiedWrapper.js';
-import { DynamicAudioBroadcaster } from './ESA.SoundPanel.js';
 
 export const ESAIngestion = ESAVerifyComponent({
   name: 'Ingestion',
-  version: '3.0.0',
+  version: '4.0.0',
   verified: true,
   
   state: {
     messages: [
-      { 
-        role: 'assistant', 
-        content: '🛡️ **ESA System Online**\n\nWelcome, Operator.\n\nAll modules loaded and operational.' 
-      }
+      { role: 'assistant', content: '🛡️ **ESA System Online**\n\nWelcome, Operator.\n\nAll modules loaded and operational.' }
     ],
     inputValue: '',
     assignedAgent: 'Ava007',
     audioEngine: null,
     audioInitialized: false,
-    systemStatus: 'ready',
-    leftSoundPanelContainer: null,
-    rightSoundPanelContainer: null
+    systemStatus: 'ready'
   },
   
   methods: {
     initAudio: (state) => {
       if (!state.audioEngine && typeof window !== 'undefined') {
         try {
-          state.audioEngine = new DynamicAudioBroadcaster();
-          state.audioInitialized = true;
-          
-          if (window.ESA?.ingestion?.components) {
-            window.ESA.ingestion.components.voice = state.audioEngine;
-            window.ESA.ingestion.components.dualAudio = true;
-          }
+          // Dynamic import to avoid errors if module unavailable
+          import('./ESA.SoundPanel.js').then(({ DynamicAudioBroadcaster }) => {
+            state.audioEngine = new DynamicAudioBroadcaster();
+            state.audioInitialized = true;
+          }).catch(() => {
+            state.systemStatus = 'error';
+          });
         } catch (err) {
           state.systemStatus = 'error';
         }
@@ -50,15 +46,29 @@ export const ESAIngestion = ESAVerifyComponent({
       return state.audioEngine;
     },
     
-    sendMessage: (state, text) => {
+    sendMessage: (state, text, container) => {
       if (!text.trim()) return;
       
       methods.initAudio(state);
       
-      state.messages.push({ role: 'user', content: text, timestamp: new Date().toISOString() });
+      // Add user message via DOM
+      const messagesContainer = container.querySelector('#esa-messages-container');
+      if (messagesContainer) {
+        const userMsgDiv = document.createElement('div');
+        userMsgDiv.style.cssText = 'margin: 8px 0; padding: 10px 14px; border-radius: 8px; background: #3c3836; color: #ebdbb2; font-size: 12px; line-height: 1.5;';
+        userMsgDiv.innerHTML = `
+          <div style="font-weight: bold; margin-bottom: 4px; font-size: 10px; opacity: 0.8;">👤 OPERATOR</div>
+          <div>${text}</div>
+        `;
+        messagesContainer.appendChild(userMsgDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+      
       state.inputValue = '';
       state.systemStatus = 'processing';
+      methods.updateStatus(container, 'processing');
       
+      // Simulate AI response
       setTimeout(() => {
         const responses = [
           `Processing "${text}" via ${state.assignedAgent}...`,
@@ -66,118 +76,87 @@ export const ESAIngestion = ESAVerifyComponent({
           `Received: "${text}". Analyzing...`
         ];
         
-        state.messages.push({
-          role: 'assistant',
-          content: responses[Math.floor(Math.random() * responses.length)],
-          timestamp: new Date().toISOString()
-        });
+        const responseText = responses[Math.floor(Math.random() * responses.length)];
         
-        if (state.audioEngine && state.audioInitialized) {
-          const baseFreq = 440 + (text.length % 12) * 25;
-          state.audioEngine.triggerAvaVoice(baseFreq, 0.75);
+        if (messagesContainer) {
+          const assistantMsgDiv = document.createElement('div');
+          assistantMsgDiv.style.cssText = 'margin: 8px 0; padding: 10px 14px; border-radius: 8px; background: #3c3836; color: #ebdbb2; font-size: 12px; line-height: 1.5;';
+          assistantMsgDiv.innerHTML = `
+            <div style="font-weight: bold; margin-bottom: 4px; font-size: 10px; opacity: 0.8;">🤖 ${state.assignedAgent}</div>
+            <div>${responseText}</div>
+          `;
+          messagesContainer.appendChild(assistantMsgDiv);
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
         
         state.systemStatus = 'ready';
+        methods.updateStatus(container, 'ready');
       }, 400 + Math.random() * 300);
     },
     
-    handleFile: (state, file, type) => {
-      methods.initAudio(state);
-      
-      state.messages.push({
-        role: 'user',
-        content: `[${type.toUpperCase()}] ${file.name}`,
-        timestamp: new Date().toISOString(),
-        attachment: { file, type }
-      });
-      
-      setTimeout(() => {
-        state.messages.push({
-          role: 'assistant',
-          content: `Received ${type}: "${file.name}". Processing...`,
-          timestamp: new Date().toISOString()
+    updateStatus: (container, status) => {
+      const statusSpan = container.querySelector('#esa-system-status');
+      if (statusSpan) {
+        statusSpan.textContent = status.toUpperCase();
+      }
+      const systemSpan = container.querySelector('#esa-audio-status');
+      if (systemSpan) {
+        // Will be updated by initAudio callback
+      }
+    },
+    
+    initDOM: (state, container) => {
+      // Agent selector
+      const agentSelect = container.querySelector('#esa-agent-select');
+      if (agentSelect) {
+        agentSelect.value = state.assignedAgent;
+        agentSelect.addEventListener('change', (e) => {
+          state.assignedAgent = e.target.value;
         });
-        
-        if (state.audioEngine && state.audioInitialized) {
-          state.audioEngine.triggerAvaVoice(523, 0.6);
-        }
-      }, 350);
-    },
-    
-    getAudioStatus: (state) => {
-      if (!state.audioEngine) return { initialized: false };
-      return { initialized: state.audioInitialized, ...state.audioEngine.getStatus() };
-    },
-    
-    initSoundPanels: async (state, container) => {
-      try {
-        const { ESASoundPanel } = await import('./ESA.SoundPanel.js');
-        
-        // Set up event listeners via DOM (Arrow.js can't handle @change on select)
-        const agentSelect = container.querySelector('#esa-agent-select');
-        if (agentSelect) {
-          agentSelect.addEventListener('change', (e) => {
-            state.assignedAgent = e.target.value;
-          });
-        }
-        
-        const chatInput = container.querySelector('#esa-chat-input');
-        if (chatInput) {
-          chatInput.addEventListener('input', (e) => {
-            state.inputValue = e.target.value;
-          });
-          chatInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') methods.sendMessage(state, state.inputValue);
-          });
-          chatInput.addEventListener('focus', () => {
-            methods.initAudio(state);
-          });
-        }
-        
-        const sendButton = container.querySelector('#esa-send-button');
-        if (sendButton) {
-          sendButton.addEventListener('click', () => {
-            methods.sendMessage(state, state.inputValue);
-          });
-        }
-        
-        // Find or create left panel container
-        let leftContainer = container.querySelector('#esa-soundpanel-left');
-        if (!leftContainer) {
-          leftContainer = document.createElement('div');
-          leftContainer.id = 'esa-soundpanel-left';
-          leftContainer.style.cssText = 'flex: 0 0 220px;';
-          const core = container.querySelector('.esa-ingestion-core');
-          if (core) {
-            container.insertBefore(leftContainer, core);
-          } else {
-            container.appendChild(leftContainer);
-          }
-        }
-        
-        // Find or create right panel container
-        let rightContainer = container.querySelector('#esa-soundpanel-right');
-        if (!rightContainer) {
-          rightContainer = document.createElement('div');
-          rightContainer.id = 'esa-soundpanel-right';
-          rightContainer.style.cssText = 'flex: 0 0 220px;';
-          container.appendChild(rightContainer);
-        }
-        
-        // Mount SoundPanels
-        ESASoundPanel.mount(leftContainer, { side: 'left', audioEngine: state.audioEngine });
-        ESASoundPanel.mount(rightContainer, { side: 'right', audioEngine: state.audioEngine });
-        
-        state.leftSoundPanelContainer = leftContainer;
-        state.rightSoundPanelContainer = rightContainer;
-        
-      } catch (e) {
-        console.error('[ESA.Ingestion] Init error:', e);
+      }
+      
+      // Chat input
+      const chatInput = container.querySelector('#esa-chat-input');
+      if (chatInput) {
+        chatInput.addEventListener('input', (e) => {
+          state.inputValue = e.target.value;
+        });
+        chatInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') methods.sendMessage(state, state.inputValue, container);
+        });
+        chatInput.addEventListener('focus', () => {
+          methods.initAudio(state);
+        });
+      }
+      
+      // Send button
+      const sendButton = container.querySelector('#esa-send-button');
+      if (sendButton) {
+        sendButton.addEventListener('click', () => {
+          methods.sendMessage(state, state.inputValue, container);
+        });
+      }
+      
+      // Render initial messages
+      const messagesContainer = container.querySelector('#esa-messages-container');
+      if (messagesContainer && state.messages) {
+        state.messages.forEach(msg => {
+          const msgDiv = document.createElement('div');
+          msgDiv.style.cssText = 'margin: 8px 0; padding: 10px 14px; border-radius: 8px; background: #3c3836; color: #ebdbb2; font-size: 12px; line-height: 1.5;';
+          msgDiv.innerHTML = `
+            <div style="font-weight: bold; margin-bottom: 4px; font-size: 10px; opacity: 0.8;">
+              ${msg.role === 'user' ? '👤 OPERATOR' : '🤖 ' + (state.assignedAgent || 'Ava007')}
+            </div>
+            <div>${msg.content}</div>
+          `;
+          messagesContainer.appendChild(msgDiv);
+        });
       }
     }
   },
   
-  template: (props, state, methods) => html`
+  // 100% STATIC TEMPLATE - No dynamic expressions!
+  template: () => html`
     <div class="esa-ingestion-layout" style="display: flex; align-items: stretch; gap: 20px; width: 100%; padding: 10px;">
       <!-- Chat Core -->
       <div class="esa-ingestion-core" style="flex: 1; display: flex; flex-direction: column; background: #32302f; border: 1px solid #3c3836; border-radius: 12px; padding: 16px; min-height: 320px;">
@@ -194,16 +173,9 @@ export const ESAIngestion = ESAVerifyComponent({
           </div>
         </div>
         
-        <!-- Messages -->
-        <div style="flex: 1; overflow-y: auto; margin-bottom: 12px; padding-right: 8px;">
-          ${() => state.messages.map(msg => html`
-            <div style="margin: 8px 0; padding: 10px 14px; border-radius: 8px; background: #3c3836; color: #ebdbb2; font-size: 12px; line-height: 1.5;">
-              <div style="font-weight: bold; margin-bottom: 4px; font-size: 10px; opacity: 0.8;">
-                ${msg.role === 'user' ? '👤 OPERATOR' : '🤖 Ava007'}
-              </div>
-              <div>${msg.content}</div>
-            </div>
-          `)}
+        <!-- Messages Container (populated dynamically) -->
+        <div id="esa-messages-container" style="flex: 1; overflow-y: auto; margin-bottom: 12px; padding-right: 8px;">
+          <!-- Messages will be inserted here via DOM -->
         </div>
         
         <!-- Input Area -->
@@ -224,12 +196,22 @@ export const ESAIngestion = ESAVerifyComponent({
         
         <!-- Status Bar -->
         <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #3c3836; display: flex; justify-content: space-between; font-size: 9px; color: #a89984;">
-          <span>System: ${state.audioInitialized ? '✅ Ready' : '⏸ Standby'}</span>
-          <span>${state.systemStatus.toUpperCase()}</span>
+          <span id="esa-audio-status">System: ⏸ Standby</span>
+          <span id="esa-system-status">READY</span>
         </div>
       </div>
     </div>
-  `
+  `,
+  
+  mounted: (props, state, methods, container) => {
+    setTimeout(() => {
+      try {
+        methods.initDOM(state, container);
+      } catch (err) {
+        console.error('[ESA.Ingestion] Init error:', err);
+      }
+    }, 100);
+  }
 });
 
 export default ESAIngestion;
