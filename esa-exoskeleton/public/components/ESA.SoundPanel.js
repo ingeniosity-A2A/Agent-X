@@ -1,18 +1,16 @@
 /**
- * ESA.SoundPanel.js (Arrow.js Compatible Version)
+ * ESA.SoundPanel.js (Fully Arrow.js Compatible)
  * ============================================
  * DUAL AUDIO SYSTEM CORE - ESA INGESTION AI BOX
  * 
- * NOTE: Arrow.js does NOT allow ${} expressions in style attributes!
- * All styles must be pre-computed or static.
+ * CRITICAL: No ${} allowed in style attributes for Arrow.js compatibility!
  */
 
 import { reactive, html } from 'https://esm.sh/@arrow-js/core';
-import { activeTheme } from '../config/gruvbox-colors.js';
 import { ESAVerifyComponent } from './ESA.VerifiedWrapper.js';
 
 // ============================================================================
-// DUAL AUDIO SYSTEM CORE ENGINE (unchanged)
+// DUAL AUDIO SYSTEM CORE ENGINE
 // ============================================================================
 
 class DynamicAudioBroadcaster {
@@ -197,25 +195,12 @@ class DynamicAudioBroadcaster {
 export { DynamicAudioBroadcaster };
 
 // ============================================================================
-// ARROW.JS COMPONENT - SIMPLIFIED FOR COMPATIBILITY
+// ARROW.JS COMPONENT - ALL STYLES HARDCODED
 // ============================================================================
-
-// Pre-computed static styles (no ${} in style attrs!)
-const spStyles = {
-  enclosure: `background: linear-gradient(165deg, #1d1f27 0%, #0c0d12 100%); border-radius: 2em; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 60px 120px rgba(0,0,0,0.9); position: relative; overflow: hidden; height: 320px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;`,
-  statusBox: `position: absolute; top: 15px; background: rgba(0,0,0,0.6); padding: 4px 12px; border-radius: 12px; border: 1px solid #3c3836; font-size: 10px; font-weight: bold; letter-spacing: 1px; color: #a89984; z-index: 10;`,
-  channelLabel: `position: absolute; top: 35px; font-size: 9px; letter-spacing: 2px; color: #a89984; opacity: 0.7; z-index: 10;`,
-  glowRing: `width: 140px; height: 140px; border-radius: 50%; background: radial-gradient(circle at 50% 50%, rgba(0,255,204,0.15) 0%, transparent 70%); display: flex; align-items: center; justify-content: center; position: relative;`,
-  speakerCone: `width: 70px; height: 70px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #3a3a3a, #0c0d12); box-shadow: inset 0 2px 4px rgba(255,255,255,0.1), 0 4px 8px rgba(0,0,0,0.5); z-index: 2; display: flex; align-items: center; justify-content: center;`,
-  dustCap: `width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle at 40% 40%, #4a4a4a, #1a1a1a); box-shadow: inset 0 1px 2px rgba(255,255,255,0.1);`,
-  controls: `margin-top: 25px; display: flex; flex-direction: column; gap: 8px; z-index: 10; width: 100%;`,
-  primaryBtn: `padding: 10px 16px; background: #458588; color: #ebdbb2; border: 1px solid #3c3836; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;`,
-  secondaryBtn: `padding: 6px 12px; background: transparent; color: #a89984; border: 1px dashed #3c3836; border-radius: 4px; cursor: pointer; font-size: 9px;`
-};
 
 export const ESASoundPanel = ESAVerifyComponent({
   name: 'SoundPanel',
-  version: '2.1.0',
+  version: '3.0.0',
   owner: 'AI-Ingestion-Chat-Box',
   verified: true,
   
@@ -286,40 +271,40 @@ export const ESASoundPanel = ESAVerifyComponent({
     const channelDesc = isLeft ? 'Inbound Mic' : 'Speech Synthesis';
     
     return html`
-      <div class="speaker_enclosure" style=${spStyles.enclosure}>
+      <div class="speaker_enclosure" style="background: linear-gradient(165deg, #1d1f27 0%, #0c0d12 100%); border-radius: 2em; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 60px 120px rgba(0,0,0,0.9); position: relative; overflow: hidden; height: 320px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
         <!-- Status Indicator -->
-        <div style=${spStyles.statusBox}>
+        <div style="position: absolute; top: 15px; background: rgba(0,0,0,0.6); padding: 4px 12px; border-radius: 12px; border: 1px solid #3c3836; font-size: 10px; font-weight: bold; letter-spacing: 1px; color: #a89984; z-index: 10;">
           STATUS: ${() => state.status}
         </div>
         
         <!-- Channel Label -->
-        <div style=${spStyles.channelLabel}>
+        <div style="position: absolute; top: 35px; font-size: 9px; letter-spacing: 2px; color: #a89984; opacity: 0.7; z-index: 10;">
           ${channelLabel} — ${channelDesc}
         </div>
 
         <!-- Visualizer Glow Ring -->
-        <div class="speaker_glow_ring" style=${spStyles.glowRing}>
-          <!-- LED Segments -->
+        <div class="speaker_glow_ring" style="width: 140px; height: 140px; border-radius: 50%; background: radial-gradient(circle at 50% 50%, rgba(0,255,204,0.15) 0%, transparent 70%); display: flex; align-items: center; justify-content: center; position: relative;">
+          <!-- LED Segments - Static positions, no dynamic rotation in style -->
           <div style="position: absolute; width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-            ${() => Array.from({ length: 32 }).map((_, i) => html`
+            ${() => Array.from({ length: 8 }).map((_, i) => html`
               <div 
                 class="speaker_vis_bar esa-vis-segment-${side}" 
-                style="position: absolute; width: 3px; height: 10%; background: linear-gradient(120deg, rgba(59,180,155,0.8) 0%, rgba(137,58,255,0.8) 53%, rgba(253,134,241,0.7) 100%); border-radius: 2px; transform: rotate(${i * 11.25}deg) translateY(-55px); transform-origin: center 60px;"
+                style="position: absolute; width: 40px; height: 3px; background: linear-gradient(90deg, rgba(59,180,155,0.8) 0%, rgba(137,58,255,0.8) 100%); border-radius: 2px; transform-origin: center;"
               ></div>
             `)}
           </div>
           
           <!-- Speaker Cone -->
-          <div style=${spStyles.speakerCone}>
-            <div style=${spStyles.dustCap}></div>
+          <div style="width: 70px; height: 70px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #3a3a3a, #0c0d12); box-shadow: inset 0 2px 4px rgba(255,255,255,0.1), 0 4px 8px rgba(0,0,0,0.5); z-index: 2; display: flex; align-items: center; justify-content: center;">
+            <div style="width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle at 40% 40%, #4a4a4a, #1a1a1a); box-shadow: inset 0 1px 2px rgba(255,255,255,0.1);"></div>
           </div>
         </div>
 
         <!-- Control Buttons -->
-        <div style=${spStyles.controls}>
+        <div style="margin-top: 25px; display: flex; flex-direction: column; gap: 8px; z-index: 10; width: 100%;">
           <button 
             @click=${() => isLeft ? methods.toggleMic(state, props) : methods.testAvaVoice(state, props)}
-            style=${spStyles.primaryBtn}
+            style="padding: 10px 16px; background: #458588; color: #ebdbb2; border: 1px solid #3c3836; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;"
           >
             ${isLeft 
               ? (state.status === 'INGEST' ? '⏹ STOP INGEST' : '🎤 ACTIVATE MIC')
@@ -329,7 +314,7 @@ export const ESASoundPanel = ESAVerifyComponent({
           
           <button 
             @click=${() => methods.toggleControls(state)}
-            style=${spStyles.secondaryBtn}
+            style="padding: 6px 12px; background: transparent; color: #a89984; border: 1px dashed #3c3836; border-radius: 4px; cursor: pointer; font-size: 9px;"
           >
             ${state.showControls ? '▼ Hide Controls' : '▸ Show Controls'}
           </button>

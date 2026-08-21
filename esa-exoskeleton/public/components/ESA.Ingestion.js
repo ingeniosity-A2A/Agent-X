@@ -1,35 +1,19 @@
 /**
- * ESA.Ingestion.js
+ * ESA.Ingestion.js (Arrow.js Fully Compatible)
  * ============================================
  * AI INGESTION CHAT BOX (PARENT COMPONENT)
- * ============================================
  * 
- * THIS IS THE PARENT THAT OWNS:
- * - ESA.ButtonPanel (Camera/Upload)
- * - ESA.SoundPanel / Dual Audio System (Ava007 Voice)
+ * ARROW.JS COMPATIBILITY: No ${} allowed in style attributes!
+ * All styles are hardcoded or use CSS classes.
  */
 
 import { reactive, html } from 'https://esm.sh/@arrow-js/core';
-import { activeTheme } from '../config/gruvbox-colors.js';
 import { ESAVerifyComponent } from './ESA.VerifiedWrapper.js';
 import { ESASoundPanel, DynamicAudioBroadcaster } from './ESA.SoundPanel.js';
 
-// Pre-computed style strings (Arrow.js doesn't allow ${} in style attrs)
-const styles = {
-  layout: `display: flex; align-items: stretch; gap: 20px; width: 100%; padding: 10px;`,
-  core: `flex: 1; display: flex; flex-direction: column; background: ${activeTheme.bg_soft}; border: 1px solid ${activeTheme.border}; border-radius: 12px; padding: 16px; min-height: 320px;`,
-  header: `display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid ${activeTheme.border};`,
-  title: `color: ${activeTheme.aqua}; font-weight: bold; font-size: 13px;`,
-  select: `background: ${activeTheme.bg}; color: ${activeTheme.fg}; border: 1px solid ${activeTheme.border}; border-radius: 4px; padding: 4px 8px; font-size: 11px; outline: none;`,
-  input: `flex: 1; background: ${activeTheme.bg}; border: 1px solid ${activeTheme.border}; color: ${activeTheme.fg}; padding: 10px 14px; border-radius: 6px; font-size: 12px; outline: none;`,
-  button: `background: ${activeTheme.green}; color: ${activeTheme.bg}; border: none; padding: 0 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;`,
-  statusBar: `margin-top: 8px; padding-top: 8px; border-top: 1px solid ${activeTheme.border}; display: flex; justify-content: space-between; font-size: 9px; color: ${activeTheme.fg_soft};`
-};
-
-// Export the full component wrapper with .mount() method
 export const ESAIngestion = ESAVerifyComponent({
   name: 'Ingestion',
-  version: '2.6.0',
+  version: '2.7.0',
   verified: true,
   
   owns: {
@@ -131,29 +115,29 @@ export const ESAIngestion = ESAVerifyComponent({
   },
   
   template: (props, state, methods) => html`
-    <div class="esa-ingestion-layout" style=${styles.layout}>
+    <div class="esa-ingestion-layout" style="display: flex; align-items: stretch; gap: 20px; width: 100%; padding: 10px;">
       <!-- Left Sound Panel -->
       <div style="flex: 0 0 220px;">
         ${ESASoundPanel.view({ side: 'left', audioEngine: state.audioEngine })}
       </div>
       
       <!-- Chat Core -->
-      <div class="esa-ingestion-core" style=${styles.core}>
+      <div class="esa-ingestion-core" style="flex: 1; display: flex; flex-direction: column; background: #32302f; border: 1px solid #3c3836; border-radius: 12px; padding: 16px; min-height: 320px;">
         <!-- Header -->
-        <div style=${styles.header}>
-          <span style=${styles.title}>💬 ESA INGESTION AI</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #3c3836;">
+          <span style="color: #689d6a; font-weight: bold; font-size: 13px;">💬 ESA INGESTION AI</span>
           <div style="display: flex; gap: 10px; align-items: center;">
             <select 
               value=${() => state.assignedAgent}
               @change=${(e) => state.assignedAgent = e.target.value}
-              style=${styles.select}
+              style="background: #282828; color: #ebdbb2; border: 1px solid #3c3836; border-radius: 4px; padding: 4px 8px; font-size: 11px; outline: none;"
             >
               <option value="Ava007">Ava007</option>
               <option value="Core-Q2">Core-Q²</option>
               <option value="Agent-X">Agent-X</option>
             </select>
             
-            <div style="width: 8px; height: 8px; border-radius: 50%; background: #928374; box-shadow: 0 0 6px transparent;"></div>
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: #928374;"></div>
           </div>
         </div>
         
@@ -178,18 +162,18 @@ export const ESAIngestion = ESAVerifyComponent({
             @keydown=${(e) => { if (e.key === 'Enter') methods.sendMessage(state, state.inputValue); }}
             @focus=${() => methods.initAudio(state)}
             placeholder="Chat with assigned agent..."
-            style=${styles.input}
+            style="flex: 1; background: #282828; border: 1px solid #3c3836; color: #ebdbb2; padding: 10px 14px; border-radius: 6px; font-size: 12px; outline: none;"
           />
           <button
             @click=${() => { methods.initAudio(state); methods.sendMessage(state, state.inputValue); }}
-            style=${styles.button}
+            style="background: #98971a; color: #282828; border: none; padding: 0 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;"
           >
             SEND
           </button>
         </div>
         
         <!-- Status Bar -->
-        <div style=${styles.statusBar}>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #3c3836; display: flex; justify-content: space-between; font-size: 9px; color: #a89984;">
           <span>System: ${state.audioInitialized ? '✅ Ready' : '⏸ Standby'}</span>
           <span>${state.systemStatus.toUpperCase()}</span>
         </div>
