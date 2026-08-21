@@ -168,7 +168,6 @@ export const ESAIngestion = ESAVerifyComponent({
           <span style="color: #689d6a; font-weight: bold; font-size: 13px;">💬 ESA INGESTION AI</span>
           <div style="display: flex; gap: 10px; align-items: center;">
             <select 
-              value=${() => state.assignedAgent}
               @change=${(e) => state.assignedAgent = e.target.value}
               style="background: #282828; color: #ebdbb2; border: 1px solid #3c3836; border-radius: 4px; padding: 4px 8px; font-size: 11px; outline: none;"
             >
@@ -197,7 +196,6 @@ export const ESAIngestion = ESAVerifyComponent({
         <div style="display: flex; gap: 8px;">
           <input
             type="text"
-            value=${() => state.inputValue}
             @input=${(e) => state.inputValue = e.target.value}
             @keydown=${(e) => { if (e.key === 'Enter') methods.sendMessage(state, state.inputValue); }}
             @focus=${() => methods.initAudio(state)}
