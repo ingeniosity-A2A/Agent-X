@@ -43,7 +43,7 @@ export const ESAMaintenanceChecklist = {
               </div>
             </div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
-              <div><label style="display:block;color:#a89984;font-size:10px;margin-bottom:4px;text-transform:uppercase;">Date</label><input type="date" id="mc-date" value="${state.headerData.date}" style="width:100%;background:#282828;color:#ebdbb2;border:1px solid #3c3836;border-radius:6px;padding:8px 10px;font-size:12px;" /></div>
+              <div><label style="display:block;color:#a89984;font-size:10px;margin-bottom:4px;text-transform:uppercase;">Date</label><input type="date" id="mc-date" style="width:100%;background:#282828;color:#ebdbb2;border:1px solid #3c3836;border-radius:6px;padding:8px 10px;font-size:12px;" /></div>
               <div><label style="display:block;color:#a89984;font-size:10px;margin-bottom:4px;text-transform:uppercase;">Shift</label><select id="mc-shift" style="width:100%;background:#282828;color:#ebdbb2;border:1px solid #3c3836;border-radius:6px;padding:8px 10px;font-size:12px;"><option>Day Shift</option><option>Swing Shift</option><option>Night Shift</option></select></div>
               <div><label style="display:block;color:#a89984;font-size:10px;margin-bottom:4px;text-transform:uppercase;">Employee Name</label><input type="text" id="mc-emp" placeholder="Your name..." style="width:100%;background:#282828;color:#ebdbb2;border:1px solid #3c3836;border-radius:6px;padding:8px 10px;font-size:12px;" /></div>
               <div><label style="display:block;color:#a89984;font-size:10px;margin-bottom:4px;text-transform:uppercase;">Manager Sign-off</label><input type="text" id="mc-mgr" placeholder="Initials..." style="width:100%;background:#282828;color:#ebdbb2;border:1px solid #3c3836;border-radius:6px;padding:8px 10px;font-size:12px;" /></div>
@@ -131,7 +131,7 @@ export const ESAMaintenanceChecklist = {
           <!-- FOOTER -->
           <div style="background:#32302f;border-top:1px solid #3c3836;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;">
             <div id="mc-footer" style="display:flex;gap:20px;font-size:10px;color:#665c54;">
-              <span>📅 ${state.headerData.date}</span><span>🕐 Day Shift</span><span>👤 Not signed in</span>
+              <span>📅 Select Date</span><span>🕐 Day Shift</span><span>👤 Not signed in</span>
             </div>
             <div style="font-size:10px;color:#689d6a;">✓ Auto-saved</div>
           </div>
@@ -255,7 +255,9 @@ export const ESAMaintenanceChecklist = {
           });
           
           // Header inputs
-          container.querySelector('#mc-date')?.addEventListener('change', e => { state.headerData.date=e.target.value; updateFooter(); });
+          const dateInput = container.querySelector('#mc-date');
+          if(dateInput) dateInput.value = state.headerData.date;
+          dateInput?.addEventListener('change', e => { state.headerData.date=e.target.value; updateFooter(); });
           container.querySelector('#mc-shift')?.addEventListener('change', e => { state.headerData.shift=e.target.value; updateFooter(); });
           container.querySelector('#mc-emp')?.addEventListener('input', e => { state.headerData.employeeName=e.target.value; updateFooter(); });
           container.querySelector('#mc-notes')?.addEventListener('input', e => { state.shiftNotes=e.target.value; });
