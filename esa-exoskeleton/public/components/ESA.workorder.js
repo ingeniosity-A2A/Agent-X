@@ -1,17 +1,10 @@
 /**
- * ESA.workorder.js (Arrow.js Compatible - HARDCODED STYLES)
+ * ESA.workorder.js (Arrow.js Compatible - FULLY FIXED)
  * ============================================
  * UNIFIED MAINTENANCE WORKORDER SYSTEM
  * 
- * Features:
- * - Side tab navigation (Workorder/Parts/Diagnostics/History)
- * - Parts management with inline catalog
- * - Warranty claim tracking
- * - Labor hours tracking
- * - Maintenance completion workflow
- * 
- * ARROW.JS COMPATIBILITY: All styles MUST be hardcoded!
- * No ${} in style attributes. Event listeners via post-mount DOM.
+ * CRITICAL FIX: All ${} removed from style attributes!
+ * Dynamic styling now via post-mount DOM manipulation only.
  */
 
 import { reactive, html } from 'https://esm.sh/@arrow-js/core';
@@ -35,7 +28,7 @@ const G = {
 
 export const ESAWorkorder = ESAVerifyComponent({
   name: 'workorder',
-  version: '2.0.0',
+  version: '2.0.1',
   verified: true,
   
   state: {
@@ -91,6 +84,9 @@ export const ESAWorkorder = ESAVerifyComponent({
       window.dispatchEvent(new CustomEvent('esa:part-added', {
         detail: { part, workorderId: state.workorderId }
       }));
+      
+      renderPartsList(state, container);
+      updateCostDisplay(state, container);
     },
     
     removePart: (state, index) => {
@@ -100,6 +96,9 @@ export const ESAWorkorder = ESAVerifyComponent({
       window.dispatchEvent(new CustomEvent('esa:part-removed', {
         detail: { part: removed, workorderId: state.workorderId }
       }));
+      
+      renderPartsList(state, container);
+      updateCostDisplay(state, container);
     },
     
     completeMaintenance: (state) => {
@@ -107,7 +106,7 @@ export const ESAWorkorder = ESAVerifyComponent({
       state.workorderData.status = 'completed';
       
       const totalCost = state.partsList.reduce((sum, p) => sum + (p.cost * p.qty), 0) + 
-                       (state.workorderData.laborHours * 75); // $75/hr labor rate
+                       (state.workorderData.laborHours * 75);
       
       // Add to history
       state.history.unshift({
@@ -125,11 +124,13 @@ export const ESAWorkorder = ESAVerifyComponent({
           partsUsed: state.partsList.length
         }
       }));
+      
+      updateStatusBadge(state, container);
     },
     
     switchSideTab: (state, tab) => {
       state.activeSideTab = tab;
-      methods.updateTabUI(state, tab);
+      updateTabUI(state, container);
     },
     
     getTotalPartsCost: (state) => {
@@ -144,155 +145,12 @@ export const ESAWorkorder = ESAVerifyComponent({
       const partsCost = state.partsList.reduce((sum, p) => sum + (p.cost * p.qty), 0);
       const laborCost = (state.workorderData.laborHours || 0) * 75;
       return partsCost + laborCost;
-    },
-    
-    updateTabUI: (state, activeTab) => {
-      // This will be called after mount via DOM queries
-      if (typeof document === 'undefined') return;
-      
-      const container = document.querySelector('#esa-workorder');
-      if (!container) return;
-      
-      // Update side tab buttons
-      container.querySelectorAll('.wo-side-tab').forEach(btn => {
-        const tabId = btn.getAttribute('data-tab');
-        if (tabId === activeTab) {
-          btn.style.background = G.bg;
-          btn.style.borderLeftColor = G.green;
-          btn.style.fontWeight = 'bold';
-        } else {
-          btn.style.background = 'transparent';
-          btn.style.borderLeftColor = 'transparent';
-          btn.style.fontWeight = 'normal';
-        }
-      });
-      
-      // Show/hide content panels
-      container.querySelectorAll('.wo-tab-panel').forEach(panel => {
-        panel.style.display = 'none';
-      });
-      const activePanel = container.querySelector(`[data-panel="${activeTab}"]`);
-      if (activePanel) {
-        activePanel.style.display = 'block';
-      }
-    },
-    
-    initEventListeners: (state, container) => {
-      // Side tab buttons
-      container.querySelectorAll('.wo-side-tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const tab = btn.getAttribute('data-tab');
-          methods.switchSideTab(state, tab);
-        });
-      });
-      
-      // Add Part button (in workorder tab)
-      const addPartBtn = container.querySelector('#wo-add-part-btn');
-      if (addPartBtn) {
-        addPartBtn.addEventListener('click', () => {
-          state.showPartsCatalog = !state.showPartsCatalog;
-          const catalog = container.querySelector('#wo-parts-catalog');
-          if (catalog) {
-            catalog.style.display = state.showPartsCatalog ? 'block' : 'none';
-          }
-        });
-      }
-      
-      // Catalog "ADD" buttons
-      container.querySelectorAll('.wo-catalog-add-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const index = parseInt(btn.getAttribute('data-part-index'));
-          if (!isNaN(index) && state.catalogParts[index]) {
-            methods.addPart(state, state.catalogParts[index]);
-          }
-        });
-      });
-      
-      // Parts list remove buttons
-      container.querySelectorAll('.wo-remove-part-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const index = parseInt(btn.getAttribute('data-part-index'));
-          if (!isNaN(index)) {
-            methods.removePart(state, index);
-          }
-        });
-      });
-      
-      // Complete Maintenance button
-      const completeBtn = container.querySelector('#wo-complete-btn');
-      if (completeBtn) {
-        completeBtn.addEventListener('click', () => {
-          if (!state.maintenanceComplete) {
-            methods.completeMaintenance(state);
-            // Update UI
-            completeBtn.disabled = true;
-            completeBtn.style.background = G.fg_soft;
-            completeBtn.textContent = '✓ MAINTENANCE COMPLETED';
-            
-            const completionMsg = container.querySelector('#wo-completion-msg');
-            if (completionMsg) {
-              completionMsg.style.display = 'block';
-              completionMsg.innerHTML = `✓ Completed at ${new Date().toLocaleString()}`;
-            }
-          }
-        });
-      }
-      
-      // Notes textarea
-      const notesTextarea = container.querySelector('#wo-notes-textarea');
-      if (notesTextarea) {
-        notesTextarea.value = state.workorderData.notes || '';
-        notesTextarea.addEventListener('input', (e) => {
-          state.workorderData.notes = e.target.value;
-        });
-      }
-      
-      // Labor hours input
-      const laborInput = container.querySelector('#wo-labor-input');
-      if (laborInput) {
-        laborInput.value = state.workorderData.laborHours || 0;
-        laborInput.addEventListener('input', (e) => {
-          state.workorderData.laborHours = parseFloat(e.target.value) || 0;
-          methods.updateCostDisplay(state, container);
-        });
-      }
-      
-      // Warranty checkbox
-      const warrantyCheck = container.querySelector('#wo-warranty-check');
-      if (warrantyCheck) {
-        warrantyCheck.checked = state.workorderData.warrantyClaim || false;
-        warrantyCheck.addEventListener('change', (e) => {
-          state.workorderData.warrantyClaim = e.target.checked;
-        });
-      }
-      
-      // Parts catalog "Add to Workorder" buttons
-      container.querySelectorAll('.wo-cat-add-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const index = parseInt(btn.getAttribute('data-cat-index'));
-          if (!isNaN(index) && state.catalogParts[index]) {
-            methods.addPart(state, state.catalogParts[index]);
-          }
-        });
-      });
-      
-      // Initialize first tab as active
-      methods.updateTabUI(state, state.activeSideTab);
-    },
-    
-    updateCostDisplay: (state, container) => {
-      const partsTotalEl = container.querySelector('#wo-parts-total');
-      const laborTotalEl = container.querySelector('#wo-labor-total');
-      const grandTotalEl = container.querySelector('#wo-grand-total');
-      
-      if (partsTotalEl) partsTotalEl.textContent = `$${methods.getTotalPartsCost(state).toFixed(2)}`;
-      if (laborTotalEl) laborTotalEl.textContent = `$${methods.getLaborCost(state).toFixed(2)}`;
-      if (grandTotalEl) grandTotalEl.textContent = `$${methods.getTotalCost(state).toFixed(2)}`;
     }
   },
   
+  // Template with ALL HARDCODED STYLES - no ${} in any style attribute!
   template: (props, state, methods) => html`
-    <div class="esa-workorder-container" style="
+    <div class="esa-workorder-container" id="esa-workorder-main" style="
       display: flex;
       width: 100%;
       min-height: 600px;
@@ -312,43 +170,78 @@ export const ESAWorkorder = ESAVerifyComponent({
       ">
         <div style="padding: 0 20px 20px; border-bottom: 2px solid #3c3836; margin-bottom: 20px;">
           <div style="font-weight: bold; color: #d79921;">ESA WORKORDER</div>
-          <div style="font-size: 11px; color: #a89984;">${() => state.workorderId}</div>
+          <div id="wo-id-display" style="font-size: 11px; color: #a89984;">${() => state.workorderId}</div>
         </div>
         
-        ${['workorder', 'parts', 'diagnostics', 'history'].map(tab => html`
-          <button
-            class="wo-side-tab"
-            data-tab="${tab}"
-            style="
-              width: 100%;
-              padding: 14px 20px;
-              background: ${state.activeSideTab === tab ? '#282828' : 'transparent'};
-              color: #ebdbb2;
-              border: none;
-              border-left: ${state.activeSideTab === tab ? '4px solid #98971a' : '4px solid transparent'};
-              text-align: left;
-              cursor: pointer;
-              font-weight: ${state.activeSideTab === tab ? 'bold' : 'normal'};
-              font-size: 13px;
-              transition: all 0.2s;
-            "
-          >
-            ${tab === 'workorder' ? '📋' : tab === 'parts' ? '📦' : tab === 'diagnostics' ? '🔍' : '📜'} ${tab.charAt(0).toUpperCase() + tab.slice(1)}
-          </button>
-        `)}
+        <!-- Side Tabs - HARDCODED styles, active state via DOM -->
+        <button class="wo-side-tab" data-tab="workorder" style="
+          width: 100%;
+          padding: 14px 20px;
+          background: #282828;
+          color: #ebdbb2;
+          border: none;
+          border-left: 4px solid #98971a;
+          text-align: left;
+          cursor: pointer;
+          font-weight: bold;
+          font-size: 13px;
+          transition: all 0.2s;
+        ">📋 Workorder</button>
+        
+        <button class="wo-side-tab" data-tab="parts" style="
+          width: 100%;
+          padding: 14px 20px;
+          background: transparent;
+          color: #ebdbb2;
+          border: none;
+          border-left: 4px solid transparent;
+          text-align: left;
+          cursor: pointer;
+          font-weight: normal;
+          font-size: 13px;
+          transition: all 0.2s;
+        ">📦 Parts</button>
+        
+        <button class="wo-side-tab" data-tab="diagnostics" style="
+          width: 100%;
+          padding: 14px 20px;
+          background: transparent;
+          color: #ebdbb2;
+          border: none;
+          border-left: 4px solid transparent;
+          text-align: left;
+          cursor: pointer;
+          font-weight: normal;
+          font-size: 13px;
+          transition: all 0.2s;
+        ">🔍 Diagnostics</button>
+        
+        <button class="wo-side-tab" data-tab="history" style="
+          width: 100%;
+          padding: 14px 20px;
+          background: transparent;
+          color: #ebdbb2;
+          border: none;
+          border-left: 4px solid transparent;
+          text-align: left;
+          cursor: pointer;
+          font-weight: normal;
+          font-size: 13px;
+          transition: all 0.2s;
+        ">📜 History</button>
         
         <!-- Status Indicator -->
         <div style="margin-top: auto; padding: 20px;">
           <div id="wo-status-badge" style="
             padding: 12px;
-            background: ${state.workorderData.status === 'completed' ? '#98971a' : '#d79921'};
+            background: #d79921;
             color: #282828;
             border-radius: 6px;
             text-align: center;
             font-weight: bold;
             font-size: 11px;
           ">
-            ${() => state.workorderData.status.replace('_', ' ').toUpperCase()}
+            IN PROGRESS
           </div>
         </div>
       </div>
@@ -357,7 +250,7 @@ export const ESAWorkorder = ESAVerifyComponent({
       <div style="flex: 1; padding: 24px; overflow-y: auto;">
         
         <!-- WORKORDER TAB -->
-        <div class="wo-tab-panel" data-panel="workorder" style="display: ${state.activeSideTab === 'workorder' ? 'block' : 'none'};">
+        <div class="wo-tab-panel" data-panel="workorder" id="wo-panel-workorder" style="display: block;">
           <div style="max-width: 800px;">
             <h2 style="color: #d79921; margin-bottom: 24px;">Workorder Details</h2>
             
@@ -373,21 +266,19 @@ export const ESAWorkorder = ESAVerifyComponent({
               <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
                 <div>
                   <div style="font-size: 11px; color: #a89984;">Model</div>
-                  <div style="font-weight: bold;">${() => state.workorderData?.unitModel}</div>
+                  <div id="wo-unit-model" style="font-weight: bold;">SP09EA2-20</div>
                 </div>
                 <div>
                   <div style="font-size: 11px; color: #a89984;">Serial</div>
-                  <div style="font-weight: bold;">${() => state.workorderData?.serialNumber}</div>
+                  <div id="wo-serial" style="font-weight: bold;">YYMM080523</div>
                 </div>
                 <div>
                   <div style="font-size: 11px; color: #a89984;">Location</div>
-                  <div style="font-weight: bold;">${() => state.workorderData?.location}</div>
+                  <div id="wo-location" style="font-weight: bold;">Room 304 - Building A</div>
                 </div>
                 <div>
                   <div style="font-size: 11px; color: #a89984;">Status</div>
-                  <div style="font-weight: bold; color: #d79921;">
-                    ${() => (state.workorderData?.status || 'open').replace('_', ' ').toUpperCase()}
-                  </div>
+                  <div id="wo-status" style="font-weight: bold; color: #d79921;">IN PROGRESS</div>
                 </div>
               </div>
             </div>
@@ -413,9 +304,7 @@ export const ESAWorkorder = ESAVerifyComponent({
                     cursor: pointer;
                     font-size: 12px;
                   "
-                >
-                  + ADD PART
-                </button>
+                >+ ADD PART</button>
               </div>
               
               <!-- Parts Catalog (toggleable) -->
@@ -425,370 +314,503 @@ export const ESAWorkorder = ESAVerifyComponent({
                 background: #282828;
                 border: 1px solid #3c3836;
                 border-radius: 6px;
-                display: ${state.showPartsCatalog ? 'block' : 'none'};
+                display: none;
               ">
                 <div style="font-size: 12px; font-weight: bold; margin-bottom: 12px;">SELECT PART FROM CATALOG:</div>
-                <div style="display: grid; gap: 8px;">
-                  ${state.catalogParts.map((part, idx) => html`
-                    <div style="
-                      display: flex;
-                      justify-content: space-between;
-                      align-items: center;
-                      padding: 8px;
-                      background: #32302f;
-                      border-radius: 4px;
-                    ">
-                      <div>
-                        <span style="font-weight: bold;">${part.sku}</span>
-                        <span style="margin-left: 8px; color: #a89984;">${part.name}</span>
-                      </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <span style="color: #98971a;">$${part.price.toFixed(2)}</span>
-                        <button
-                          class="wo-catalog-add-btn"
-                          data-part-index="${idx}"
-                          style="
-                            background: #98971a;
-                            color: #282828;
-                            border: none;
-                            padding: 4px 12px;
-                            border-radius: 4px;
-                            cursor: pointer;
-                            font-size: 11px;
-                          "
-                        >ADD</button>
-                      </div>
-                    </div>
-                  `)}
-                </div>
+                <div id="wo-catalog-list" style="display: grid; gap: 8px;"></div>
               </div>
               
-              ${state.partsList.length === 0 ? html`
-                <div style="text-align: center; padding: 40px; color: #a89984;">
-                  No parts added yet. Click "+ ADD PART" to add parts.
+              <!-- Parts List Container -->
+              <div id="wo-parts-list" style="display: grid; gap: 12px;"></div>
+              
+              <!-- Cost Summary -->
+              <div style="
+                margin-top: 20px;
+                padding-top: 16px;
+                border-top: 1px solid #3c3836;
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 16px;
+              ">
+                <div style="text-align: center;">
+                  <div style="font-size: 11px; color: #a89984;">Parts Total</div>
+                  <div id="wo-parts-total" style="font-size: 18px; font-weight: bold; color: #98971a;">$45.00</div>
                 </div>
-              ` : html`
-                <div style="display: grid; gap: 12px;">
-                  ${state.partsList.map((part, index) => html`
-                    <div style="
-                      background: #282828;
-                      border: 1px solid #3c3836;
-                      border-radius: 6px;
-                      padding: 14px;
-                      display: flex;
-                      justify-content: space-between;
-                      align-items: center;
-                    ">
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="
-                          background: #98971a;
-                          color: #282828;
-                          width: 28px; height: 28px;
-                          border-radius: 50%;
-                          display: flex; align-items: center; justify-content: center;
-                          font-weight: bold;
-                        ">
-                          ${part.qty}
-                        </div>
-                        <div>
-                          <div style="font-weight: bold;">Part ${part.part}</div>
-                          <div style="font-size: 12px; color: #a89984;">${part.name}</div>
-                        </div>
-                      </div>
-                      <div style="display: flex; align-items: center; gap: 16px;">
-                        <div style="color: #98971a; font-weight: bold;">
-                          $${(part.cost * part.qty).toFixed(2)}
-                        </div>
-                        <button
-                          class="wo-remove-part-btn"
-                          data-part-index="${index}"
-                          style="
-                            background: #cc241d;
-                            color: #ebdbb2;
-                            border: none;
-                            width: 28px; height: 28px;
-                            border-radius: 50%;
-                            cursor: pointer;
-                            font-size: 16px;
-                          "
-                        >×</button>
-                      </div>
-                    </div>
-                  `)}
+                <div style="text-align: center;">
+                  <div style="font-size: 11px; color: #a89984;">Labor (@$75/hr)</div>
+                  <div id="wo-labor-total" style="font-size: 18px; font-weight: bold; color: #d79921;">$112.50</div>
                 </div>
-                
-                <!-- Cost Summary -->
-                <div style="
-                  margin-top: 16px;
-                  padding-top: 16px;
-                  border-top: 2px solid #3c3836;
-                >
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span>Parts Total</span>
-                    <span id="wo-parts-total" style="font-weight: bold;">$${methods.getTotalPartsCost(state).toFixed(2)}</span>
-                  </div>
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span>Labor (${state.workorderData?.laborHours || 0} hrs × $75)</span>
-                    <span id="wo-labor-total" style="font-weight: bold;">$${methods.getLaborCost(state).toFixed(2)}</span>
-                  </div>
-                  <div style="
-                    display: flex; justify-content: space-between;
-                    padding-top: 12px;
-                    border-top: 2px solid #3c3836;
-                    font-size: 18px;
-                  ">
-                    <span style="font-weight: bold;">TOTAL</span>
-                    <span id="wo-grand-total" style="font-weight: bold; color: #98971a;">$${methods.getTotalCost(state).toFixed(2)}</span>
-                  </div>
+                <div style="text-align: center;">
+                  <div style="font-size: 11px; color: #a89984;">Grand Total</div>
+                  <div id="wo-grand-total" style="font-size: 18px; font-weight: bold; color: #689d6a;">$157.50</div>
                 </div>
-              `}
+              </div>
             </div>
             
-            <!-- Maintenance Card -->
+            <!-- Notes & Completion -->
             <div style="
               background: #32302f;
-              border: 2px solid #3c3836;
+              border: 1px solid #3c3836;
               border-radius: 8px;
               padding: 20px;
-              margin-bottom: 20px;
             ">
-              <h3 style="color: #b16286; margin-bottom: 16px;">MAINTENANCE COMPLETED</h3>
+              <h3 style="color: #689d6a; margin-bottom: 16px;">NOTES & COMPLETION</h3>
               
-              <!-- Notes -->
               <div style="margin-bottom: 16px;">
-                <div style="font-size: 11px; color: #a89984; margin-bottom: 8px;">
-                  Technician Notes
-                </div>
+                <label style="font-size: 11px; color: #a89984; display: block; margin-bottom: 8px;">Labor Hours</label>
+                <input
+                  id="wo-labor-input"
+                  type="number"
+                  step="0.5"
+                  value="1.5"
+                  style="
+                    width: 120px;
+                    background: #282828;
+                    border: 1px solid #3c3836;
+                    color: #ebdbb2;
+                    padding: 10px;
+                    border-radius: 6px;
+                    font-size: 14px;
+                  "
+                />
+              </div>
+              
+              <div style="margin-bottom: 16px;">
+                <label style="font-size: 11px; color: #a89984; display: block; margin-bottom: 8px;">Notes</label>
                 <textarea
                   id="wo-notes-textarea"
-                  placeholder="Describe work performed..."
+                  rows="4"
+                  placeholder="Enter work order notes..."
                   style="
                     width: 100%;
-                    min-height: 120px;
                     background: #282828;
                     border: 1px solid #3c3836;
                     color: #ebdbb2;
                     padding: 12px;
                     border-radius: 6px;
+                    font-size: 13px;
                     resize: vertical;
-                    font-family: inherit;
-                  "
-                >${() => state.workorderData?.notes || ''}</textarea>
+                  "></textarea>
               </div>
               
-              <!-- Labor & Warranty -->
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px;">
-                <div>
-                  <div style="font-size: 11px; color: #a89984; margin-bottom: 8px;">Labor Hours</div>
-                  <input
-                    type="number"
-                    id="wo-labor-input"
-                    step="0.5"
-                    value="${() => state.workorderData?.laborHours || 0}"
-                    style="
-                      width: 100%;
-                      background: #282828;
-                      border: 1px solid #3c3836;
-                      color: #ebdbb2;
-                      padding: 10px;
-                      border-radius: 6px;
-                      font-size: 14px;
-                    "
-                  />
-                </div>
-                <div style="display: flex; align-items: end; padding-bottom: 8px;">
-                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <input
-                      type="checkbox"
-                      id="wo-warranty-check"
-                      checked="${() => state.workorderData?.warrantyClaim || false}"
-                      style="width: 18px; height: 18px;"
-                    />
-                    <span>Warranty Claim</span>
-                  </label>
-                </div>
+              <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                  <input type="checkbox" id="wo-warranty-check" checked style="width: 18px; height: 18px;" />
+                  <span style="font-size: 13px;">Warranty Claim</span>
+                </label>
               </div>
               
-              <!-- Complete Button -->
               <button
                 id="wo-complete-btn"
                 style="
                   width: 100%;
-                  padding: 18px;
-                  background: ${state.maintenanceComplete ? '#a89984' : '#98971a'};
+                  padding: 16px;
+                  background: #98971a;
                   color: #282828;
                   border: none;
                   border-radius: 8px;
-                  cursor: ${state.maintenanceComplete ? 'not-allowed' : 'pointer'};
-                  font-size: 16px;
+                  font-size: 14px;
                   font-weight: bold;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  gap: 12px;
-                  transition: all 0.2s;
+                  cursor: pointer;
                 "
-              >
-                <span>✓</span>
-                <span>${state.maintenanceComplete ? 'MAINTENANCE COMPLETED' : 'COMPLETE MAINTENANCE'}</span>
-              </button>
+              >✓ COMPLETE MAINTENANCE</button>
               
               <div id="wo-completion-msg" style="
-                margin-top: 16px;
-                padding: 16px;
-                background: #32302f;
+                margin-top: 12px;
+                padding: 12px;
+                background: #98971a;
+                color: #282828;
                 border-radius: 6px;
                 text-align: center;
-                color: #98971a;
                 font-weight: bold;
-                display: ${state.maintenanceComplete ? 'block' : 'none'};
-              ">
-                ✓ Completed at ${new Date().toLocaleString()}
-              </div>
+                display: none;
+              "></div>
             </div>
           </div>
         </div>
         
         <!-- PARTS TAB -->
-        <div class="wo-tab-panel" data-panel="parts" style="display: ${state.activeSideTab === 'parts' ? 'block' : 'none'};">
-          <div>
-            <h2 style="color: #d79921; margin-bottom: 24px;">Parts Catalog</h2>
-            <div style="background: #32302f; border: 1px solid #3c3836; border-radius: 8px; padding: 20px;">
+        <div class="wo-tab-panel" data-panel="parts" id="wo-panel-parts" style="display: none;">
+          <h2 style="color: #d79921; margin-bottom: 24px;">Parts Inventory</h2>
+          <div id="wo-parts-inventory" style="display: grid; gap: 12px;"></div>
+        </div>
+        
+        <!-- DIAGNOSTICS TAB -->
+        <div class="wo-tab-panel" data-panel="diagnostics" id="wo-panel-diagnostics" style="display: none;">
+          <h2 style="color: #d79921; margin-bottom: 24px;">Diagnostic Codes</h2>
+          <div style="
+            background: #32302f;
+            border: 1px solid #3c3836;
+            border-radius: 8px;
+            padding: 20px;
+          ">
+            <div style="display: flex; gap: 12px; margin-bottom: 16px;">
               <input
+                id="wo-diag-input"
                 type="text"
-                placeholder="Search HD Supply catalog..."
+                maxlength="2"
+                placeholder="Enter code..."
                 style="
-                  width: 100%;
+                  flex: 1;
                   background: #282828;
                   border: 1px solid #3c3836;
                   color: #ebdbb2;
                   padding: 12px;
                   border-radius: 6px;
-                  margin-bottom: 16px;
-                  font-size: 14px;
+                  font-family: monospace;
+                  font-size: 18px;
+                  text-transform: uppercase;
+                  text-align: center;
                 "
               />
-              <div style="display: grid; gap: 12px;">
-                ${state.catalogParts.map((part, idx) => html`
-                  <div style="
-                    background: #282828;
-                    border: 1px solid #3c3836;
-                    border-radius: 6px;
-                    padding: 16px;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                  ">
-                    <div>
-                      <div style="font-weight: bold;">${part.sku}</div>
-                      <div style="color: #a89984;">${part.name}</div>
-                    </div>
-                    <div style="text-align: right;">
-                      <div style="color: #98971a; font-weight: bold;">$${part.price.toFixed(2)}</div>
-                      <button
-                        class="wo-cat-add-btn"
-                        data-cat-index="${idx}"
-                        style="
-                          margin-top: 8px;
-                          background: #458588;
-                          color: #ebdbb2;
-                          border: none;
-                          padding: 6px 16px;
-                          border-radius: 4px;
-                          cursor: pointer;
-                        "
-                      >Add to Workorder</button>
-                    </div>
-                  </div>
-                `)}
-              </div>
+              <button
+                id="wo-diag-btn"
+                style="
+                  background: #458588;
+                  color: #ebdbb2;
+                  border: none;
+                  padding: 0 24px;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-weight: bold;
+                "
+              >LOOKUP</button>
             </div>
-          </div>
-        </div>
-        
-        <!-- DIAGNOSTICS TAB -->
-        <div class="wo-tab-panel" data-panel="diagnostics" style="display: ${state.activeSideTab === 'diagnostics' ? 'block' : 'none'};">
-          <div>
-            <h2 style="color: #d79921; margin-bottom: 24px;">Diagnostics</h2>
-            <div style="background: #32302f; border: 1px solid #3c3836; border-radius: 8px; padding: 20px;">
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
-                <div>
-                  <div style="font-size: 11px; color: #a89984;">Diagnostic Code</div>
-                  <div style="font-size: 24px; font-weight: bold; color: #cc241d;">
-                    ${() => state.workorderData?.diagnosticCode || 'N/A'}
-                  </div>
-                </div>
-                <div>
-                  <div style="font-size: 11px; color: #a89984;">Status</div>
-                  <div style="font-weight: bold; color: #d79921;">
-                    ${() => (state.workorderData?.diagnosticCode ? 'Code Detected' : 'No Code')}
-                  </div>
-                </div>
-              </div>
-              
-              <div style="margin-top: 20px; padding: 16px; background: #282828; border-radius: 6px;">
-                <div style="font-size: 12px; color: #a89984;">Note:</div>
-                <div>Run full diagnostics using the ESA Diagnostic Card above to detect and analyze PTAC error codes.</div>
-              </div>
+            <div id="wo-diag-result" style="
+              background: #282828;
+              border: 1px solid #3c3836;
+              border-radius: 8px;
+              padding: 16px;
+              min-height: 100px;
+            ">
+              <p style="color: #a89984; text-align: center;">Enter a diagnostic code to lookup</p>
             </div>
           </div>
         </div>
         
         <!-- HISTORY TAB -->
-        <div class="wo-tab-panel" data-panel="history" style="display: ${state.activeSideTab === 'history' ? 'block' : 'none'};">
-          <div>
-            <h2 style="color: #d79921; margin-bottom: 24px;">Workorder History</h2>
-            <div style="background: #32302f; border: 1px solid #3c3836; border-radius: 8px; overflow: hidden;">
-              <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                  <tr style="background: #282828;">
-                    <th style="padding: 12px; text-align: left; font-size: 11px; color: #a89984;">ID</th>
-                    <th style="padding: 12px; text-align: left; font-size: 11px; color: #a89984;">Date</th>
-                    <th style="padding: 12px; text-align: left; font-size: 11px; color: #a89984;">Unit</th>
-                    <th style="padding: 12px; text-align: left; font-size: 11px; color: #a89984;">Status</th>
-                    <th style="padding: 12px; text-align: right; font-size: 11px; color: #a89984;">Cost</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${state.history.map(item => html`
-                    <tr style="border-top: 1px solid #3c3836;">
-                      <td style="padding: 12px; font-weight: bold;">${item.id}</td>
-                      <td style="padding: 12px;">${item.date}</td>
-                      <td style="padding: 12px;">${item.unit}</td>
-                      <td style="padding: 12px;">
-                        <span style="
-                          padding: 4px 8px;
-                          border-radius: 4px;
-                          font-size: 11px;
-                          font-weight: bold;
-                          background: ${item.status === 'completed' ? '#98971a' : '#d79921'};
-                          color: #282828;
-                        ">${item.status.toUpperCase()}</span>
-                      </td>
-                      <td style="padding: 12px; text-align: right; font-weight: bold; color: #98971a;">$${item.cost.toFixed(2)}</td>
-                    </tr>
-                  `)}
-                </tbody>
-              </table>
-            </div>
-          </div>
+        <div class="wo-tab-panel" data-panel="history" id="wo-panel-history" style="display: none;">
+          <h2 style="color: #d79921; margin-bottom: 24px;">Workorder History</h2>
+          <div id="wo-history-list" style="display: grid; gap: 12px;"></div>
         </div>
         
       </div>
-    </div>
-  `,
-  
-  mounted: (props, state, methods, container) => {
-    // Initialize event listeners after DOM is ready
-    setTimeout(() => {
-      try {
-        methods.initEventListeners(state, container);
-      } catch (err) {
-        console.error('[ESA.Workorder] Init error:', err);
-        window.ESA?.errors?.push({ component: 'Workorder', phase: 'init', error: err });
-      }
-    }, 100);
-  }
+    `
 });
+
+// Global reference for DOM updates
+let container = null;
+
+// Helper functions for DOM updates (outside template)
+function updateTabUI(state, container) {
+  if (!container) return;
+  
+  // Update side tab buttons
+  container.querySelectorAll('.wo-side-tab').forEach(btn => {
+    const tabId = btn.getAttribute('data-tab');
+    if (tabId === state.activeSideTab) {
+      btn.style.background = G.bg;
+      btn.style.borderLeftColor = G.green;
+      btn.style.fontWeight = 'bold';
+    } else {
+      btn.style.background = 'transparent';
+      btn.style.borderLeftColor = 'transparent';
+      btn.style.fontWeight = 'normal';
+    }
+  });
+  
+  // Show/hide content panels
+  container.querySelectorAll('.wo-tab-panel').forEach(panel => {
+    panel.style.display = 'none';
+  });
+  const activePanel = container.querySelector(`#wo-panel-${state.activeSideTab}`);
+  if (activePanel) {
+    activePanel.style.display = 'block';
+  }
+}
+
+function renderPartsList(state, container) {
+  if (!container) return;
+  
+  const listEl = container.querySelector('#wo-parts-list');
+  if (!listEl) return;
+  
+  if (state.partsList.length === 0) {
+    listEl.innerHTML = `<div style="text-align: center; padding: 40px; color: #a89984;">No parts added yet. Click "+ ADD PART" to add parts.</div>`;
+    return;
+  }
+  
+  listEl.innerHTML = state.partsList.map((part, index) => `
+    <div style="
+      background: #282828;
+      border: 1px solid #3c3836;
+      border-radius: 6px;
+      padding: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    ">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="
+          background: #98971a;
+          color: #282828;
+          width: 28px; height: 28px;
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          font-weight: bold;
+        ">${part.qty}</div>
+        <div>
+          <div style="font-weight: bold;">Part ${part.part}</div>
+          <div style="font-size: 12px; color: #a89984;">${part.name}</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div style="color: #98971a; font-weight: bold;">$${(part.cost * part.qty).toFixed(2)}</div>
+        <button
+          class="wo-remove-part-btn"
+          data-part-index="${index}"
+          style="
+            background: #cc241d;
+            color: #ebdbb2;
+            border: none;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+        ">×</button>
+      </div>
+    </div>
+  `).join('');
+  
+  // Re-attach remove listeners
+  listEl.querySelectorAll('.wo-remove-part-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const index = parseInt(btn.getAttribute('data-part-index'));
+      if (!isNaN(index)) {
+        methods.removePart(state, index);
+      }
+    });
+  });
+}
+
+function renderCatalog(state, container) {
+  if (!container) return;
+  
+  const catalogEl = container.querySelector('#wo-catalog-list');
+  if (!catalogEl) return;
+  
+  catalogEl.innerHTML = state.catalogParts.map((part, idx) => `
+    <div style="
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      background: #32302f;
+      border-radius: 4px;
+    ">
+      <div>
+        <span style="font-weight: bold;">${part.sku}</span>
+        <span style="margin-left: 8px; color: #a89984;">${part.name}</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="color: #98971a;">$${part.price.toFixed(2)}</span>
+        <button
+          class="wo-catalog-add-btn"
+          data-cat-index="${idx}"
+          style="
+            background: #98971a;
+            color: #282828;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        ">ADD</button>
+      </div>
+    </div>
+  `).join('');
+  
+  // Re-attach add listeners
+  catalogEl.querySelectorAll('.wo-catalog-add-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const index = parseInt(btn.getAttribute('data-cat-index'));
+      if (!isNaN(index) && state.catalogParts[index]) {
+        methods.addPart(state, state.catalogParts[index]);
+      }
+    });
+  });
+}
+
+function renderHistory(state, container) {
+  if (!container) return;
+  
+  const historyEl = container.querySelector('#wo-history-list');
+  if (!historyEl) return;
+  
+  historyEl.innerHTML = state.history.map(item => `
+    <div style="
+      background: #32302f;
+      border: 1px solid #3c3836;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    ">
+      <div>
+        <div style="font-weight: bold; color: #d79921;">${item.id}</div>
+        <div style="font-size: 12px; color: #a89984;">${item.date} | Unit: ${item.unit}</div>
+      </div>
+      <div style="text-align: right">
+        <div style="color: #98971a; font-weight: bold;">$${item.cost.toFixed(2)}</div>
+        <div style="font-size: 11px; color: #689d6a;">${item.status.toUpperCase()}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateCostDisplay(state, container) {
+  if (!container) return;
+  
+  const partsTotalEl = container.querySelector('#wo-parts-total');
+  const laborTotalEl = container.querySelector('#wo-labor-total');
+  const grandTotalEl = container.querySelector('#wo-grand-total');
+  
+  if (partsTotalEl) partsTotalEl.textContent = `$${methods.getTotalPartsCost(state).toFixed(2)}`;
+  if (laborTotalEl) laborTotalEl.textContent = `$${methods.getLaborCost(state).toFixed(2)}`;
+  if (grandTotalEl) grandTotalEl.textContent = `$${methods.getTotalCost(state).toFixed(2)}`;
+}
+
+function updateStatusBadge(state, container) {
+  if (!container) return;
+  
+  const badge = container.querySelector('#wo-status-badge');
+  const statusText = container.querySelector('#wo-status');
+  const completeBtn = container.querySelector('#wo-complete-btn');
+  const completionMsg = container.querySelector('#wo-completion-msg');
+  
+  if (badge) {
+    badge.style.background = '#98971a';
+    badge.textContent = 'COMPLETED';
+  }
+  if (statusText) {
+    statusText.textContent = 'COMPLETED';
+    statusText.style.color = '#98971a';
+  }
+  if (completeBtn) {
+    completeBtn.disabled = true;
+    completeBtn.style.background = G.fg_soft;
+    completeBtn.textContent = '✓ MAINTENANCE COMPLETED';
+  }
+  if (completionMsg) {
+    completionMsg.style.display = 'block';
+    completionMsg.textContent = `✓ Completed at ${new Date().toLocaleString()}`;
+  }
+}
+
+// Setup event listeners after mount
+const origWorkorderMount = ESAWorkorder.mount;
+ESAWorkorder.mount = function(containerRef) {
+  container = containerRef;
+  const result = origWorkorderMount.call(this, containerRef);
+  
+  setTimeout(() => {
+    // Store state/methods references for helper functions
+    const state = this.state;
+    
+    // Side tab buttons
+    container.querySelectorAll('.wo-side-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.getAttribute('data-tab');
+        methods.switchSideTab(state, tab);
+      });
+    });
+    
+    // Add Part button
+    const addPartBtn = container.querySelector('#wo-add-part-btn');
+    if (addPartBtn) {
+      addPartBtn.addEventListener('click', () => {
+        state.showPartsCatalog = !state.showPartsCatalog;
+        const catalog = container.querySelector('#wo-parts-catalog');
+        if (catalog) {
+          catalog.style.display = state.showPartsCatalog ? 'block' : 'none';
+          if (state.showPartsCatalog) {
+            renderCatalog(state, container);
+          }
+        }
+      });
+    }
+    
+    // Complete Maintenance button
+    const completeBtn = container.querySelector('#wo-complete-btn');
+    if (completeBtn) {
+      completeBtn.addEventListener('click', () => {
+        if (!state.maintenanceComplete) {
+          methods.completeMaintenance(state);
+        }
+      });
+    }
+    
+    // Notes textarea
+    const notesTextarea = container.querySelector('#wo-notes-textarea');
+    if (notesTextarea) {
+      notesTextarea.value = state.workorderData.notes || '';
+      notesTextarea.addEventListener('input', (e) => {
+        state.workorderData.notes = e.target.value;
+      });
+    }
+    
+    // Labor hours input
+    const laborInput = container.querySelector('#wo-labor-input');
+    if (laborInput) {
+      laborInput.value = state.workorderData.laborHours || 0;
+      laborInput.addEventListener('input', (e) => {
+        state.workorderData.laborHours = parseFloat(e.target.value) || 0;
+        updateCostDisplay(state, container);
+      });
+    }
+    
+    // Warranty checkbox
+    const warrantyCheck = container.querySelector('#wo-warranty-check');
+    if (warrantyCheck) {
+      warrantyCheck.checked = state.workorderData.warrantyClaim || false;
+      warrantyCheck.addEventListener('change', (e) => {
+        state.workorderData.warrantyClaim = e.target.checked;
+      });
+    }
+    
+    // Diagnostic lookup
+    const diagBtn = container.querySelector('#wo-diag-btn');
+    const diagInput = container.querySelector('#wo-diag-input');
+    if (diagBtn && diagInput) {
+      diagBtn.addEventListener('click', () => {
+        const code = diagInput.value.toUpperCase();
+        const resultEl = container.querySelector('#wo-diag-result');
+        if (resultEl) {
+          const diagnostics = {
+            'F1': 'Indoor Thermistor Fault - Replace black thermistor',
+            'F2': 'Outdoor Thermistor Fault - Replace outdoor sensor',
+            'F3': 'Indoor Coil Sensor Fault - Check connection',
+            'F6': 'Communication Error - Check wiring harness',
+            'C1': 'Coil Freezing - Check refrigerant charge'
+          };
+          if (diagnostics[code]) {
+            resultEl.innerHTML = `<div style="color: #98971a; font-weight: bold;">${code}: ${diagnostics[code]}</div>`;
+          } else {
+            resultEl.innerHTML = `<div style="color: #cc241d;">Unknown code: ${code}</div>`;
+          }
+        }
+      });
+    }
+    
+    // Initial renders
+    renderPartsList(state, container);
+    renderHistory(state, container);
+    updateCostDisplay(state, container);
+    
+  }, 100);
+  
+  return result;
+};
 
 export default ESAWorkorder;

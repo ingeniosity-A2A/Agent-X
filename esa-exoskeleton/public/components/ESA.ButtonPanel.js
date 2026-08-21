@@ -1,9 +1,10 @@
 /**
- * ESA.ButtonPanel.js (Arrow.js Compatible - HARDCODED STYLES)
+ * ESA.ButtonPanel.js (Arrow.js Compatible - FULLY FIXED)
  * ============================================
  * AI INGESTION BUTTON PANEL
  * 
- * All styles hardcoded for Arrow.js compatibility
+ * CRITICAL FIX: All dynamic expressions removed from template!
+ * Image preview rendered via post-mount DOM manipulation only.
  */
 
 import { reactive, html } from 'https://esm.sh/@arrow-js/core';
@@ -11,7 +12,7 @@ import { ESAVerifyComponent } from './ESA.VerifiedWrapper.js';
 
 export const ESAButtonPanel = ESAVerifyComponent({
   name: 'ButtonPanel',
-  version: '1.1.0',
+  version: '1.1.1',
   verified: true,
   
   state: {
@@ -24,6 +25,7 @@ export const ESAButtonPanel = ESAVerifyComponent({
     activateCamera: async (state, onCapture) => {
       try {
         state.cameraActive = true;
+        updateCameraButton(state);
         
         const stream = await navigator.mediaDevices.getUserMedia({ 
           video: { facingMode: 'environment' } 
@@ -43,6 +45,9 @@ export const ESAButtonPanel = ESAVerifyComponent({
           state.capturedImage = dataURL;
           state.cameraActive = false;
           
+          updateCameraButton(state);
+          renderImagePreview(state);
+          
           stream.getTracks().forEach(track => track.stop());
           
           if (onCapture) {
@@ -55,6 +60,7 @@ export const ESAButtonPanel = ESAVerifyComponent({
       } catch (error) {
         console.error('[ESA.ButtonPanel] Camera error:', error.message);
         state.cameraActive = false;
+        updateCameraButton(state);
       }
     },
     
@@ -67,6 +73,8 @@ export const ESAButtonPanel = ESAVerifyComponent({
     
     clearImage: (state) => {
       state.capturedImage = null;
+      const preview = document.querySelector('#esa-image-preview');
+      if (preview) preview.remove();
     },
 
     sendText: (state, onAttachment) => {
@@ -79,18 +87,17 @@ export const ESAButtonPanel = ESAVerifyComponent({
     }
   },
   
+  // Template with ALL HARDCODED STYLES - no dynamic ${} expressions!
   template: (props, state, methods) => {
-    const { onCapture, onAttachment } = props;
-    
     return html`
-      <div class="ESA-ButtonPanel" style="display: flex; flex-direction: column; gap: 6px; position: relative;">
+      <div class="ESA-ButtonPanel" id="esa-button-panel-container" style="display: flex; flex-direction: column; gap: 6px; position: relative;">
         <!-- Main AI Button -->
         <button
           id="esa-camera-btn"
           title="ESA AI - Camera & Upload"
           style="width: 60px; height: 60px; background: linear-gradient(135deg, #b16286, #458588); border: 2px solid #ebdbb2; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #ebdbb2; font-size: 24px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); transition: all 0.2s;"
         >
-          ${() => state.cameraActive ? '📷' : '✨'}
+          <span id="esa-camera-icon">✨</span>
           <span style="font-size: 10px; font-weight: bold;">AI</span>
         </button>
         
@@ -112,6 +119,7 @@ export const ESAButtonPanel = ESAVerifyComponent({
           >
             📄
             <input
+              id="esa-file-input"
               type="file"
               accept=".pdf,.txt"
               style="display: none"
@@ -119,28 +127,51 @@ export const ESAButtonPanel = ESAVerifyComponent({
           </label>
         </div>
         
-        <!-- Image Preview -->
-        ${() => state.capturedImage ? html`
-          <div style="position: absolute; top: 0; right: 70px; width: 140px; height: 105px; background: #282828; border: 2px solid #3c3836; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); z-index: 10;">
-            <img src=${state.capturedImage} style="width: 100%; height: 100%; object-fit: cover;" alt="Capture" />
-            <button
-              id="esa-clear-img-btn"
-              title="Remove image"
-              style="position: absolute; top: 4px; right: 4px; background: #cc241d; color: #ebdbb2; border: 1px solid #ebdbb2; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 14px; line-height: 1;"
-            >×</button>
-          </div>
-        ` : ''}
+        <!-- Image Preview Container (empty by default, populated via DOM) -->
+        <div id="esa-image-preview-container" style="position: relative;"></div>
       </div>
     `;
   }
 });
 
-// Setup event listeners after mount (Arrow.js can't handle @click properly)
+// Helper functions for DOM updates (outside template)
+function updateCameraButton(state) {
+  const icon = document.querySelector('#esa-camera-icon');
+  if (icon) {
+    icon.textContent = state.cameraActive ? '📷' : '✨';
+  }
+}
+
+function renderImagePreview(state) {
+  const container = document.querySelector('#esa-image-preview-container');
+  if (!container || !state.capturedImage) return;
+  
+  container.innerHTML = `
+    <div id="esa-image-preview" style="position: absolute; top: 0; right: 70px; width: 140px; height: 105px; background: #282828; border: 2px solid #3c3836; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); z-index: 10;">
+      <img src="${state.capturedImage}" style="width: 100%; height: 100%; object-fit: cover;" alt="Capture" />
+      <button
+        id="esa-clear-img-btn"
+        title="Remove image"
+        style="position: absolute; top: 4px; right: 4px; background: #cc241d; color: #ebdbb2; border: 1px solid #ebdbb2; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 14px; line-height: 1;"
+      >×</button>
+    </div>
+  `;
+  
+  // Attach clear button listener
+  const clearBtn = document.querySelector('#esa-clear-img-btn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      methods.clearImage(state);
+    });
+  }
+}
+
+// Setup event listeners after mount
 const originalMount = ESAButtonPanel.mount;
 ESAButtonPanel.mount = function(container, props = {}) {
   const result = originalMount.call(this, container, props);
   
-  // Attach event listeners via DOM
+  // Attach event listeners via DOM after mount
   setTimeout(() => {
     const cameraBtn = container.querySelector('#esa-camera-btn');
     if (cameraBtn) {
@@ -159,19 +190,12 @@ ESAButtonPanel.mount = function(container, props = {}) {
       });
     }
     
-    const fileInput = container.querySelector('input[type="file"]');
+    const fileInput = container.querySelector('#esa-file-input');
     if (fileInput) {
       fileInput.addEventListener('change', (e) => {
         const type = e.target.files[0]?.name.endsWith('.pdf') ? 'pdf' : 'text';
         methods.handleFileUpload(this.state, e, type, props.onAttachment);
         e.target.value = '';
-      });
-    }
-    
-    const clearBtn = container.querySelector('#esa-clear-img-btn');
-    if (clearBtn) {
-      clearBtn.addEventListener('click', () => {
-        methods.clearImage(this.state);
       });
     }
   }, 100);
