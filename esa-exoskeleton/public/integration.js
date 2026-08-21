@@ -45,7 +45,7 @@ async function initESAExoskeleton() {
   // ============================================
   // LOAD COMPONENTS
   // ============================================
-  let ESAIngestion, ESAButtonPanel, ESADiagnosticCard, ESAInvPartsCardB, ESAWorkorder, themeModule;
+  let ESAIngestion, ESAButtonPanel, ESADiagnosticCard, ESAInvPartsCardB, ESAWorkorder, ESAMaintenanceChecklist, themeModule;
   
   try {
     const [
@@ -54,6 +54,7 @@ async function initESAExoskeleton() {
       diagnosticModule,
       partsModule,
       workorderModule,
+      checklistModule,
       themeMod
     ] = await Promise.allSettled([
       import('./components/ESA.Ingestion.js'),
@@ -61,6 +62,7 @@ async function initESAExoskeleton() {
       import('./components/ESA.DiagnosticCard.js'),
       import('./components/ESA.invpartscard-B.js'),
       import('./components/ESA.workorder.js'),
+      import('./components/ESA.MaintenanceChecklist.js'),
       import('./config/gruvbox-colors.js')
     ]);
     
@@ -69,6 +71,7 @@ async function initESAExoskeleton() {
     ESADiagnosticCard = diagnosticModule.status === 'fulfilled' ? diagnosticModule.value.ESADiagnosticCard : null;
     ESAInvPartsCardB = partsModule.status === 'fulfilled' ? partsModule.value.ESAInvPartsCardB : null;
     ESAWorkorder = workorderModule.status === 'fulfilled' ? workorderModule.value.ESAWorkorder : null;
+    ESAMaintenanceChecklist = checklistModule.status === 'fulfilled' ? checklistModule.value.ESAMaintenanceChecklist : null;
     themeModule = themeMod.status === 'fulfilled' ? themeMod.value : null;
     
     // Log failures silently
@@ -86,6 +89,9 @@ async function initESAExoskeleton() {
     }
     if (workorderModule.status === 'rejected') {
       window.ESA.errors.push({ component: 'Workorder', error: workorderModule.reason });
+    }
+    if (checklistModule.status === 'rejected') {
+      window.ESA.errors.push({ component: 'MaintenanceChecklist', error: checklistModule.reason });
     }
     
   } catch (err) {
@@ -218,13 +224,31 @@ async function initESAExoskeleton() {
     }
   }
   
-  // 6. GSAP ANIMATIONS (subtle entrance)
+  // 6. MAINTENANCE CHECKLIST
+  if (ESAMaintenanceChecklist && typeof ESAMaintenanceChecklist.mount === 'function') {
+    try {
+      const checklistContainer = document.getElementById('esa-maintenance-checklist');
+      if (checklistContainer) {
+        checklistContainer.innerHTML = '';
+        const mountResult = ESAMaintenanceChecklist.mount(checklistContainer);
+        if (mountResult) {
+          window.ESA.components.maintenanceChecklist = mountResult;
+          window.ESA.mountedComponents.push(mountResult);
+        }
+      }
+    } catch (err) {
+      window.ESA.errors.push({ component: 'MaintenanceChecklist', phase: 'mount', error: err });
+    }
+  }
+  
+  // 7. GSAP ANIMATIONS (subtle entrance)
   try {
     if (typeof gsap !== 'undefined') {
       gsap.from('#esa-ingestion', { duration: 0.5, opacity: 0, y: 20, ease: 'power2.out' });
       gsap.from('#esa-diagnostics', { duration: 0.5, opacity: 0, y: 20, delay: 0.1, ease: 'power2.out' });
       gsap.from('#esa-parts-card', { duration: 0.5, opacity: 0, y: 20, delay: 0.15, ease: 'power2.out' });
       gsap.from('#esa-workorder', { duration: 0.5, opacity: 0, y: 20, delay: 0.2, ease: 'power2.out' });
+      gsap.from('#esa-maintenance-checklist', { duration: 0.5, opacity: 0, y: 20, delay: 0.25, ease: 'power2.out' });
     }
   } catch (err) {
     // Animations non-critical
@@ -245,7 +269,8 @@ async function initESAExoskeleton() {
         diagnosticCard: !!window.ESA.components.diagnosticCard,
         invPartsCard: !!window.ESA.components.invPartsCard,
         workorder: !!window.ESA.components.workorder,
-        buttonPanel: !!window.ESA.components.buttonPanel
+        buttonPanel: !!window.ESA.components.buttonPanel,
+        maintenanceChecklist: !!window.ESA.components.maintenanceChecklist
       }
     } 
   }));
