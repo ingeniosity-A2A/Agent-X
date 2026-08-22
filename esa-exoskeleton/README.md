@@ -3,16 +3,17 @@
 **Enterprise Security Agent (ESA) Exoskeleton** - A cloud-native AI agent console with DuckDB WASM integration.
 
 [![Deployed on Cloudflare](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://ESA.ingeniosity.tech)
-[![Version](https://img.shields.io/badge/version-2.1.0-green.svg)](https://github.com/ingeniosity-A2A/Agent-X/tree/main/esa-exoskeleton)
+[![Version](https://img.shields.io/badge/version-3.1.0-green.svg)](https://github.com/ingeniosity-A2A/Agent-X/tree/main/esa-exoskeleton)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ---
 
 ## Features
 
-- ✅ **ESA Console** - Main execution surface with timestamped logging
-- ✅ **ESA Ingestion** - Standalone AI ingestion (no chat, no to-do)
-- ✅ **ESA.ButtonPanel** - AI camera + file attachments (far right position)
+- ✅ **ESA.Ingestion AI** - React module: bottom Ingestion dock (lens → DuckDB/HD Supply, PDF upload, email-to, dual audio, visualizer overlay on input) + chat card in the rendering area
+- ✅ **Rendering cards** - every module is a card: AI chat, diagnostics, broadcast parts, workorder, daily to-do list
+- ✅ **Web console** - left sidebar styled as a scene/layers panel: Console ⇄ Library tabs, filtered log feed, and a search bar (hidden on mobile)
+- ✅ **React module** - Ingestion Interface is React (esm.sh CDN, no build step); Arrow.js sandboxes the rest of the Exoskeleton
 - ✅ **DuckDB WASM** - HD Supply catalog streaming (zero local storage)
 - ✅ **Arrow.js** - Verified component wrapping with sandbox isolation
 - ✅ **Gruvbox Theme** - Dark/Light toggleable color scheme
@@ -70,17 +71,23 @@ esa-exoskeleton/
 │   └── workflows/
 │       └── cloudflare-deploy.yml    # GitHub Actions CI/CD
 ├── .wrangler/
-│   └── wrangler.toml                 # Cloudflare Workers config
-├── config/
-│   ├── gruvbox-colors.js            # Theme configuration
-│   └── duckdb-setup.js              # DuckDB WASM initialization
-├── components/
-│   ├── ESA.VerifiedWrapper.js       # Component verification layer
-│   ├── ESA.ButtonPanel.js           # AI + attachment buttons
-│   └── ESA.SandboxManager.js        # WASM sandbox wrapper
-├── public/
+│   └── wrangler.toml                 # Cloudflare Pages config (output: ./public)
+├── config/                           # Source copies (theme, duckdb)
+├── components/                       # Source copies (Arrow.js versions)
+├── public/                           # ← DEPLOY ROOT (Cloudflare Pages)
+│   ├── components/
+│   │   ├── ESAIngestionChat.js       # React Ingestion Interface (chat + dual audio)
+│   │   ├── ESA.Ingestion.js          # Adapter → React Ingestion module
+│   │   ├── ESA.ButtonPanel.js        # React lens / text / upload panel
+│   │   ├── ESA.ReactMount.js         # Shared React setup (esm.sh + htm)
+│   │   └── …                         # Arrow.js sandboxed components (workorder, parts…)
+│   ├── hooks/
+│   │   └── use-esa-chat.js           # React chat hook + DuckDB/HD Supply engine
+│   ├── config/
+│   │   ├── gruvbox-colors.js        # Theme configuration
+│   │   └── duckdb-setup.js          # DuckDB WASM initialization
 │   └── index.html                   # Main HTML (ESA EXOSKELETON)
-├── integration.js                    # Component wiring & initialization
+├── integration.js                    # Source copy (stale) — public/integration.js is used
 ├── package.json                      # Dependencies & scripts
 ├── SKILL.md                          # Component registry
 └── README.md                         # This file
@@ -129,22 +136,33 @@ Add:
 ```
 ESA EXOSKELETON
 │
-├── ESA.Console (Verified)
-│   └── Timestamped log output
+├── ESA Console (left sidebar — scene/layers panel style, hidden on mobile)
+│   ├── Header (✦ icon + title + subtitle)
+│   ├── Console ⇄ Library segmented toggle
+│   ├── Console: icon-coded log feed · Library: rendering-card list (click → jump to card)
+│   └── Search bar (filters active view)
 │
-├── ESA.Ingestion (Verified)
-│   └── File handling (NO chat, NO to-do)
+├── RENDERING AREA — every module is a card
+│   └── APPROVED 3D RENDERING CARD STANDARD: 24rem wide · 2rem radius · 1.75rem
+│       padding · fixed 11rem middle (meta col | model zone | stepper). Top and
+│       bottom vary per card type; the middle and card size stay standard.
+│   ├── 💬 AI INGESTION CHAT card (standard: meta | thread zone | stepper)
+│   ├── 📦 Broadcast parts card (React — standard product card: Seasons PTAC,
+│   │   model zone with loader, specs, price, HD Supply CTA)
+│   ├── 🩺 Diagnostic card (standard frame)
+│   ├── 📋 Workorder card (operator console — spans the full row, standard frame)
+│   └── ✅ Daily to-do list card (standard frame)
 │
-├── ESA.ButtonPanel (Sandbox) - Far Right
-│   ├── ✨ AI Button (Camera)
-│   ├── 📝 Text Button (Stacked)
-│   └── 📄 PDF Button (Stacked)
+├── ESA.Ingestion DOCK (bottom, React module) — SOLE COMMUNICATION HUB
+│   └── Floating prompt pill (3D-editor style): + Add menu (photos/videos → lens, files → PDF/TXT, email → AgentMail),
+│       ✨ Inspiration quick prompts, input with audio visualizer overlay, 🎤 mic, white circular send
+│   └── Dual audio system flanking the pill (Sound I inbound mic + Agent voice output)
+│   └── RENDERING VIEW toolbar (floating pill over the viewport: tools, 100%, ‹ › card navigation)
 │
-├── ESA.SandboxManager
-│   └── WASM isolation layer
+├── ESA.DuckDB
+│   └── HD Supply catalog streaming (with embedded fallback)
 │
-└── ESA.DuckDB
-    └── HD Supply catalog streaming
+└── Arrow.js sandboxes the remaining components (ESAVerifyComponent)
 ```
 
 ---
