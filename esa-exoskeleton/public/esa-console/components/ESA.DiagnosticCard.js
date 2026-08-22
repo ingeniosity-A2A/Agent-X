@@ -1,7 +1,7 @@
 /**
  * ESA.DiagnosticCard.js (Arrow.js Compatible - FULLY FIXED)
  * ============================================
- * HELP ASSEMBLY QA CHECK PANEL (furniture assembly quality)
+ * PTAC DIAGNOSTIC SERVICE PANEL
  * 
  * CRITICAL FIX: All ${} removed from style attributes!
  * Dynamic styling now via post-mount DOM manipulation only.
@@ -11,18 +11,25 @@ import { reactive, html } from 'https://esm.sh/@arrow-js/core';
 import { ESAVerifyComponent } from './ESA.VerifiedWrapper.js';
 import { DynamicAudioBroadcaster } from './ESA.SoundPanel.js';
 
-const HA_ASSEMBLY_CHECKS = {
-  'OK': { status: 'Assembly Verified', severity: 'info', voice: 'Assembly verified. All checks passed. Ready for sign-off.', warranty: true },
-  'W1': { status: 'Unit Wobbles', severity: 'critical', voice: 'Unit wobbles. Tighten cam locks and re-check leveling.', warranty: true, repair: 'leveling' },
-  'M1': { status: 'Panel Misalignment', severity: 'warning', voice: 'Panels misaligned. Loosen, realign, and re-seat the panels.', warranty: true },
-  'H1': { status: 'Missing Hardware', severity: 'critical', voice: 'Missing hardware detected. Cross-check the parts list and install.', warranty: false, rework: true },
-  'T1': { status: 'Cam Lock Not Engaged', severity: 'warning', voice: 'Cam lock not engaged. Rotate each lock to the closed position.', warranty: true },
-  'S1': { status: 'Surface Damage', severity: 'warning', voice: 'Surface damage noted. Document it and flag for follow-up.', warranty: false },
-  'L1': { status: 'Leveling Feet Not Set', severity: 'warning', voice: 'Leveling feet not adjusted. Level the unit before sign-off.', warranty: true },
-  'D1': { status: 'Drawer / Shelf Misaligned', severity: 'warning', voice: 'Drawer or shelf runner misaligned. Adjust and re-test movement.', warranty: true },
-  'C1': { status: 'Concealed Hinge Issue', severity: 'warning', voice: 'Concealed hinge misaligned. Re-seat hinge cups and adjust tension.', warranty: true },
-  'E1': { status: 'Leftover / Missing Parts', severity: 'critical', voice: 'Leftover or missing parts at site. Verify assembly completeness.', warranty: false, rework: true },
-  'Q1': { status: 'Sign-off Pending', severity: 'info', voice: 'Customer sign-off pending. Confirm quality before closing the job.', warranty: true }
+const PTAC_DIAGNOSTICS = {
+  'FP': { status: 'Freeze Protection', severity: 'info', voice: 'Freeze protection mode engaged. Normal operation.', warranty: true },
+  'F1': { status: 'Indoor Thermistor Fault', severity: 'critical', voice: 'Indoor ambient thermistor fault. Replace black thermistor.', warranty: true, repair: 'thermistor' },
+  'F2': { status: 'Outdoor Thermistor Fault', severity: 'critical', voice: 'Outdoor ambient thermistor fault. Replace outdoor sensor.', warranty: true, repair: 'thermistor' },
+  'F3': { status: 'Indoor Coil Thermistor Fault', severity: 'warning', voice: 'Indoor coil temperature sensor fault. Check connection.', warranty: true },
+  'F4': { status: 'Outdoor Coil Thermistor Fault', severity: 'warning', voice: 'Outdoor coil sensor fault. Verify wiring.', warranty: true },
+  'F5': { status: 'Discharge Thermistor Fault', severity: 'critical', voice: 'Discharge line thermistor fault. High risk of compressor damage.', warranty: false },
+  'F6': { status: 'Indoor/Outdoor Comm Fault', severity: 'critical', voice: 'Communication error between indoor and outdoor units. Check wiring harness.', warranty: true },
+  'C1': { status: 'Indoor Coil Freezing', severity: 'critical', voice: 'Indoor coil freezing detected. Check refrigerant charge and airflow.', warranty: false, replaceUnit: true },
+  'C2': { status: 'Indoor Coil Sensor Fault', severity: 'warning', voice: 'Indoor coil temperature sensor out of range.', warranty: true },
+  'C3': { status: 'Outdoor Coil Sensor Fault', severity: 'warning', voice: 'Outdoor coil sensor fault. May affect efficiency.', warranty: true },
+  'C4': { status: 'Discharge Sensor Fault', severity: 'critical', voice: 'Discharge line temperature sensor critical fault.', warranty: false },
+  'C5': { status: 'Room Sensor Fault', severity: 'warning', voice: 'Room temperature sensor fault. Unit will run on timer mode.', warranty: true },
+  'Fd': { status: 'Fan Detection Fault', severity: 'warning', voice: 'Indoor fan speed feedback fault. Check fan motor and capacitor.', warranty: true },
+  'Eo': { status: 'Unconfigured Board', severity: 'critical', voice: 'Unconfigured service board detected. Set C3 jumper.', warranty: true },
+  'EH': { status: 'Electric Heat Fault', severity: 'critical', voice: 'Electric heat fault detected. Check heat strips.', warranty: true },
+  'LS': { status: 'Loss of Power', severity: 'critical', voice: 'Power interruption detected. Check breaker.', warranty: true },
+  'HP': { status: 'High Pressure', severity: 'critical', voice: 'High pressure switch tripped.', warranty: true },
+  'UR': { status: 'Voltage Range Fault', severity: 'critical', voice: 'Voltage out of acceptable range.', warranty: false }
 };
 
 export const ESADiagnosticCard = ESAVerifyComponent({
@@ -85,15 +92,15 @@ export const ESADiagnosticCard = ESAVerifyComponent({
       
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      const codes = Object.keys(HA_ASSEMBLY_CHECKS);
+      const codes = Object.keys(PTAC_DIAGNOSTICS);
       const randomCode = codes[Math.floor(Math.random() * codes.length)];
       
       state.detectedCode = randomCode;
       state.diagnosticCode = randomCode;
       state.scanning = false;
       
-      const diag = HA_ASSEMBLY_CHECKS[randomCode];
-      methods.speak(state, `QA code ${randomCode}. ${diag.voice}`);
+      const diag = PTAC_DIAGNOSTICS[randomCode];
+      methods.speak(state, `Diagnostic code ${randomCode} detected. ${diag.voice}`);
       
       window.dispatchEvent(new CustomEvent('esa:diagnostic', {
         detail: { code: randomCode, ...diag }
@@ -101,7 +108,7 @@ export const ESADiagnosticCard = ESAVerifyComponent({
     },
     
     getRecommendation: (state, code) => {
-      const diag = HA_ASSEMBLY_CHECKS[code];
+      const diag = PTAC_DIAGNOSTICS[code];
       if (!diag) return null;
       
       return {
@@ -109,9 +116,9 @@ export const ESADiagnosticCard = ESAVerifyComponent({
         status: diag.status,
         severity: diag.severity,
         voice: diag.voice,
-        shouldReplace: diag.rework || false,
+        shouldReplace: diag.replaceUnit || false,
         warrantyStatus: diag.warranty ? 'under_warranty' : 'expired',
-        repairType: diag.repair || 'rework'
+        repairType: diag.repair || 'service'
       };
     },
     
@@ -138,7 +145,7 @@ export const ESADiagnosticCard = ESAVerifyComponent({
       }
       
       const recommendation = methods.getRecommendation(state, state.detectedCode);
-      const diag = HA_ASSEMBLY_CHECKS[state.detectedCode];
+      const diag = PTAC_DIAGNOSTICS[state.detectedCode];
       if (!recommendation) return;
       
       const isCritical = recommendation.severity === 'critical';
@@ -172,7 +179,7 @@ export const ESADiagnosticCard = ESAVerifyComponent({
       if (recommendation.shouldReplace) {
         html += `
           <div style="margin-top: 16px; padding: 12px; background: #cc241d; color: #ebdbb2; border-radius: 6px; text-align: center; font-weight: bold;">
-            ⚠️ REWORK RECOMMENDED BEFORE SIGN-OFF
+            ⚠️ UNIT REPLACEMENT RECOMMENDED
           </div>
         `;
       }
@@ -204,8 +211,8 @@ export const ESADiagnosticCard = ESAVerifyComponent({
           <div style="display: flex; align-items: center; gap: 12px;">
             <span style="font-size: 24px;">🔧</span>
             <div>
-              <div style="font-weight: bold; font-size: 14px;">HELP ASSEMBLY QA PANEL</div>
-              <div style="font-size: 11px; opacity: 0.9;">Slide to reveal assembly quality checks</div>
+              <div style="font-weight: bold; font-size: 14px;">ESA DIAGNOSTIC SERVICE PANEL</div>
+              <div style="font-size: 11px; opacity: 0.9;">Slide to reveal AI diagnostics</div>
             </div>
           </div>
           <div id="esa-diag-header-arrow" style="transition: transform 0.3s ease;">▼</div>
@@ -219,7 +226,7 @@ export const ESADiagnosticCard = ESAVerifyComponent({
               id="esa-scan-btn"
               style="width: 100%; padding: 16px; background: #98971a; color: #282828; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer;"
             >
-              🔍 SCAN ASSEMBLY FOR QA CODES
+              🔍 SCAN FOR DIAGNOSTIC CODES
             </button>
             
             <!-- Manual Code Entry -->
@@ -227,7 +234,7 @@ export const ESADiagnosticCard = ESAVerifyComponent({
               <input
                 type="text"
                 id="esa-diag-input"
-                placeholder="Enter code (e.g., W1, M1)"
+                placeholder="Enter code (e.g., F1, C3)"
                 maxlength="2"
                 style="flex: 1; background: #282828; border: 1px solid #3c3836; color: #ebdbb2; padding: 12px; border-radius: 6px; text-transform: uppercase; font-family: monospace; font-size: 18px; text-align: center;"
               />
@@ -272,7 +279,7 @@ ESADiagnosticCard.mount = function(container) {
       scanBtn.addEventListener('click', async () => {
         scanBtn.textContent = '🔍 Scanning...';
         await methods.scanForCodes(this.state);
-        scanBtn.textContent = '🔍 SCAN ASSEMBLY FOR QA CODES';
+        scanBtn.textContent = '🔍 SCAN FOR DIAGNOSTIC CODES';
         methods.updateSlideState(this.state, container);
         methods.renderResults(this.state, container);
       });
@@ -283,12 +290,12 @@ ESADiagnosticCard.mount = function(container) {
     if (analyzeBtn) {
       analyzeBtn.addEventListener('click', () => {
         const input = container.querySelector('#esa-diag-input');
-        if (input && input.value && HA_ASSEMBLY_CHECKS[input.value.toUpperCase()]) {
+        if (input && input.value && PTAC_DIAGNOSTICS[input.value.toUpperCase()]) {
           this.state.detectedCode = input.value.toUpperCase();
           this.state.diagnosticCode = input.value.toUpperCase();
           this.state.isSlidOpen = true;
-          const diag = HA_ASSEMBLY_CHECKS[input.value.toUpperCase()];
-          methods.speak(this.state, `QA code ${input.value.toUpperCase()}. ${diag.voice}`);
+          const diag = PTAC_DIAGNOSTICS[input.value.toUpperCase()];
+          methods.speak(this.state, `Code ${input.value.toUpperCase()}. ${diag.voice}`);
           methods.updateSlideState(this.state, container);
           methods.renderResults(this.state, container);
         }

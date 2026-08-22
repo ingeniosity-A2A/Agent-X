@@ -1,9 +1,11 @@
-# ESA EXOSKELETON - Master Skill Registry
+# HELP ASSEMBLY EXOSKELETON - Master Skill Registry
 
-## Version: 2.1.0
+## Version: 3.6.0
 ## Status: Active ✓
-## Last Updated: 2026-08-21
+## Last Updated: 2026-08-22
 ## Deployment: ESA.ingeniosity.tech
+## Identity: Agent X = logic & reasoning for the capabilities layer · Ava007 = voice · Scope = Help Assembly Services only
+## Exoskeletons: `public/` = Help Assembly Services console · `public/esa-console/` = ESA Exoskeleton (hotel maintenance, HD Supply PTAC) — sandboxed separately, no shared architecture
 
 ---
 
@@ -13,9 +15,9 @@
 | Component | Version | Description | Status |
 |-----------|---------|-------------|--------|
 | **ESA.Console** | v1.1.0 | Scene/layers panel (left sidebar): Console ⇄ Library tabs + search | ✅ Active |
-| **ESA.DuckDB** | v1.0.0 | HD Supply streaming (WASM) | ✅ Active |
-| **ESA.Ingestion** | v7.0.0 | React comms hub — dock (lens/PDF/email/audio) + chat card | ✅ Active |
-| **ESA.MaintenanceChecklist** | v3.0.0 | React daily maintenance checklist card (SOP workflow) | ✅ Active |
+| **ESA.DuckDB** | v1.0.0 | Help Assembly catalog streaming (WASM) | ✅ Active |
+| **ESA.Ingestion** | v7.0.0 | React comms hub — dock (lens/PDF/email/audio) + chat card (Help Assembly scope) | ✅ Active |
+| **ESA.MaintenanceChecklist** | v3.0.0 | React tech shift checklist card (assembly workflow) | ✅ Active |
 
 ### 🏖️ Sandbox Components
 | Component | Version | Description | Status |
@@ -23,6 +25,8 @@
 | **ESA.ButtonPanel** | v1.0.0 | AI button + stacked attachments | 🏖️ Sandbox |
 | **ESA.SandboxManager** | v1.0.0 | WASM sandbox wrapper | 🏖️ Sandbox |
 | **ESA.VerifiedWrapper** | v1.0.0 | Component verification layer | 🏖️ Sandbox |
+| **ESA.InvPartsCard-B** | v1.0.0 | Service broadcasting B-side: inventory + parts panel (see docs/service-broadcast-cards.md) | 🏖️ Sandbox |
+| **ESA.Ptac-B** | v1.0.0 | Service broadcasting B-side: PTAC #223532 service deck (see docs/service-broadcast-cards.md) | 🏖️ Sandbox |
 
 ---
 
@@ -79,6 +83,13 @@ ESA EXOSKELETON (ESA.ingeniosity.tech)
   - PDF/TXT file upload
   - Image preview popup
 - **Events**: Dispatches `esa:capture` and `esa:attachment` events
+
+### ESA.InvPartsCard-B / ESA.Ptac-B (Service Broadcasting B-side)
+- **Role**: parent/child pair operating the Seasons PTAC catalog — inventory (warranty/processing/recycle), service intervals, diagnostics, and live service broadcasts
+- **InvPartsCard-B**: inventory + verbal-inventory scan (`esa:inventory-scan`), parts ordering (`esa:order-part`), toggleable broadcast features
+- **Ptac-B**: right-edge sliding service deck for HD Supply Part #223532; tabs Overview / Parts / Service / Diagnostics / Broadcast; `broadcastMessage()` → GSAP Transport `broadcast:message` tween atom + voice announcement + `esa:broadcast` event
+- **Status**: Arrow.js components (ESAVerifyComponent), syntax-verified, not yet mounted in the console
+- **▶ Full spec**: `docs/service-broadcast-cards.md`
 
 ### ESA.DuckDB
 - **Storage**: Pure WASM streaming (zero local persistence)
@@ -168,6 +179,9 @@ npm run dev      # http://localhost:8787
 
 | Version | Date | Changes |
 |---------|------|---------|
+| **3.6.1** | 2026-08-22 | **GLB 3D rendering**: `<model-viewer>` 3.5.0 (Google CDN) added to both consoles; catalog items carry a `model` GLB URL via `MODEL_URLS` (Khronos sample placeholders — swap for real product GLBs); product render cards + parts-card model zones render the GLB with auto-rotate/camera-controls and fall back to the CSS visual on error |
+| **3.6.0** | 2026-08-22 | **Two sandboxed exoskeletons**: `public/` = Help Assembly Services console (root); `public/esa-console/` = separate ESA EXOSKELETON console (`/esa-console`) with hotel-maintenance content (HD Supply PTAC catalog, Seasons PTAC product card, service broadcasting, hotel workorder/checklist) restored from the pre-retool baseline + light console theme. **Lens → render flow** in both: upload a photo → visual catalog picker → tap the match → product render card (Help Assembly: info + quote + QUOTE/BOOK; ESA: 3D PTAC visual + inventory + ORDER PART / WORK ORDER). **CI added**: `.github/workflows/verify.yml` (node --check + py_compile + import containment + hub-event symmetry) |
+| **3.5.0** | 2026-08-22 | Retooled console for **Help Assembly Services** (furniture assembly): Ingestion chat + catalog engine now Help Assembly scope (HA-* SKUs, Agent X logic / Ava007 voice); broadcast parts card → furniture service card; tech shift checklist replaces daily maintenance; workorder → furniture job order (customer/order/QA codes); diagnostic card → assembly QA panel; DuckDB seed → help_assembly_catalog |
 | **3.4.1** | 2026-08-22 | Stepper wheel moved onto the far right of the 3D model zone (overlay) and made functional: parts card scrolls quotes/images/specs slides (wheel + click); chat card scrolls the thread |
 | **3.4.0** | 2026-08-22 | Approved 3D RENDERING CARD STANDARD applied: 24rem cards, warm glass frame, fixed 11rem middle (meta col \| model zone \| stepper); chat + parts cards rebuilt to the standard, parts card is now a React product card (Seasons PTAC) |
 | **3.3.0** | 2026-08-22 | Console restyled as scene/layers panel (Console ⇄ Library tabs + search); viewport gets dot-grid + floating RENDERING VIEW toolbar; Ingestion dock becomes a floating prompt pill (+ Add menu, ✨ Inspiration, mic, white send) — no right sidebar |

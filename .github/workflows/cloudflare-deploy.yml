@@ -1,12 +1,13 @@
-name: Deploy to Cloudflare Pages
+name: Deploy ESA Exoskeleton to Cloudflare Pages
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
+    paths:
+      - 'esa-exoskeleton/public/**'
+      - '.github/workflows/cloudflare-deploy.yml'
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -14,29 +15,18 @@ jobs:
     permissions:
       contents: read
       deployments: write
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      
-      - name: Install dependencies
-        run: npm install
-      
-      - name: Build ESA Exoskeleton
-        run: npm run build
-      
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy public --project-name=esa-exoskeleton --branch=main
-      
+          command: pages deploy esa-exoskeleton/public --project-name=esa-exoskeleton --branch=main
+
       - name: Deployment Success
         run: |
           echo "✅ ESA EXOSKELETON deployed to Cloudflare Pages"

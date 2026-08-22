@@ -1,0 +1,15 @@
+# Cache Control Headers for ESA EXOSKELETON
+# Force no-cache during development
+
+/*
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/index.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/*.js
+  Cache-Control: no-cache, must-revalidate

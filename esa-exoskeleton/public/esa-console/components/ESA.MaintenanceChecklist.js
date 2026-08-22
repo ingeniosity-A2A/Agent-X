@@ -1,7 +1,7 @@
 /**
  * ESA.MaintenanceChecklist.js
  * ============================================
- * HELP ASSEMBLY TECH WORKFLOW — REACT MODULE
+ * DAILY MAINTENANCE WORKFLOW — REACT MODULE
  * ============================================
  *
  * The daily to-do list card, styled like the dark glassmorphic "Checklist"
@@ -11,11 +11,10 @@
  *   - category sections with colored circular icons + connector lines
  *   - rounded checkboxes with strikethrough on completion
  *   - skeleton loaders on mount / reset
- *   - "Shift Notes & Parts Used Log" table
+ *   - "Shift Notes & Green Shield Tracking Log" table
  *
- * Content follows the Help Assembly technician workflow: job board sync,
- * van/equipment inspection, on-site assembly, customer sign-off, and
- * handover. Agent X handles dispatch & reasoning; Ava007 provides voice.
+ * Content follows the printed DAILY MAINTENANCE WORKFLOW — Standard
+ * Operating Procedure & Shift Checklist (Done / Task / SOP rows).
  *
  * React (esm.sh CDN, no build step); Arrow.js sandboxes the rest of the
  * Exoskeleton. State persists to localStorage.
@@ -24,7 +23,7 @@
 import { html, useState, useEffect, useRef, useCallback } from './ESA.ReactMount.js';
 import { mountReact } from './ESA.ReactMount.js';
 
-const STORAGE_KEY = 'ha-tech-checklist-v2';
+const STORAGE_KEY = 'esa-maintenance-checklist-v2';
 
 const SECTIONS = [
   {
@@ -33,54 +32,53 @@ const SECTIONS = [
     icon: '🔑',
     color: '#5b8def',
     items: [
-      { task: 'Check Today\'s Job Board', sop: 'Pull assigned bookings from Agent X dispatch (A2A scheduler) and confirm the day\'s schedule.' },
-      { task: 'Load Van Inventory', sop: 'Verify hardware kits, tools, and moving supplies (HA-2001+) match the job list for the day.' },
-      { task: 'Route & Travel Plan', sop: 'Sequence jobs by service area / city to minimize drive time across Metro Atlanta.' },
-      { task: 'Morning Dispatch Sync', sop: 'Brief with Agent X dispatch: confirm ETAs, flag open questions, and note any reschedules.' }
+      { task: 'Sign Out Keys', sop: 'Log your name, timestamp, and designated key number on the master log.' },
+      { task: 'Check Maintenance Mailbox', sop: 'Retrieve, sort, and prioritize incoming hardcopy maintenance requests.' },
+      { task: 'Print Front Desk Reports', sop: 'Obtain the current Vacant Room List and Out-of-Service (OOS) report from PM shift.' },
+      { task: 'Manager Check-In (GM)', sop: 'Briefly sync with the General Manager to review critical or high-priority tasks for the day.' }
     ]
   },
   {
-    id: 'vehicle',
-    title: 'Vehicle & Equipment Inspection',
-    icon: '🚐',
+    id: 'inspection',
+    title: 'Property Inspection & Trash Collection',
+    icon: '🏢',
     color: '#2bc4f3',
     items: [
-      { task: 'Van Walkaround', sop: 'Check tires, lights, mirrors, and brakes; clear the cargo area for today\'s loads.' },
-      { task: 'Tool Kit Audit', sop: 'Confirm drills are charged and bits, Allen sets, levels, and stud finders are complete.' },
-      { task: 'Supplies Restock', sop: 'Top up wall anchors, cam locks, dowels, and wood glue from warehouse stock before leaving.' }
+      { task: 'Full Walkthrough', sop: 'Walk the entire property structure systematically (complete indoor corridors and full outdoor perimeter).' },
+      { task: 'Identify Deficiencies', sop: 'Proactively scan for missing window screens, structural hazards, lighting failures, or visible leaks.' },
+      { task: 'Log Repairs Needed', sop: 'Document found room/common area issues clearly on the OOS or maintenance report for afternoon action.' },
+      { task: 'First Trash Sweep', sop: 'Collect all trash from common area bins and safely transport the loads to the primary dumpster area.' }
     ]
   },
   {
-    id: 'on-site',
-    title: 'On-Site Assembly',
-    icon: '🛠️',
+    id: 'common-areas',
+    title: 'Common Areas & Preventative Maintenance',
+    icon: '🧹',
     color: '#4caf7d',
     items: [
-      { task: 'Job Site Arrival', sop: 'Log arrival to the booking (did:helpassembly:fieldtech:001), confirm the customer and prep area.' },
-      { task: 'Parts & Hardware Count', sop: 'Verify box contents and hardware bags against the packing list before starting assembly.' },
-      { task: 'Assemble Per Manual', sop: 'Follow the included instructions; check leveling, alignment, and torque as you go.' },
-      { task: 'Damage & Defect Report', sop: 'Log missing or damaged parts to Agent X inventory so replacements are dispatched on the next run.' }
+      { task: 'Clean Common Areas', sop: 'Sanitize high-touch surfaces, sweep, and mop entryways, lobbies, and shared public corridors.' },
+      { task: 'Clean Guest Laundry', sop: 'Wipe down external surfaces of washers/dryers, clear lint traps completely, and sweep flooring.' },
+      { task: 'Green Shield Focus', sop: 'Execute the designated preventative Green Shield task scheduled for today (Daily/Weekly/Monthly/Annual sequence).' }
     ]
   },
   {
-    id: 'sign-off',
-    title: 'Customer Sign-Off & Completion',
-    icon: '✅',
+    id: 'mid-day',
+    title: 'Mid-Day Operations & Maintenance Execution',
+    icon: '🛠️',
     color: '#f2a33c',
     items: [
-      { task: 'Quality Check', sop: 'Confirm stability, leveling, no exposed fasteners, and remove protective films.' },
-      { task: 'Customer Walkthrough', sop: 'Review the assembled item with the customer, answer questions, and get sign-off.' },
-      { task: 'Job Complete Report', sop: 'Log actual hours and notes; mark the booking complete with Agent X dispatch.' }
+      { task: 'Mid-Day GM Check-In', sop: 'Provide a brief status update to the GM regarding critical hazards fixed or long-term OOS progress.' },
+      { task: 'Address Work Orders', sop: 'Execute and close out prioritized maintenance requests and room repairs logged during the morning walk.' }
     ]
   },
   {
     id: 'wrap-up',
-    title: 'Wrap-Up & Handover',
+    title: 'Shift Wrap-Up & Handover',
     icon: '🔐',
     color: '#9c6ade',
     items: [
-      { task: 'Final Trash & Packing Removal', sop: 'Clear cardboard and packaging from the job site and dispose of it responsibly.' },
-      { task: 'Next-Day Prep', sop: 'Return unused parts, restock the van, and confirm tomorrow\'s dispatch before clocking out.' }
+      { task: 'Final Trash Round', sop: 'Perform one last complete round of trash collection from high-traffic zones before shift end.' },
+      { task: 'Secure & Sign In Keys', sop: 'Return all keys directly to the secure lockbox and officially sign them back into the registry.' }
     ]
   }
 ];
@@ -284,8 +282,8 @@ function ESA_MaintenanceChecklistView() {
         <!-- Header -->
         <div style=${{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', marginBottom: '14px', flexWrap: 'wrap' }}>
           <div>
-            <div style=${{ fontSize: '17px', fontWeight: 'bold', color: '#ebdbb2', letterSpacing: '0.5px' }}>Tech Shift Checklist</div>
-            <div style=${{ fontSize: '10px', color: '#8a8a92', marginTop: '2px' }}>Help Assembly Technician Workflow & Shift Checklist</div>
+            <div style=${{ fontSize: '17px', fontWeight: 'bold', color: '#ebdbb2', letterSpacing: '0.5px' }}>Daily Maintenance</div>
+            <div style=${{ fontSize: '10px', color: '#8a8a92', marginTop: '2px' }}>Standard Operating Procedure & Shift Checklist</div>
           </div>
           <div style=${{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style=${{ display: 'flex', alignItems: 'center', gap: '7px', background: 'rgba(0,0,0,0.35)', border: '1px solid #3a3a42', borderRadius: '20px', padding: '6px 14px' }}>
@@ -323,25 +321,25 @@ function ESA_MaintenanceChecklistView() {
         <!-- Sections -->
         ${SECTIONS.map(s => html`<${SectionBlock} key=${s.id} section=${s} checks=${checks} onToggle=${toggle} skeleton=${loading} />`)}
 
-        <!-- Shift Notes & Parts Used Log -->
+        <!-- Shift Notes & Green Shield Tracking Log -->
         <div style=${{ marginTop: '22px' }}>
           <div style=${{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style=${{ width: '30px', height: '30px', borderRadius: '50%', background: '#2bc4f3', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', boxShadow: '0 0 14px #2bc4f355' }}>📝</div>
-            <div style=${{ fontSize: '14px', fontWeight: 'bold', color: '#ebdbb2' }}>Shift Notes & Parts Used Log</div>
+            <div style=${{ fontSize: '14px', fontWeight: 'bold', color: '#ebdbb2' }}>Shift Notes & Green Shield Tracking Log</div>
           </div>
           <div style=${{ fontSize: '11px', fontStyle: 'italic', color: '#8a8a92', margin: '8px 0 12px', lineHeight: '1.5' }}>
-            Log any notable jobs, customer requests, or hardware/parts used so Agent X inventory stays accurate:
+            Use this section to record any dynamic Green Shield tasks completed or complex property hazards encountered:
           </div>
 
           <div style=${{ borderRadius: '10px', overflow: 'hidden', border: '1px solid #3a3a42' }}>
             <div style=${{ display: 'flex', background: '#2f2f36', color: '#d7b46a' }}>
-              <div style=${{ flex: 1, padding: '9px 12px', fontSize: '10px', fontWeight: 'bold', letterSpacing: '1px' }}>JOB / SERVICE AREA</div>
-              <div style=${{ flex: '1.5', padding: '9px 12px', fontSize: '10px', fontWeight: 'bold', letterSpacing: '1px', borderLeft: '1px solid #3a3a42' }}>ACTIONS LOGGED & PARTS USED</div>
+              <div style=${{ flex: 1, padding: '9px 12px', fontSize: '10px', fontWeight: 'bold', letterSpacing: '1px' }}>TARGET AREA / GREEN SHIELD CYCLE</div>
+              <div style=${{ flex: '1.5', padding: '9px 12px', fontSize: '10px', fontWeight: 'bold', letterSpacing: '1px', borderLeft: '1px solid #3a3a42' }}>MAINTENANCE ACTIONS LOGGED & PARTS USED</div>
             </div>
             ${notes.map((row, i) => html`
               <div key=${i} style=${{ display: 'flex', borderTop: '1px solid #33333a', background: i % 2 ? 'rgba(255,255,255,0.015)' : 'transparent' }}>
-                <input value=${row.area} onChange=${e => updateNote(i, 'area', e.target.value)} placeholder="e.g. Alpharetta / KALLAX" style=${{ ...inputStyle, border: 'none', borderRadius: 0, background: 'transparent' }} />
-                <input value=${row.actions} onChange=${e => updateNote(i, 'actions', e.target.value)} placeholder="e.g. Used cam lock kit HA-2001" style=${{ ...inputStyle, border: 'none', borderRadius: 0, borderLeft: '1px solid #33333a', background: 'transparent' }} />
+                <input value=${row.area} onChange=${e => updateNote(i, 'area', e.target.value)} placeholder="e.g. Lobby / Weekly" style=${{ ...inputStyle, border: 'none', borderRadius: 0, background: 'transparent' }} />
+                <input value=${row.actions} onChange=${e => updateNote(i, 'actions', e.target.value)} placeholder="e.g. Replaced filter HD-9033" style=${{ ...inputStyle, border: 'none', borderRadius: 0, borderLeft: '1px solid #33333a', background: 'transparent' }} />
                 <button onClick=${() => removeNote(i)} title="Remove entry" style=${{ width: '32px', flexShrink: 0, border: 'none', borderLeft: '1px solid #33333a', background: 'transparent', color: '#cc241d', cursor: 'pointer', fontSize: '14px' }}>×</button>
               </div>
             `)}
@@ -359,7 +357,7 @@ function ESA_MaintenanceChecklistView() {
 
 export const ESAMaintenanceChecklist = {
   name: 'MaintenanceChecklist',
-  version: '4.0.0',
+  version: '3.0.0',
   kind: 'react',
 
   /**

@@ -1,20 +1,24 @@
-# 🛡️ ESA EXOSKELETON
+# 🛡️ HELP ASSEMBLY EXOSKELETON
 
-**Enterprise Security Agent (ESA) Exoskeleton** - A cloud-native AI agent console with DuckDB WASM integration.
+**Help Assembly Services Exoskeleton** - A cloud-native furniture-assembly service console: 3D rendering cards, DuckDB catalog, and the Ingestion Interface as the sole communication hub. **Agent X** provides the logic and reasoning for the capabilities layer; **Ava007** provides the voice.
 
 [![Deployed on Cloudflare](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://ESA.ingeniosity.tech)
-[![Version](https://img.shields.io/badge/version-3.1.0-green.svg)](https://github.com/ingeniosity-A2A/Agent-X/tree/main/esa-exoskeleton)
+[![Version](https://img.shields.io/badge/version-3.5.0-green.svg)](https://github.com/ingeniosity-A2A/Agent-X/tree/main/esa-exoskeleton)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ---
 
 ## Features
 
-- ✅ **ESA.Ingestion AI** - React module: bottom Ingestion dock (lens → DuckDB/HD Supply, PDF upload, email-to, dual audio, visualizer overlay on input) + chat card in the rendering area
-- ✅ **Rendering cards** - every module is a card: AI chat, diagnostics, broadcast parts, workorder, daily to-do list
+- ✅ **ESA.Ingestion AI** - React module: bottom Ingestion dock (lens → DuckDB/Help Assembly catalog, PDF upload, email-to, dual audio, visualizer overlay on input) + chat card in the rendering area
+- ✅ **Rendering cards** - every module is a card: AI chat, QA check, broadcast service, job order, tech shift checklist
 - ✅ **Web console** - left sidebar styled as a scene/layers panel: Console ⇄ Library tabs, filtered log feed, and a search bar (hidden on mobile)
 - ✅ **React module** - Ingestion Interface is React (esm.sh CDN, no build step); Arrow.js sandboxes the rest of the Exoskeleton
-- ✅ **DuckDB WASM** - HD Supply catalog streaming (zero local storage)
+- ✅ **DuckDB WASM** - Help Assembly catalog streaming (furniture services + hardware, zero local storage)
+- ✅ **Separate ESA Exoskeleton** - `/esa-console` is a sandboxed second console with ESA hotel-maintenance content (HD Supply PTAC catalog, Seasons PTAC product cards, service broadcasting) — no architecture mixing
+- ✅ **Lens → render flow** - upload/capture a photo → visual catalog picker → tap the match → renders the product card with info + quote (Help Assembly) or 3D preview + inventory + workorder actions (ESA)
+- ✅ **GLB 3D rendering** - `<model-viewer>` (CDN, no build step) renders a GLB per SKU in the product cards and parts-card model zones; catalog items carry a `model` URL (demo placeholders from the Khronos glTF samples — swap for real product GLBs) with CSS visual fallback
+- ✅ **Identity** - Agent X = logic & reasoning; Ava007 = voice; console scope is Help Assembly Services only
 - ✅ **Arrow.js** - Verified component wrapping with sandbox isolation
 - ✅ **Gruvbox Theme** - Dark/Light toggleable color scheme
 - ✅ **GSAP Animations** - Smooth component entrance effects
@@ -82,11 +86,17 @@ esa-exoskeleton/
 │   │   ├── ESA.ReactMount.js         # Shared React setup (esm.sh + htm)
 │   │   └── …                         # Arrow.js sandboxed components (workorder, parts…)
 │   ├── hooks/
-│   │   └── use-esa-chat.js           # React chat hook + DuckDB/HD Supply engine
+│   │   └── use-esa-chat.js           # React chat hook + Help Assembly catalog engine
 │   ├── config/
 │   │   ├── gruvbox-colors.js        # Theme configuration
-│   │   └── duckdb-setup.js          # DuckDB WASM initialization
-│   └── index.html                   # Main HTML (ESA EXOSKELETON)
+│   │   └── duckdb-setup.js          # DuckDB WASM initialization (help_assembly_catalog)
+│   ├── index.html                   # HELP ASSEMBLY EXOSKELETON console (site root)
+│   └── esa-console/                 # SEPARATE sandboxed ESA EXOSKELETON console (/esa-console)
+│       ├── index.html               # ESA EXOSKELETON — hotel maintenance + PTAC content
+│       ├── integration.js           # ESA console wiring (light theme, HD Supply hub)
+│       ├── components/              # PTAC/HD Supply cards (Seasons PTAC, Ptac-B, QA…)
+│       ├── hooks/use-esa-chat.js    # ESA chat hook — HD Supply catalog engine
+│       └── config/duckdb-setup.js   # DuckDB WASM (hd_supply_catalog)
 ├── integration.js                    # Source copy (stale) — public/integration.js is used
 ├── package.json                      # Dependencies & scripts
 ├── SKILL.md                          # Component registry
@@ -161,6 +171,11 @@ ESA EXOSKELETON
 │
 ├── ESA.DuckDB
 │   └── HD Supply catalog streaming (with embedded fallback)
+│
+├── 📡 Service broadcasting B-side cards (Arrow.js)
+│   ├── ESA.InvPartsCard-B — inventory + broadcast service parts panel
+│   └── ESA.Ptac-B — service broadcasting deck for PTAC Unit #223532
+│   └── ▶ Full spec: docs/service-broadcast-cards.md
 │
 └── Arrow.js sandboxes the remaining components (ESAVerifyComponent)
 ```
