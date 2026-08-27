@@ -1,0 +1,13 @@
+{
+  "name": "docs-pipeline",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Content ingestion pipeline — push docs from any interface",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}

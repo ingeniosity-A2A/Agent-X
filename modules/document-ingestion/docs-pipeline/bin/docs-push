@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+# docs-push — Push markdown content to docs pipeline from Termux / any shell
+# Usage:
+#   echo "# My Page\nContent here" | docs-push
+#   docs-push file.md
+#   docs-push --title "Custom Title" --section core-concepts file.md
+#   docs-push --url https://example.com/doc.md  (fetches remote then pushes)
+
+set -euo pipefail
+
+# --- Config ---
+INGEST_URL="${DOCS_INGEST_URL:-http://localhost:3456}"
+API_KEY="${DOCS_API_KEY:-}"
+
+# --- Flags ---
+TITLE=""
+PARENT_ID=""
+SECTION=""
+URL=""
+FILE=""
+EMOJI=""
+
+usage() {
+  cat <<'EOF'
+docs-push — Push markdown to docs pipeline
+
+Usage:
+  docs-push [options] [file.md | -]
+  echo "content" | docs-push -
+
+Options:
+  --title TITLE    Override page title
+  --section NAME   Target section: core-concepts, api-reference,
+                   resilience, devops, get-started
+  --parent ID      Target parent page ID (overrides --section)
+  --emoji EMOJI    Page emoji (e.g. 1f680)
+  --url URL        Fetch markdown from URL then push
+  -h, --help       Show this help
+
+Environment:
+  DOCS_INGEST_URL   Ingestion API URL (default: http://localhost:3456)
+  DOCS_API_KEY      API key if the server requires auth
+  DOCS_TOKEN        Docs API token (for direct mode)
+
+Examples:
+  docs-push README.md
+  echo "# New Page\nHello" | docs-push -
+  docs-push --title "Architecture" --section core-concepts arch.md
+  docs-push --url https://raw.githubusercontent.com/user/repo/main/doc.md
+EOF
+  exit 0
+}
+
+# --- Parse args ---
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --title)   TITLE="$2"; shift 2 ;;
+    --section) SECTION="$2"; shift 2 ;;
+    --parent)  PARENT_ID="$2"; shift 2 ;;
+    --emoji)   EMOJI="$2"; shift 2 ;;
+    --url)     URL="$2"; shift 2 ;;
+    -h|--help) usage ;;
+    *)         FILE="$1"; shift ;;
+  esac
+done
+
+# --- Section name -> parent ID mapping ---
+declare -A SECTION_MAP=(
+  [core-concepts]="0b6iTnqcd7QTBNhA9G4e"
+  [api-reference]="QTzQCGGI058DhqctVw4r"
+  [resilience]="CxP45m6MOmVtFBIExjOD"
+  [devops]="UowUJ12We71JI7qsiRir"
+  [get-started]="q4XBows54cHqvvkfz4Ti"
+)
+
+if [[ -n "$SECTION" && -z "$PARENT_ID" ]]; then
+  PARENT_ID="${SECTION_MAP[$SECTION]:-}"
+  if [[ -z "$PARENT_ID" ]]; then
+    echo "ERROR: Unknown section '$SECTION'. Valid: ${!SECTION_MAP[*]}" >&2
+    exit 1
+  fi
+fi
+
+# --- Get markdown content ---
+MARKDOWN=""
+
+if [[ -n "$URL" ]]; then
+  echo "[docs-push] Fetching from $URL..." >&2
+  MARKDOWN=$(curl -fsSL "$URL")
+  if [[ -z "$MARKDOWN" ]]; then
+    echo "ERROR: Failed to fetch content from $URL" >&2
+    exit 1
+  fi
+elif [[ "$FILE" == "-" || -z "$FILE" ]]; then
+  MARKDOWN=$(cat)
+else
+  if [[ ! -f "$FILE" ]]; then
+    echo "ERROR: File not found: $FILE" >&2
+    exit 1
+  fi
+  MARKDOWN=$(cat "$FILE")
+fi
+
+if [[ ${#MARKDOWN} -lt 10 ]]; then
+  echo "ERROR: Content too short (min 10 chars)" >&2
+  exit 1
+fi
+
+echo "[docs-push] Content: ${#MARKDOWN} chars" >&2
+
+# --- Build JSON payload ---
+JSON_PAYLOAD=$(jq -n \
+  --arg md "$MARKDOWN" \
+  --arg title "$TITLE" \
+  --arg parent "$PARENT_ID" \
+  --arg emoji "$EMOJI" \
+  '{
+    markdown: $md,
+    title: (if $title == "" then null else $title end),
+    parent_id: (if $parent == "" then null else $parent end),
+    emoji: (if $emoji == "" then null else $emoji end)
+  }')
+
+# --- Send to ingestion API ---
+AUTH_HEADER=""
+if [[ -n "$API_KEY" ]]; then
+  AUTH_HEADER="-H X-API-Key:$API_KEY"
+fi
+
+echo "[docs-push] Pushing to docs pipeline via $INGEST_URL..." >&2
+
+RESPONSE=$(curl -sS \
+  -X POST "$INGEST_URL/ingest" \
+  -H 'Content-Type: application/json' \
+  $AUTH_HEADER \
+  -d "$JSON_PAYLOAD")
+
+# --- Parse and display result ---
+STATUS=$(echo "$RESPONSE" | jq -r '.status // .error // "unknown"')
+PAGE_URL=$(echo "$RESPONSE" | jq -r '.url // empty')
+CR_NUM=$(echo "$RESPONSE" | jq -r '.crNumber // empty')
+SECTION_NAME=$(echo "$RESPONSE" | jq -r '.section // empty')
+PAGE_TITLE=$(echo "$RESPONSE" | jq -r '.title // empty')
+
+if [[ "$STATUS" == "published" ]]; then
+  echo "[docs-push] Published successfully!" >&2
+  echo "" >&2
+  echo "  Title:   $PAGE_TITLE" >&2
+  echo "  Section: $SECTION_NAME" >&2
+  echo "  CR:      #$CR_NUM" >&2
+  echo "  URL:     $PAGE_URL" >&2
+else
+  echo "[docs-push] Failed: $RESPONSE" >&2
+  exit 1
+fi
