@@ -25,7 +25,7 @@ The primary SDK implementations live in two places — NOT in this project's Age
 
 2. **Agent-X GitHub repo**: https://github.com/ingeniosity-A2A/Agent-X — the canonical source for execution surfaces, quantum modules, appless protocols, and A2A mesh routing.
 
-The `Agent-X/` folder in this project (gitbook-ingest) is a **reference/documentation snapshot**. It contains:
+The `Agent-X/` folder in this project (docs-pipeline snapshot) is a **reference/documentation snapshot**. It contains:
 - `src/quantum/` — Python implementations of TashiDAG, InteractionQuantum, TweenAtom, GSAP, RF physical, crypto routing, UWB ranging, VFile, SMS bridge, Beeper bridge
 - `src/appless/` — VCF/vCard generator, appless server
 - `src/config.py` — A2A agent DIDs (`did:helpassembly:*`), tool definitions (`a2a_send`, `a2a_request`), pattern triggers
