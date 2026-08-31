@@ -1,0 +1,1041 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ============================================================
+   BENTO UI8 — DESIGN TOKENS & THEME ENGINE
+   Eight color varieties: UI8 Charcoal, UI8 Linen, Obsidian,
+   Graphite, Neon Orchid, Gruvbox Dark, Gruvbox Light, Warm Clay
+   Multi-layer depth model: Dark/Light Base → Raised Card →
+   Embedded Viewport → Tinted Floating Glass Module
+   ============================================================ */
+
+/* ============================================================
+   BENTO-EXOSKEL-UI — precise multi-layer constants (theme-independent)
+   Layer 1: Dark Canvas Base · Layer 2: Light/Beige Variant ·
+   Layer 3: Glass Black Tinted Overlay
+   ============================================================ */
+:root {
+  /* Layer 1: Dark Canvas Base */
+  --exoskel-bg-base: #18181b;
+  --exoskel-card-dark: #242427;
+  --exoskel-viewport-dark: #1c1c1f;
+  --exoskel-border-dark: rgba(255, 255, 255, 0.08);
+
+  /* Layer 2: Light / Beige Layer Variant */
+  --exoskel-bg-light: #e5e5e0;
+  --exoskel-card-beige: #f4f4ee;
+  --exoskel-beige-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.07);
+
+  /* Layer 3: Glass Black Tinted Overlay */
+  --exoskel-glass-tinted: rgba(20, 20, 25, 0.75);
+  --exoskel-glass-border: rgba(255, 255, 255, 0.12);
+  --exoskel-glass-glow: 0 12px 32px rgba(0, 0, 0, 0.4);
+
+  /* Radii */
+  --exoskel-radius-card: 28px;
+  --exoskel-radius-inner: 16px;
+  --exoskel-radius-pill: 9999px;
+
+  /* legacy aliases kept for existing classes */
+  --ui8-glass-tinted: var(--exoskel-glass-tinted);
+  --ui8-glass-border: var(--exoskel-glass-border);
+  --ui8-glass-glow: var(--exoskel-glass-glow);
+  --ui8-badge-bg: #3a3a40;
+}
+
+:root,
+[data-theme='obsidian'] {
+  --bk-bg: #0a0a0f;
+  --bk-glow-1: rgba(59, 130, 246, 0.1);
+  --bk-glow-2: rgba(139, 92, 246, 0.09);
+  --bk-card: rgba(255, 255, 255, 0.035);
+  --bk-panel: rgba(255, 255, 255, 0.045);
+  --bk-panel-2: rgba(0, 0, 0, 0.22);
+  --bk-chip: rgba(255, 255, 255, 0.07);
+  --bk-line: rgba(255, 255, 255, 0.14);
+  --bk-border: rgba(255, 255, 255, 0.07);
+  --bk-border-soft: rgba(255, 255, 255, 0.045);
+  --bk-text: #ffffff;
+  --bk-text-2: rgba(255, 255, 255, 0.62);
+  --bk-text-3: rgba(255, 255, 255, 0.38);
+  --bk-accent: #3b82f6;
+  --bk-accent-2: #8b5cf6;
+  --bk-accent-3: #ec4899;
+  --bk-ring-1: #3b82f6;
+  --bk-ring-2: #8b5cf6;
+  --bk-ring-3: #f97316;
+  --bk-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --bk-shadow-hover: 0 14px 44px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --bk-inset: inset 2px 2px 8px rgba(0, 0, 0, 0.45), inset -2px -2px 8px rgba(255, 255, 255, 0.04);
+  --bk-inset-soft: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+  --bk-btn-bg: rgba(255, 255, 255, 0.07);
+  --bk-btn-text: #ffffff;
+  --bk-input-bg: rgba(0, 0, 0, 0.25);
+  --bk-on-accent: #ffffff;
+  --bk-check-bg: #3b82f6;
+  --bk-scheme: dark;
+  --bk-viewport: rgba(4, 4, 9, 0.6);
+  --bk-viewport-border: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='graphite'] {
+  --bk-bg: #1e1e21;
+  --bk-glow-1: rgba(255, 255, 255, 0.05);
+  --bk-glow-2: rgba(255, 255, 255, 0.03);
+  --bk-card: #28282c;
+  --bk-panel: #303035;
+  --bk-panel-2: #232326;
+  --bk-chip: rgba(255, 255, 255, 0.08);
+  --bk-line: rgba(255, 255, 255, 0.17);
+  --bk-border: rgba(255, 255, 255, 0.06);
+  --bk-border-soft: rgba(255, 255, 255, 0.04);
+  --bk-text: #f4f4f5;
+  --bk-text-2: rgba(244, 244, 245, 0.6);
+  --bk-text-3: rgba(244, 244, 245, 0.35);
+  --bk-accent: #e4e4e7;
+  --bk-accent-2: #a1a1aa;
+  --bk-accent-3: #fbbf24;
+  --bk-ring-1: #d4d4d8;
+  --bk-ring-2: #a1a1aa;
+  --bk-ring-3: #71717a;
+  --bk-shadow: 0 6px 28px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --bk-shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --bk-inset: inset 2px 2px 8px rgba(0, 0, 0, 0.4), inset -2px -2px 8px rgba(255, 255, 255, 0.05);
+  --bk-inset-soft: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+  --bk-btn-bg: #38383e;
+  --bk-btn-text: #f4f4f5;
+  --bk-input-bg: #232326;
+  --bk-on-accent: #18181b;
+  --bk-check-bg: #e4e4e7;
+  --bk-scheme: dark;
+  --bk-viewport: #232326;
+  --bk-viewport-border: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='neon'] {
+  --bk-bg: #0c0916;
+  --bk-glow-1: rgba(167, 139, 250, 0.13);
+  --bk-glow-2: rgba(240, 171, 252, 0.09);
+  --bk-card: rgba(139, 92, 246, 0.055);
+  --bk-panel: rgba(139, 92, 246, 0.08);
+  --bk-panel-2: rgba(20, 12, 40, 0.35);
+  --bk-chip: rgba(167, 139, 250, 0.11);
+  --bk-line: rgba(196, 181, 253, 0.22);
+  --bk-border: rgba(139, 92, 246, 0.19);
+  --bk-border-soft: rgba(139, 92, 246, 0.12);
+  --bk-text: #f5f3ff;
+  --bk-text-2: rgba(221, 214, 254, 0.62);
+  --bk-text-3: rgba(221, 214, 254, 0.35);
+  --bk-accent: #a78bfa;
+  --bk-accent-2: #f0abfc;
+  --bk-accent-3: #22d3ee;
+  --bk-ring-1: #a78bfa;
+  --bk-ring-2: #f0abfc;
+  --bk-ring-3: #22d3ee;
+  --bk-shadow: 0 6px 28px rgba(10, 4, 30, 0.55), inset 0 1px 0 rgba(221, 214, 254, 0.08);
+  --bk-shadow-hover: 0 16px 52px rgba(10, 4, 30, 0.7), inset 0 1px 0 rgba(221, 214, 254, 0.14);
+  --bk-inset: inset 2px 2px 10px rgba(8, 2, 24, 0.55), inset -2px -2px 8px rgba(167, 139, 250, 0.05);
+  --bk-inset-soft: inset 0 1px 2px rgba(8, 2, 24, 0.45);
+  --bk-btn-bg: rgba(167, 139, 250, 0.12);
+  --bk-btn-text: #ede9fe;
+  --bk-input-bg: rgba(10, 4, 30, 0.4);
+  --bk-on-accent: #1e1040;
+  --bk-check-bg: #a78bfa;
+  --bk-scheme: dark;
+  --bk-viewport: rgba(14, 6, 36, 0.6);
+  --bk-viewport-border: rgba(167, 139, 250, 0.12);
+}
+
+[data-theme='gruvbox-dark'] {
+  --bk-bg: #1d2021;
+  --bk-glow-1: rgba(254, 128, 25, 0.08);
+  --bk-glow-2: rgba(250, 189, 47, 0.06);
+  --bk-card: #282828;
+  --bk-panel: #32302f;
+  --bk-panel-2: #1d2021;
+  --bk-chip: rgba(235, 219, 178, 0.09);
+  --bk-line: rgba(235, 219, 178, 0.24);
+  --bk-border: rgba(235, 219, 178, 0.1);
+  --bk-border-soft: rgba(235, 219, 178, 0.06);
+  --bk-text: #ebdbb2;
+  --bk-text-2: #bdae93;
+  --bk-text-3: #7c6f64;
+  --bk-accent: #fe8019;
+  --bk-accent-2: #fabd2f;
+  --bk-accent-3: #8ec07c;
+  --bk-ring-1: #fe8019;
+  --bk-ring-2: #fabd2f;
+  --bk-ring-3: #8ec07c;
+  --bk-shadow: 0 6px 26px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(235, 219, 178, 0.06);
+  --bk-shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.62), inset 0 1px 0 rgba(235, 219, 178, 0.1);
+  --bk-inset: inset 2px 2px 8px rgba(0, 0, 0, 0.5), inset -2px -2px 8px rgba(235, 219, 178, 0.04);
+  --bk-inset-soft: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+  --bk-btn-bg: #3c3836;
+  --bk-btn-text: #ebdbb2;
+  --bk-input-bg: #1d2021;
+  --bk-on-accent: #1d2021;
+  --bk-check-bg: #fe8019;
+  --bk-scheme: dark;
+  --bk-viewport: #1d2021;
+  --bk-viewport-border: rgba(235, 219, 178, 0.08);
+}
+
+[data-theme='gruvbox-light'] {
+  --bk-bg: #ebdbb2;
+  --bk-glow-1: rgba(214, 93, 14, 0.1);
+  --bk-glow-2: rgba(189, 118, 38, 0.08);
+  --bk-card: #fbf1c7;
+  --bk-panel: #f2e5bc;
+  --bk-panel-2: #ebdbb2;
+  --bk-chip: rgba(214, 93, 14, 0.1);
+  --bk-line: rgba(60, 56, 54, 0.28);
+  --bk-border: rgba(60, 56, 54, 0.11);
+  --bk-border-soft: rgba(60, 56, 54, 0.07);
+  --bk-text: #3c3836;
+  --bk-text-2: #665c54;
+  --bk-text-3: #928374;
+  --bk-accent: #d65d0e;
+  --bk-accent-2: #b87626;
+  --bk-accent-3: #427b58;
+  --bk-ring-1: #d65d0e;
+  --bk-ring-2: #b87626;
+  --bk-ring-3: #427b58;
+  --bk-shadow:
+    7px 7px 18px rgba(168, 140, 90, 0.38), -7px -7px 16px rgba(255, 250, 230, 0.9),
+    inset 1px 1px 4px rgba(255, 252, 240, 0.85), inset -3px -3px 8px rgba(168, 140, 90, 0.12);
+  --bk-shadow-hover:
+    10px 10px 26px rgba(168, 140, 90, 0.45), -9px -9px 20px rgba(255, 250, 230, 1),
+    inset 1px 1px 4px rgba(255, 252, 240, 0.9), inset -3px -3px 8px rgba(168, 140, 90, 0.14);
+  --bk-inset: inset 3px 3px 8px rgba(168, 140, 90, 0.3), inset -3px -3px 8px rgba(255, 250, 230, 0.9);
+  --bk-inset-soft: inset 1px 2px 4px rgba(168, 140, 90, 0.25);
+  --bk-btn-bg: #f2e5bc;
+  --bk-btn-text: #3c3836;
+  --bk-input-bg: #ebdbb2;
+  --bk-on-accent: #fbf1c7;
+  --bk-check-bg: #d65d0e;
+  --bk-scheme: light;
+  --bk-viewport: #ebdbb2;
+  --bk-viewport-border: rgba(60, 56, 54, 0.1);
+}
+
+[data-theme='clay'] {
+  --bk-bg: #e9e0d4;
+  --bk-glow-1: rgba(255, 122, 107, 0.12);
+  --bk-glow-2: rgba(249, 115, 22, 0.08);
+  --bk-card: #f7f2ea;
+  --bk-panel: #eee6da;
+  --bk-panel-2: #e3d9cb;
+  --bk-chip: rgba(128, 92, 70, 0.09);
+  --bk-line: rgba(90, 74, 60, 0.26);
+  --bk-border: rgba(128, 92, 70, 0.1);
+  --bk-border-soft: rgba(128, 92, 70, 0.07);
+  --bk-text: #2b2620;
+  --bk-text-2: #6b5e52;
+  --bk-text-3: #a3938a;
+  --bk-accent: #ff7a6b;
+  --bk-accent-2: #f97316;
+  --bk-accent-3: #3f9e6e;
+  --bk-ring-1: #ff7a6b;
+  --bk-ring-2: #f97316;
+  --bk-ring-3: #7dd4a8;
+  --bk-shadow:
+    10px 10px 26px rgba(128, 92, 70, 0.17), -9px -9px 22px rgba(255, 255, 255, 0.85),
+    inset 2px 2px 6px rgba(255, 255, 255, 0.7), inset -4px -4px 10px rgba(128, 92, 70, 0.08);
+  --bk-shadow-hover:
+    14px 14px 34px rgba(128, 92, 70, 0.22), -12px -12px 26px rgba(255, 255, 255, 0.95),
+    inset 2px 2px 6px rgba(255, 255, 255, 0.75), inset -4px -4px 10px rgba(128, 92, 70, 0.1);
+  --bk-inset: inset 3px 3px 8px rgba(128, 92, 70, 0.2), inset -3px -3px 8px rgba(255, 255, 255, 0.9);
+  --bk-inset-soft: inset 1px 2px 5px rgba(128, 92, 70, 0.16);
+  --bk-btn-bg: #f1e9de;
+  --bk-btn-text: #2b2620;
+  --bk-input-bg: #eee6da;
+  --bk-on-accent: #ffffff;
+  --bk-check-bg: #ff7a6b;
+  --bk-scheme: light;
+  --bk-viewport: #e9dfd1;
+  --bk-viewport-border: rgba(128, 92, 70, 0.1);
+}
+
+/* UI8 Charcoal — exact reference tokens: dark base #18181b, raised card #242427 */
+[data-theme='ui8-dark'] {
+  --bk-bg: #18181b;
+  --bk-glow-1: rgba(59, 130, 246, 0.08);
+  --bk-glow-2: rgba(139, 92, 246, 0.07);
+  --bk-card: #242427;
+  --bk-panel: #2c2c31;
+  --bk-panel-2: #1c1c1f;
+  --bk-chip: rgba(255, 255, 255, 0.08);
+  --bk-line: rgba(255, 255, 255, 0.16);
+  --bk-border: rgba(255, 255, 255, 0.08);
+  --bk-border-soft: rgba(255, 255, 255, 0.05);
+  --bk-text: #ffffff;
+  --bk-text-2: rgba(255, 255, 255, 0.6);
+  --bk-text-3: rgba(255, 255, 255, 0.4);
+  --bk-accent: #3b82f6;
+  --bk-accent-2: #8b5cf6;
+  --bk-accent-3: #ec4899;
+  --bk-ring-1: #3b82f6;
+  --bk-ring-2: #8b5cf6;
+  --bk-ring-3: #f97316;
+  --bk-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --bk-shadow-hover: 0 28px 56px -15px rgba(0, 0, 0, 0.62), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  --bk-inset: inset 2px 2px 8px rgba(0, 0, 0, 0.45), inset -2px -2px 8px rgba(255, 255, 255, 0.04);
+  --bk-inset-soft: inset 0 1px 3px rgba(0, 0, 0, 0.42);
+  --bk-btn-bg: rgba(255, 255, 255, 0.1);
+  --bk-btn-text: rgba(255, 255, 255, 0.9);
+  --bk-input-bg: #1c1c1f;
+  --bk-on-accent: #ffffff;
+  --bk-check-bg: #3b82f6;
+  --bk-scheme: dark;
+  --bk-viewport: #1c1c1f;
+  --bk-viewport-border: rgba(255, 255, 255, 0.05);
+}
+
+/* UI8 Linen — exact reference tokens: light base #e5e5e0, beige raised card #f4f4ee */
+[data-theme='ui8-light'] {
+  --bk-bg: #e5e5e0;
+  --bk-glow-1: rgba(59, 130, 246, 0.08);
+  --bk-glow-2: rgba(236, 72, 153, 0.06);
+  --bk-card: #f4f4ee;
+  --bk-panel: #ebebe4;
+  --bk-panel-2: #e0e0da;
+  --bk-chip: rgba(24, 24, 27, 0.06);
+  --bk-line: rgba(24, 24, 27, 0.16);
+  --bk-border: rgba(24, 24, 27, 0.08);
+  --bk-border-soft: rgba(24, 24, 27, 0.05);
+  --bk-text: #18181b;
+  --bk-text-2: rgba(24, 24, 27, 0.62);
+  --bk-text-3: rgba(24, 24, 27, 0.4);
+  --bk-accent: #2563eb;
+  --bk-accent-2: #8b5cf6;
+  --bk-accent-3: #10b981;
+  --bk-ring-1: #2563eb;
+  --bk-ring-2: #8b5cf6;
+  --bk-ring-3: #f97316;
+  --bk-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  --bk-shadow-hover: 0 26px 52px -15px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --bk-inset: inset 3px 3px 8px rgba(0, 0, 0, 0.08), inset -3px -3px 8px rgba(255, 255, 255, 0.85);
+  --bk-inset-soft: inset 0 1px 3px rgba(0, 0, 0, 0.07);
+  --bk-btn-bg: #e5e5e0;
+  --bk-btn-text: #26262b;
+  --bk-input-bg: #e5e5e0;
+  --bk-on-accent: #ffffff;
+  --bk-check-bg: #2563eb;
+  --bk-scheme: light;
+  --bk-viewport: #e5e5e0;
+  --bk-viewport-border: rgba(0, 0, 0, 0.05);
+}
+
+/* ============ BENTO COMPONENT CLASSES ============ */
+
+.bento-page {
+  background: var(--bk-bg);
+  color: var(--bk-text);
+  min-height: 100vh;
+  position: relative;
+  transition: background-color 0.45s ease, color 0.45s ease;
+}
+
+.bento-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(52rem 32rem at 12% -6%, var(--bk-glow-1), transparent 60%),
+    radial-gradient(48rem 30rem at 92% 12%, var(--bk-glow-2), transparent 60%),
+    radial-gradient(40rem 28rem at 50% 108%, var(--bk-glow-1), transparent 62%);
+  z-index: 0;
+}
+
+.bento-card {
+  background: var(--bk-card);
+  border: 1px solid var(--bk-border);
+  border-radius: 28px;
+  box-shadow: var(--bk-shadow);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: background-color 0.45s ease, border-color 0.45s ease, box-shadow 0.35s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.bento-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0%, transparent 45%, rgba(255, 255, 255, 0.04) 100%);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+}
+
+[data-scheme='light'] .bento-card::before {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, transparent 45%, rgba(255, 255, 255, 0.5) 100%);
+}
+
+.bento-card:hover {
+  box-shadow: var(--bk-shadow-hover);
+}
+
+.bento-demo {
+  position: relative;
+  border-radius: 20px;
+  height: 288px;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  /* Embedded viewport layer — inner-shadow frame from the UI8 reference */
+  background: var(--bk-viewport);
+  border: 1px solid var(--bk-viewport-border);
+  box-shadow: var(--bk-inset-soft);
+}
+
+/* Decorative 3×3 grid lines inside viewports */
+.ui8-gridlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--bk-text) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--bk-text) 7%, transparent) 1px, transparent 1px);
+  background-size: 33.34% 33.34%;
+}
+
+/* UI8 Glass Black Tinted Overlay — floats above light or dark bases
+   (unprefixed backdrop-filter only; see .bento-card-glass-tinted note) */
+.ui8-glass-overlay {
+  background: var(--ui8-glass-tinted);
+  backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--ui8-glass-border);
+  box-shadow: var(--ui8-glass-glow), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Inverted Corner Polygon Cutout — exploded-lock capability cards */
+.bento-card-inverted-corner {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 32px) 0,
+    100% 32px,
+    100% 100%,
+    0 100%
+  );
+}
+
+/* Exploded Lock Trigger — toggles hidden capability drawer
+   (patch v5: 28×28 squircle at 4px offsets, radius-sm) */
+.exploded-lock-trigger {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--bento-radius-sm);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition:
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 0.2s ease,
+    color 0.2s ease;
+  z-index: 5;
+}
+.exploded-lock-trigger:hover {
+  transform: scale(1.1) rotate(5deg);
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+.exploded-lock-trigger:active {
+  transform: scale(0.95);
+}
+/* light/beige scheme: darken the trigger so it stays tactical on #f4f4ee */
+[data-scheme='light'] .exploded-lock-trigger {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.14);
+  color: rgba(24, 24, 27, 0.72);
+}
+[data-scheme='light'] .exploded-lock-trigger:hover {
+  background: rgba(0, 0, 0, 0.11);
+  color: rgba(24, 24, 27, 1);
+}
+
+/* ============================================================
+   PATCH v5 EXTENSION PACK — Glass Tinted Finish Variant
+   Blue→violet tinted glass surface for floating feature cards
+   ============================================================ */
+:root {
+  /* Bento radius scale (patch v5 tokens) */
+  --bento-radius-sm: 12px;
+  --bento-radius-md: 20px;
+  --bento-radius-lg: 28px;
+  --bento-radius-xl: 32px;
+  --bento-radius-pill: 9999px;
+
+  /* Glass Tinted Finish Tokens */
+  --bento-surface-glass-tinted: rgba(255, 255, 255, 0.08);
+  --bento-glass-tinted-bg: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.12) 0%,
+    rgba(139, 92, 246, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  --bento-glass-tinted-border: rgba(255, 255, 255, 0.15);
+  --bento-glass-tinted-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.37),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Glass Tinted card surface — pairs with .bento-card (overrides base).
+   NOTE: only the unprefixed backdrop-filter is written — LightningCSS
+   collapses the manual -webkit- pair into prefixed-only output, which
+   some Chromium builds ignore. */
+.bento-card-glass-tinted {
+  background: var(--bento-glass-tinted-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--bento-glass-tinted-border);
+  border-radius: var(--bento-radius-lg);
+  box-shadow: var(--bento-glass-tinted-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+/* light/beige schemes: deepen the tint so the glass still reads on cream */
+[data-scheme='light'] .bento-card-glass-tinted {
+  background: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.14) 0%,
+    rgba(139, 92, 246, 0.1) 50%,
+    rgba(24, 24, 27, 0.04) 100%
+  );
+  border-color: rgba(24, 24, 27, 0.14);
+  box-shadow:
+    0 8px 32px rgba(24, 24, 27, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* GSAP slide-out drawer initial state (spec: .dev-slideout-panel) */
+.dev-slideout-panel {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+/* Universal Feature Stack rows — spec literals + light-scheme contrast */
+.ufs-row {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+[data-scheme='light'] .ufs-row {
+  background: rgba(24, 24, 27, 0.04);
+  border-color: rgba(24, 24, 27, 0.1);
+}
+.ufs-play-btn {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #93c5fd;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.ufs-play-btn:hover {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.45);
+}
+[data-scheme='light'] .ufs-play-btn {
+  background: rgba(59, 130, 246, 0.14);
+  border-color: rgba(59, 130, 246, 0.38);
+  color: #1d4ed8;
+}
+.ufs-select {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--bk-text-2);
+}
+[data-scheme='light'] .ufs-select {
+  border-color: rgba(24, 24, 27, 0.12);
+}
+.ufs-select option {
+  background: #111118;
+  color: #ffffff;
+}
+.ufs-input {
+  color: var(--bk-text);
+}
+.ufs-input::placeholder {
+  color: var(--bk-text-3);
+}
+
+/* Furniture Card 4 — keep the spec h-48 viewport, but let it flex in
+   horizontal layout where the demo strip is only 190px tall */
+.bento-grid-layout-horizontal .furniture-viewport {
+  height: auto;
+  min-height: 132px;
+  flex: 1 1 auto;
+}
+
+/* Floating collaborative cursor pill ("Artur") */
+.ui8-cursor-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: var(--ui8-badge-bg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* layout variants */
+.bento-grid-layout-square .bento-demo {
+  height: auto;
+  flex: 1 1 auto;
+  min-height: 200px;
+}
+.bento-grid-layout-square .bento-card {
+  aspect-ratio: 1 / 1;
+}
+/* functional cards (todo board) keep natural sizing */
+.bento-grid-layout-square .bento-card-functional {
+  aspect-ratio: auto;
+}
+
+.bento-grid-layout-horizontal .bento-card {
+  flex-direction: row;
+  align-items: center;
+  gap: 22px;
+}
+.bento-grid-layout-horizontal .bento-demo {
+  width: 46%;
+  height: 190px;
+  flex: 0 0 46%;
+}
+.bento-grid-layout-horizontal .bento-text {
+  flex: 1 1 auto;
+}
+/* functional cards stay vertical, full width */
+.bento-grid-layout-horizontal .bento-card-functional {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+
+.bento-text {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1 1 auto;
+  padding-top: 18px;
+}
+.bento-grid-layout-horizontal .bento-text {
+  padding-top: 0;
+}
+
+.bento-title {
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: -0.015em;
+  color: var(--bk-text);
+  margin-top: 16px;
+}
+
+.bento-desc {
+  color: var(--bk-text-2);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin-top: 6px;
+  max-width: 34ch;
+}
+
+.bk-btn {
+  margin-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 22px;
+  border-radius: 9999px;
+  background: var(--bk-btn-bg);
+  color: var(--bk-btn-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid var(--bk-border);
+  box-shadow: var(--bk-inset-soft);
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.15s ease, background-color 0.3s ease;
+}
+.bk-btn:hover {
+  filter: brightness(1.15);
+}
+.bk-btn:active {
+  transform: scale(0.96);
+}
+
+/* inner window / panel */
+.bk-panel {
+  background: var(--bk-panel);
+  border: 1px solid var(--bk-border-soft);
+  border-radius: 14px;
+}
+
+.bk-chip {
+  background: var(--bk-chip);
+  border: 1px solid var(--bk-border-soft);
+}
+
+.bk-line {
+  background: var(--bk-line);
+  border-radius: 9999px;
+  height: 6px;
+}
+
+.bk-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--bk-chip);
+  border: 1px solid var(--bk-border);
+  color: var(--bk-text-2);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+.bk-icon-btn:hover {
+  color: var(--bk-text);
+}
+.bk-icon-btn:active {
+  transform: scale(0.92);
+}
+
+.bk-input {
+  background: var(--bk-input-bg);
+  border: 1px solid var(--bk-border);
+  color: var(--bk-text);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.bk-input::placeholder {
+  color: var(--bk-text-3);
+}
+.bk-input:focus {
+  border-color: var(--bk-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--bk-accent) 22%, transparent);
+}
+
+.bk-accent { color: var(--bk-accent); }
+.bk-accent-2 { color: var(--bk-accent-2); }
+.bk-accent-3 { color: var(--bk-accent-3); }
+.bk-text2 { color: var(--bk-text-2); }
+.bk-text3 { color: var(--bk-text-3); }
+
+/* scrollbar */
+.bk-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bk-line) transparent;
+}
+.bk-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.bk-scroll::-webkit-scrollbar-thumb {
+  background: var(--bk-line);
+  border-radius: 9999px;
+}
+.bk-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* theme dot active ring */
+.theme-dot-active {
+  box-shadow: 0 0 0 2px var(--bk-bg), 0 0 0 4px var(--bk-text-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bento-card,
+  .bk-btn,
+  .bk-icon-btn,
+  .exploded-lock-trigger {
+    transition: none !important;
+  }
+}
+
+/* ============================================================
+   AVA007 console patch v6 — Glass-gel & punch-out extension pack
+   Adapted (not copied verbatim) from MIT-licensed CodePen demos —
+   glass-gel-progress-meter, color-gradient-bottom-mask-button,
+   border-punch-outs-w-mask-composite, curved-scrollbar-25 — all by
+   Simey (codepen.io/simeydotme), MIT license, attribution kept here.
+   Applied only as restyling of elements that already exist in the
+   card layouts — no card gains or loses height/width from this.
+   (glass-gel *slider* vocabulary intentionally not forced: no card
+   in this board has a range input, and adding one would change size.)
+   ============================================================ */
+
+/* gel-glass progress meter: contained bar, fixed track height,
+   never affects parent flex box sizing */
+.gel-progress-track {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.03);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.gel-progress-fill {
+  position: absolute;
+  inset: 0;
+  width: var(--gel-progress, 50%);
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent 40%),
+    linear-gradient(90deg, var(--gel-progress-color, #7ec8a0), var(--gel-progress-color-2, #5fb98a));
+  box-shadow: 0 0 8px var(--gel-progress-color, #7ec8a0);
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gel-progress-fill::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  filter: blur(0.5px);
+}
+
+/* gel meter on the beige/light scheme: darker track so the gel reads */
+[data-scheme='light'] .gel-progress-track {
+  background: rgba(0, 0, 0, 0.12);
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* gradient-mask button: bottom-fade sheen on an existing button,
+   pure restyle — no padding/size change */
+.gradient-mask-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.gradient-mask-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, transparent 55%);
+  mask-image: linear-gradient(180deg, black, transparent 85%);
+  -webkit-mask-image: linear-gradient(180deg, black, transparent 85%);
+  pointer-events: none;
+}
+
+.gradient-mask-btn:hover::before {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, transparent 65%);
+}
+
+/* punch-out border dots: decorative ::after inset within the card's
+   own padding box, contained by the card's existing overflow:hidden
+   so it can never enlarge the card */
+.punch-border {
+  position: relative;
+}
+
+.punch-border::after {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border-radius: inherit;
+  pointer-events: none;
+  --punch-dot: radial-gradient(circle 1.5px, #000 1.4px, transparent 1.6px);
+  mask: var(--punch-dot) 0 0 / 14px 14px, linear-gradient(#fff 0 100%);
+  -webkit-mask: var(--punch-dot) 0 0 / 14px 14px, linear-gradient(#fff 0 100%);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+  background: rgba(255, 255, 255, 0.06);
+  opacity: 0.5;
+}
+
+/* light scheme: dots punch against the beige card */
+[data-scheme='light'] .punch-border::after {
+  --punch-dot: radial-gradient(circle 1.5px, #fff 1.4px, transparent 1.6px);
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* curved scroll indicator: restyles the existing wheel scrollbar
+   track/thumb only — wheel column width (48px) is unchanged.
+   `.bento-wheel` is the shared hook for the board's scroll-wheel
+   columns (Actuator Preset P1–P5 + Furniture Design render wheel). */
+.bento-wheel::-webkit-scrollbar {
+  width: 3px;
+}
+.bento-wheel::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 999px;
+}
+.bento-wheel::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #7ec8a0, #5fb98a);
+  border-radius: 999px;
+  box-shadow: 0 0 4px rgba(126, 200, 160, 0.6);
+}
+[data-scheme='light'] .bento-wheel::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.06);
+}
+[data-scheme='light'] .bento-wheel::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #34d399, #10b981);
+  box-shadow: 0 0 4px rgba(16, 185, 129, 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gel-progress-fill {
+    transition: none !important;
+  }
+}
