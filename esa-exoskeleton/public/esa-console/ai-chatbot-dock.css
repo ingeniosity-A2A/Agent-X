@@ -1,0 +1,134 @@
+/* Unified AI Chatbot Ingestion — fixed non-scroll clickable toolbar */
+
+#esa-ai-chatbot,
+#esa-ingestion {
+  grid-area: chat;
+  position: relative;
+  z-index: 40;
+  border-top: 1px solid rgba(200, 168, 130, 0.2);
+  background: rgba(18, 18, 18, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  /* never a scroll region for the primary chrome */
+  overflow: visible;
+  padding: 10px 12px 12px;
+}
+
+/* Fixed action toolbar — does NOT scroll */
+.esa-ai-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow: visible;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0;
+  /* kill scroll-driven / snap dock behavior */
+  scroll-snap-type: none;
+  scrollbar-width: none;
+}
+
+.esa-ai-toolbar::-webkit-scrollbar {
+  display: none;
+}
+
+.esa-ai-toolbar button,
+.esa-ai-toolbar .esa-ai-tool {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid #2e2e2e;
+  background: #1d1d1d;
+  color: #e8e8e8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.esa-ai-toolbar button:hover,
+.esa-ai-toolbar .esa-ai-tool:hover {
+  background: #2a2a2a;
+  border-color: #4a4a4a;
+}
+
+.esa-ai-toolbar button:active,
+.esa-ai-toolbar .esa-ai-tool:active {
+  transform: scale(0.94);
+}
+
+.esa-ai-toolbar button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Main prompt row: tools + field + send */
+.esa-ai-prompt-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  max-width: 720px;
+  background: rgba(22, 22, 22, 0.98);
+  border: 1px solid #2a2a2a;
+  border-radius: 999px;
+  padding: 6px 8px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.esa-ai-prompt-row input,
+.esa-ai-prompt-row textarea {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #f0f0f0;
+  font-size: 14px;
+  padding: 8px 6px;
+  resize: none;
+}
+
+.esa-ai-send {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #fff;
+  color: #111;
+  cursor: pointer;
+  flex: none;
+}
+
+.esa-ai-send:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Hide legacy stage chat card — chat lives only in this dock */
+#esa-ingestion-chat-card,
+#esa-ingestion-chat-card.esa-merged-away {
+  display: none !important;
+}
+
+/* Mobile: dock glued to bottom */
+@media (max-width: 768px) {
+  #esa-ai-chatbot,
+  #esa-ingestion {
+    position: sticky;
+    bottom: 0;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  .esa-ai-toolbar {
+    max-width: 100%;
+  }
+}

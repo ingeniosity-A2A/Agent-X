@@ -1,4 +1,4 @@
-/* ESA service shell — not “console product” */
+/* ESA service shell — cards + unified AI Chatbot Ingestion */
 
 .esa-workspace {
   display: grid;
@@ -11,7 +11,6 @@
   gap: 0;
 }
 
-/* LEFT: service nav */
 #esa-service-nav,
 #esa-console {
   grid-area: nav;
@@ -72,7 +71,6 @@
   box-shadow: inset 3px 0 0 #b07d4f;
 }
 
-/* CENTER: card stage above chat */
 .esa-render-area {
   grid-area: stage;
   overflow: auto;
@@ -92,22 +90,12 @@
   display: block;
 }
 
-/* BOTTOM: single AI chatbot dock */
-#esa-ingestion,
-#esa-chat-dock {
+/* chat area owned by ai-chatbot-dock.css */
+#esa-ai-chatbot,
+#esa-ingestion {
   grid-area: chat;
-  border-top: 1px solid rgba(200, 168, 130, 0.18);
-  background: #161616;
-  min-height: 72px;
-  z-index: 20;
 }
 
-/* Hide legacy duplicate chat card in stage when dock owns chat */
-#esa-ingestion-chat-card.esa-merged-away {
-  display: none !important;
-}
-
-/* MOBILE: card + chatbot only */
 @media (max-width: 768px) {
   .esa-workspace {
     grid-template-columns: 1fr;
@@ -123,12 +111,6 @@
   #esa-console {
     border-right: none;
     border-bottom: 1px solid rgba(200, 168, 130, 0.18);
-    max-height: 42vh;
-  }
-
-  #esa-ingestion,
-  #esa-chat-dock {
-    position: sticky;
-    bottom: 0;
+    max-height: 36vh;
   }
 }

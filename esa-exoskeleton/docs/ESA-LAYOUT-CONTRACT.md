@@ -1,49 +1,31 @@
-# ESA layout contract (application — not infra)
+# ESA layout contract
 
-**Wrong:** “Consoles” as a product surface. Multiple competing chat docks.
+## Surfaces
 
-**Right:**
+| Region | Name | Role |
+|--------|------|------|
+| Left | **ESA** (service) | Expand → card types |
+| Center | Card stage | One card above chat (multi only if selected) |
+| Bottom | **AI Chatbot Ingestion** | **Only** AI chat surface — not “esa-ingestion” product |
 
-```text
-┌─────────────────────────────────────────────────────────┐
-│ LEFT                CENTER (viewport)              │
-│ Service: ESA        Card stage (above chat)        │
-│  └ expand           One card at a time (or multi)  │
-│     card types                                     │
-│       Diagnostic                                   │
-│       Parts                                        │
-│       Workorder                                    │
-│       Checklist                                    │
-│       …                                            │
-│                                                    │
-│ ───────────────────────────────────────────────── │
-│ BOTTOM: single AI chatbot (ingest + mic + send)    │
-│   merged Ingestion Interface + speaker ends + chat │
-│   pattern ref: elements.ai-sdk.dev/examples/chatbot│
-└──────────────────────────────────────────────────────────┘
-```
+**Forbidden product names:** Console, esa-ingestion (as a label).
 
-## Rules
+**DOM note:** mount node may keep `id="esa-ai-chatbot"` (preferred) with legacy alias `esa-ingestion` for existing `ESA.Ingestion.mount` until integration is retargeted.
 
-1. **Service title** on the left is **ESA** (not “Console”).
-2. Click **ESA** → dropdown / tree of **card types** attached to that service.
-3. Click a card type → that card **renders in the middle viewport, above the chatbot**.
-4. Default: **one card visible**. Multi-select only when explicitly enabled.
-5. **One AI chatbot only** — merge ingestion box + end speakers + chat input into a single bottom dock.
-6. **Mobile:** only **active card + bottom chatbot** visible (sidebar collapses / drawer).
+## Bottom dock rules
 
-## Card registry (service-attached)
+1. **One** unified AI Chatbot Ingestion (input + mic + send + actions).
+2. **Toolbar is fixed, clickable, non-scrolling** — no horizontal scroll-snap dock for primary actions.
+3. Toolbar actions are buttons (not scroll-driven icons).
+4. Speakers / ingest affordances live **inside** this bar, not as a second chat card in the stage.
+5. Mobile: active card + this dock only.
 
-| id | Label |
-|----|--------|
-| `esa-diagnostics` | Diagnostic |
-| `esa-parts-card` | Parts / Broadcast |
-| `esa-workorder` | Workorder |
-| `esa-maintenance-checklist` | Checklist |
-| (optional) PTAC / Sound | when mounted |
+## Card types (service-attached)
 
-## Implementation files
+Diagnostic · Parts · Workorder · Checklist (+ optional PTAC / Sound when mounted)
 
-- `public/esa-console/shell-nav.js` — service tree + show/hide cards
-- `public/esa-console/shell-layout.css` — grid + mobile
-- Wire from `index.html` after integration mounts
+## Files
+
+- `shell-layout.css` / `shell-nav.js`
+- `ai-chatbot-dock.css` — fixed toolbar
+- `mount-alias.js` — `esa-ai-chatbot` ↔ legacy mount
