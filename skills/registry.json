@@ -1,0 +1,30 @@
+{
+  "registry_version": "0.1.0",
+  "invariant": "No skill → no capability. No verified skill → no authority.",
+  "skills": [
+    {
+      "skill_id": "onomondo-ncs",
+      "version": "0.1.0",
+      "provides": ["cellular.softsim.cli"],
+      "entry": "skills/onomondo-ncs/SKILL.md",
+      "authority": "network",
+      "status": "present"
+    },
+    {
+      "skill_id": "agent-browser",
+      "version": "0.1.0",
+      "provides": ["browser.agent"],
+      "entry": "skills/agent-browser/SKILL.md",
+      "authority": "local",
+      "status": "present"
+    },
+    {
+      "skill_id": "headless-reflex-arc",
+      "version": "0.1.0",
+      "provides": ["shell.gated.local"],
+      "entry": "skills/headless-reflex-arc/SKILL.md",
+      "authority": "local",
+      "status": "scaffold"
+    }
+  ]
+}

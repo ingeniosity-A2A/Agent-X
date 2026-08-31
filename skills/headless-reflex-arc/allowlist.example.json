@@ -1,0 +1,12 @@
+{
+  "allow": [
+    "ls",
+    "pwd",
+    "cat",
+    "echo",
+    "uname",
+    "df",
+    "free"
+  ],
+  "deny_substrings": ["rm ", "mkfs", "dd ", ">/dev/", "sudo "]
+}
