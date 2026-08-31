@@ -1,0 +1,134 @@
+/* ESA service shell — not “console product” */
+
+.esa-workspace {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  grid-template-rows: 1fr auto;
+  grid-template-areas:
+    "nav stage"
+    "nav chat";
+  height: calc(100vh - 56px);
+  gap: 0;
+}
+
+/* LEFT: service nav */
+#esa-service-nav,
+#esa-console {
+  grid-area: nav;
+  background: #141414;
+  border-right: 1px solid rgba(200, 168, 130, 0.18);
+  overflow: auto;
+  padding: 12px 10px 16px;
+}
+
+.esa-service-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(200, 168, 130, 0.22);
+  background: #1a1a1a;
+  color: #f2f2f2;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.esa-service-head[aria-expanded="true"] {
+  border-color: rgba(176, 125, 79, 0.55);
+}
+
+.esa-card-tree {
+  margin-top: 10px;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.esa-card-tree.open {
+  display: flex;
+}
+
+.esa-card-tree button {
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: #c8c4bc;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.esa-card-tree button:hover,
+.esa-card-tree button[aria-selected="true"] {
+  background: #222;
+  color: #fff;
+}
+
+.esa-card-tree button[aria-selected="true"] {
+  box-shadow: inset 3px 0 0 #b07d4f;
+}
+
+/* CENTER: card stage above chat */
+.esa-render-area {
+  grid-area: stage;
+  overflow: auto;
+  padding: 16px;
+  background:
+    radial-gradient(rgba(140, 190, 150, 0.05) 1px, transparent 1px) 0 0 / 26px 26px,
+    #101010;
+}
+
+.esa-render-area > [data-esa-card] {
+  display: none;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.esa-render-area > [data-esa-card].esa-card-active {
+  display: block;
+}
+
+/* BOTTOM: single AI chatbot dock */
+#esa-ingestion,
+#esa-chat-dock {
+  grid-area: chat;
+  border-top: 1px solid rgba(200, 168, 130, 0.18);
+  background: #161616;
+  min-height: 72px;
+  z-index: 20;
+}
+
+/* Hide legacy duplicate chat card in stage when dock owns chat */
+#esa-ingestion-chat-card.esa-merged-away {
+  display: none !important;
+}
+
+/* MOBILE: card + chatbot only */
+@media (max-width: 768px) {
+  .esa-workspace {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "nav"
+      "stage"
+      "chat";
+    height: 100dvh;
+  }
+
+  #esa-service-nav,
+  #esa-console {
+    border-right: none;
+    border-bottom: 1px solid rgba(200, 168, 130, 0.18);
+    max-height: 42vh;
+  }
+
+  #esa-ingestion,
+  #esa-chat-dock {
+    position: sticky;
+    bottom: 0;
+  }
+}
