@@ -1,20 +1,11 @@
-# Official Bento card library (target)
+# Official Bento (upgrade — one framework)
 
-This directory is the **home on `main`** for the official UI card system.
+Ported from `bento-board` → `platform/src/components/bento/` on **main**.
 
-**Populate from** branch `bento-board`:
-
-```bash
-# from a worktree of bento-board — copy only components, not whole app root
-cp -R src/components/bento/* platform/src/components/bento/
-# plus globals theme CSS tokens from bento-board src/app/globals.css (bk-* section)
+```ts
+import { BentoCard, BentoProvider, useBentoReveal } from '@/components/bento';
 ```
 
-Required files:
-- `core.tsx` — `BentoCard`, hooks
-- `theme.tsx` — `BentoProvider`, themes
-- `cardsA.tsx` … as needed for ESA/Help/platform
+Needs `gsap` (ScrollTrigger, Flip) in platform dependencies.
 
-See `docs/BENTO-OFFICIAL-UI.md`.
-
-Destiny cards: rewrite to `BentoCard` before merge; do not keep a Destiny skin.
+Copy remaining from bento-board if missing: `cardsA.tsx`–`cardsD.tsx`, `todo.tsx`, CSS tokens from `src/app/globals.css`.
