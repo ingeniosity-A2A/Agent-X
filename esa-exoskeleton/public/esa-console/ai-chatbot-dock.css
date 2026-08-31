@@ -1,4 +1,13 @@
-/* Unified AI Chatbot Ingestion — fixed non-scroll clickable toolbar */
+/* Unified AI Chatbot Ingestion
+ *
+ *   ┌─────────────────────────────┐
+ *   │  typing / prompt row        │
+ *   ├─────────────────────────────┤
+ *   │  [icons…]   ← bottom-left   │  icon dock INSIDE chatbot, UNDER typing
+ *   └─────────────────────────────┘
+ *
+ * Fixed clickable icons — no horizontal scroll.
+ */
 
 #esa-ai-chatbot,
 #esa-ingestion {
@@ -9,74 +18,28 @@
   background: rgba(18, 18, 18, 0.96);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  /* never a scroll region for the primary chrome */
   overflow: visible;
   padding: 10px 12px 12px;
 }
 
-/* Fixed action toolbar — does NOT scroll */
-.esa-ai-toolbar {
+/* Column: typing on top, icon dock below */
+.esa-ai-shell {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: 8px;
-  flex-wrap: nowrap;
-  overflow: visible;
   max-width: 920px;
   margin: 0 auto;
-  padding: 0;
-  /* kill scroll-driven / snap dock behavior */
-  scroll-snap-type: none;
-  scrollbar-width: none;
+  width: 100%;
 }
 
-.esa-ai-toolbar::-webkit-scrollbar {
-  display: none;
-}
-
-.esa-ai-toolbar button,
-.esa-ai-toolbar .esa-ai-tool {
-  flex: 0 0 auto;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  border: 1px solid #2e2e2e;
-  background: #1d1d1d;
-  color: #e8e8e8;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s, border-color 0.15s, transform 0.1s;
-}
-
-.esa-ai-toolbar button:hover,
-.esa-ai-toolbar .esa-ai-tool:hover {
-  background: #2a2a2a;
-  border-color: #4a4a4a;
-}
-
-.esa-ai-toolbar button:active,
-.esa-ai-toolbar .esa-ai-tool:active {
-  transform: scale(0.94);
-}
-
-.esa-ai-toolbar button:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Main prompt row: tools + field + send */
+/* Typing row */
 .esa-ai-prompt-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: 1;
+  width: 100%;
   min-width: 0;
-  max-width: 720px;
   background: rgba(22, 22, 22, 0.98);
   border: 1px solid #2a2a2a;
   border-radius: 999px;
@@ -113,22 +76,82 @@
   cursor: not-allowed;
 }
 
-/* Hide legacy stage chat card — chat lives only in this dock */
+/* Icon dock: INSIDE chatbot, BELOW typing, BOTTOM-LEFT */
+.esa-ai-toolbar,
+.esa-ai-icon-dock {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  flex-wrap: nowrap;
+  overflow: visible;
+  scroll-snap-type: none;
+  scrollbar-width: none;
+  width: 100%;
+  padding: 0 4px;
+  margin: 0;
+  order: 2;
+}
+
+.esa-ai-prompt-row {
+  order: 1;
+}
+
+.esa-ai-toolbar::-webkit-scrollbar,
+.esa-ai-icon-dock::-webkit-scrollbar {
+  display: none;
+}
+
+.esa-ai-toolbar button,
+.esa-ai-icon-dock button,
+.esa-ai-tool {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid #2e2e2e;
+  background: #1d1d1d;
+  color: #e8e8e8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.esa-ai-toolbar button:hover,
+.esa-ai-icon-dock button:hover,
+.esa-ai-tool:hover {
+  background: #2a2a2a;
+  border-color: #4a4a4a;
+}
+
+.esa-ai-toolbar button:active,
+.esa-ai-icon-dock button:active,
+.esa-ai-tool:active {
+  transform: scale(0.94);
+}
+
+.esa-ai-toolbar button:disabled,
+.esa-ai-icon-dock button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
 #esa-ingestion-chat-card,
 #esa-ingestion-chat-card.esa-merged-away {
   display: none !important;
 }
 
-/* Mobile: dock glued to bottom */
 @media (max-width: 768px) {
   #esa-ai-chatbot,
   #esa-ingestion {
     position: sticky;
     bottom: 0;
     padding-bottom: max(12px, env(safe-area-inset-bottom));
-  }
-
-  .esa-ai-toolbar {
-    max-width: 100%;
   }
 }
