@@ -1,12 +1,10 @@
-/* Unified AI Chatbot Ingestion
+/* Unified AI Chatbot Ingestion — Bento beige/green/black
  *
- *   ┌─────────────────────────────┐
- *   │  typing / prompt row        │
- *   ├─────────────────────────────┤
- *   │  [icons…]   ← bottom-left   │  icon dock INSIDE chatbot, UNDER typing
- *   └─────────────────────────────┘
+ * Prompt row (top):
+ *   [ input …………… ] [ Send ] [ Big Lens ]  ← Lens far right
  *
- * Fixed clickable icons — no horizontal scroll.
+ * Icon dock (under typing, bottom-left) with tooltips:
+ *   [+] [mic] […]     tooltips on hover/focus
  */
 
 #esa-ai-chatbot,
@@ -14,15 +12,14 @@
   grid-area: chat;
   position: relative;
   z-index: 40;
-  border-top: 1px solid rgba(200, 168, 130, 0.2);
-  background: rgba(18, 18, 18, 0.96);
+  border-top: 1px solid var(--esa-line, rgba(244, 244, 238, 0.12));
+  background: rgba(10, 10, 10, 0.96);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   overflow: visible;
   padding: 10px 12px 12px;
 }
 
-/* Column: typing on top, icon dock below */
 .esa-ai-shell {
   display: flex;
   flex-direction: column;
@@ -33,18 +30,19 @@
   width: 100%;
 }
 
-/* Typing row */
+/* Typing row: input | send | big lens (far right) */
 .esa-ai-prompt-row {
   display: flex;
   align-items: center;
   gap: 8px;
   width: 100%;
   min-width: 0;
-  background: rgba(22, 22, 22, 0.98);
-  border: 1px solid #2a2a2a;
+  background: rgba(18, 18, 18, 0.98);
+  border: 1px solid var(--esa-line, rgba(244, 244, 238, 0.12));
   border-radius: 999px;
   padding: 6px 8px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  order: 1;
 }
 
 .esa-ai-prompt-row input,
@@ -54,21 +52,31 @@
   border: none;
   outline: none;
   background: transparent;
-  color: #f0f0f0;
+  color: var(--esa-beige, #f4f4ee);
   font-size: 14px;
   padding: 8px 6px;
   resize: none;
 }
 
+.esa-ai-prompt-row input::placeholder,
+.esa-ai-prompt-row textarea::placeholder {
+  color: var(--esa-beige-muted, rgba(244, 244, 238, 0.45));
+}
+
+/* Send — immediately left of Lens */
 .esa-ai-send {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: none;
-  background: #fff;
-  color: #111;
+  border: 1px solid var(--esa-line, rgba(244, 244, 238, 0.14));
+  background: var(--esa-beige, #f4f4ee);
+  color: var(--esa-black, #0a0a0a);
   cursor: pointer;
   flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
 }
 
 .esa-ai-send:disabled {
@@ -76,7 +84,40 @@
   cursor: not-allowed;
 }
 
-/* Icon dock: INSIDE chatbot, BELOW typing, BOTTOM-LEFT */
+.esa-ai-send:hover:not(:disabled) {
+  background: var(--esa-green, #7ec8a0);
+  border-color: var(--esa-green, #7ec8a0);
+}
+
+/* Big Lens — FAR RIGHT of prompt row */
+.esa-ai-lens {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  border: 1px solid var(--esa-line-strong, rgba(126, 200, 160, 0.35));
+  background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+  color: var(--esa-green, #7ec8a0);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 0 0 1px rgba(126, 200, 160, 0.12), 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: transform 0.12s, box-shadow 0.15s, border-color 0.15s;
+}
+
+.esa-ai-lens:hover {
+  transform: scale(1.04);
+  border-color: var(--esa-green, #7ec8a0);
+  box-shadow: 0 0 20px rgba(126, 200, 160, 0.25);
+}
+
+.esa-ai-lens:active {
+  transform: scale(0.96);
+}
+
+/* Icon dock under typing, bottom-left + tooltips */
 .esa-ai-toolbar,
 .esa-ai-icon-dock {
   display: flex;
@@ -87,59 +128,69 @@
   flex-wrap: nowrap;
   overflow: visible;
   scroll-snap-type: none;
-  scrollbar-width: none;
   width: 100%;
   padding: 0 4px;
-  margin: 0;
   order: 2;
-}
-
-.esa-ai-prompt-row {
-  order: 1;
-}
-
-.esa-ai-toolbar::-webkit-scrollbar,
-.esa-ai-icon-dock::-webkit-scrollbar {
-  display: none;
 }
 
 .esa-ai-toolbar button,
 .esa-ai-icon-dock button,
 .esa-ai-tool {
+  position: relative;
   flex: 0 0 auto;
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  border: 1px solid #2e2e2e;
-  background: #1d1d1d;
-  color: #e8e8e8;
+  border: 1px solid var(--esa-line, rgba(244, 244, 238, 0.12));
+  background: var(--esa-black-3, #1a1a1a);
+  color: var(--esa-beige, #f4f4ee);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .esa-ai-toolbar button:hover,
 .esa-ai-icon-dock button:hover,
 .esa-ai-tool:hover {
-  background: #2a2a2a;
-  border-color: #4a4a4a;
+  background: #222;
+  border-color: var(--esa-green, #7ec8a0);
+  color: var(--esa-green, #7ec8a0);
 }
 
-.esa-ai-toolbar button:active,
-.esa-ai-icon-dock button:active,
-.esa-ai-tool:active {
-  transform: scale(0.94);
+/* Tooltip */
+.esa-ai-toolbar button[data-tip]::after,
+.esa-ai-icon-dock button[data-tip]::after,
+.esa-ai-tool[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--esa-black, #0a0a0a);
+  background: var(--esa-beige, #f4f4ee);
+  border: 1px solid var(--esa-line, rgba(0, 0, 0, 0.08));
+  border-radius: 6px;
+  padding: 4px 8px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+  z-index: 50;
 }
 
-.esa-ai-toolbar button:disabled,
-.esa-ai-icon-dock button:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  transform: none;
+.esa-ai-toolbar button[data-tip]:hover::after,
+.esa-ai-toolbar button[data-tip]:focus-visible::after,
+.esa-ai-icon-dock button[data-tip]:hover::after,
+.esa-ai-icon-dock button[data-tip]:focus-visible::after,
+.esa-ai-tool[data-tip]:hover::after,
+.esa-ai-tool[data-tip]:focus-visible::after {
+  opacity: 1;
 }
 
 #esa-ingestion-chat-card,
@@ -153,5 +204,11 @@
     position: sticky;
     bottom: 0;
     padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  .esa-ai-lens {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
   }
 }

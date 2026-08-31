@@ -1,0 +1,64 @@
+/* ESA + HAS — official Bento palette
+ * Beige · Green · Black. Brown / warm clay accents REMOVED.
+ */
+:root {
+  --esa-black: #0a0a0a;
+  --esa-black-2: #121212;
+  --esa-black-3: #1a1a1a;
+  --esa-beige: #f4f4ee;
+  --esa-beige-2: #e8ebe0;
+  --esa-beige-muted: rgba(244, 244, 238, 0.55);
+  --esa-green: #7ec8a0;
+  --esa-green-2: #5aaf84;
+  --esa-green-dim: rgba(126, 200, 160, 0.18);
+  --esa-line: rgba(244, 244, 238, 0.12);
+  --esa-line-strong: rgba(126, 200, 160, 0.35);
+
+  /* Kill legacy brown tokens if referenced */
+  --std-warm: var(--esa-beige-muted);
+  --std-accent: var(--esa-green);
+  --std-paper: var(--esa-beige);
+  --std-ink: var(--esa-black);
+  --std-border: var(--esa-line);
+  --std-status: var(--esa-green);
+  --std-muted: var(--esa-beige-muted);
+}
+
+/* Override gruvbox / brown leftovers on ESA shell */
+#esa-exoskeleton,
+#esa-ai-chatbot,
+#esa-ingestion,
+#esa-service-nav,
+#esa-console {
+  --std-warm: var(--esa-beige-muted);
+  --std-accent: var(--esa-green);
+}
+
+.esa-title,
+.esa-loading-title {
+  color: var(--esa-green) !important;
+}
+
+.esa-status-badge {
+  color: var(--esa-green) !important;
+  border-color: var(--esa-line) !important;
+  background: var(--esa-black-2) !important;
+}
+
+.esa-status-dot {
+  background: var(--esa-green) !important;
+}
+
+.esa-header {
+  background: var(--esa-black-2) !important;
+  border-color: var(--esa-line) !important;
+}
+
+/* Service head selection — green edge, not brown */
+.esa-card-tree button[aria-selected="true"] {
+  box-shadow: inset 3px 0 0 var(--esa-green) !important;
+}
+
+.esa-service-head[aria-expanded="true"] {
+  border-color: var(--esa-line-strong) !important;
+}
