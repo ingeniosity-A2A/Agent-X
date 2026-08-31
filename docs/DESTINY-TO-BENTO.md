@@ -1,9 +1,11 @@
-# Destiny → Bento
+# Destiny upgraded into Bento (not a second framework)
 
-Destiny is **not** official UI.
+Destiny does not stay as an alternate skin.
 
-- Product cards = **Bento** only.
-- Destiny *data* under `destiny_build/sif_corpus/` is training material — move to QAG-MemBrain when convenient; not a UI path.
-- Any Destiny *card component* must be updated to Bento (`BentoCard` + `.bento-card` + theme tokens) before it ships on ESA/Help/platform.
+1. Rebuild any Destiny card UI as a **Bento** card (`BentoCard` + `.bento-card`).
+2. Keep domain content; drop Destiny-only CSS.
+3. Optional polish (gel / punch / gradient-mask) only as classes **on** Bento.
 
-After port: remove Destiny CSS and do not reintroduce parallel card frameworks.
+`destiny_build/sif_corpus/` = training data only → archive to QAG when ready.
+
+**Outcome:** one upgraded framework = Bento.
