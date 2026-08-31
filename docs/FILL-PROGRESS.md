@@ -2,11 +2,14 @@
 
 | Item | Status |
 |------|--------|
-| Skill registry JSON | Done |
-| Headless Reflex Arc scaffold | Done |
-| Bento core + theme + cardsE | Done on main |
-| Bento cardsA–D + todo | Copy from `bento-board` (local one-liner in PORT-STATUS) |
-| destiny_build skillopt | **Removed** — archived QAG |
-| imports/ | Marked ARCHIVED — promote selectively |
-| Arrow Flight substrate | Done on a2a-exoskeleton |
-| Manifesto 10Q + runner + collectibles | Done on Cybernetic-Ava007 |
+| Skill registry + Reflex Arc scaffold | Done |
+| Bento core + theme + cardsE + tokens | Done |
+| Bento cardsA–D + todo | Local copy from `bento-board` |
+| destiny_build removed / QAG archive | Done |
+| imports marked ARCHIVED | Done |
+| Arrow Flight stubs (a2a-exoskeleton) | Done |
+| Manifesto 10Q + runner + collectibles | Done |
+| Memory retain API (Cybernetic) | Done |
+| Inferential kernel cycle | Done |
+| Wire Bento into ESA/Help live routes | **Next** |
+| Hash-mount live skills via firmware registry | Next |

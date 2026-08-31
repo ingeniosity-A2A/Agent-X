@@ -1,0 +1,94 @@
+/* Official Bento tokens (upgrade path — one framework)
+   Full theme sheet remains on bento-board src/app/globals.css */
+
+:root,
+[data-theme="ui8-dark"] {
+  --bk-card: #18181b;
+  --bk-panel: #1f1f23;
+  --bk-panel-2: #27272a;
+  --bk-border: #3f3f46;
+  --bk-border-soft: #3f3f4688;
+  --bk-line: #52525b;
+  --bk-text: #fafafa;
+  --bk-text-2: #e4e4e7;
+  --bk-text-3: #a1a1aa;
+  --bk-accent: #3b82f6;
+  --bk-accent-2: #8b5cf6;
+  --bk-on-accent: #ffffff;
+  --bk-chip: #27272a;
+  --bk-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  --bk-inset-soft: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --bk-viewport-border: #3f3f46;
+}
+
+.bento-card {
+  border-radius: 1.25rem;
+  border: 1px solid var(--bk-border);
+  background: var(--bk-card);
+  box-shadow: var(--bk-shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.bento-demo {
+  position: relative;
+  min-height: 12rem;
+  background: var(--bk-panel);
+}
+
+.bento-text {
+  padding: 1rem 1.1rem 1.15rem;
+}
+
+.bento-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--bk-text);
+}
+
+.bento-desc {
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--bk-text-3);
+}
+
+.bk-btn {
+  margin-top: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--bk-border);
+  background: var(--bk-chip);
+  color: var(--bk-text);
+}
+
+.bk-line {
+  display: inline-block;
+  border-radius: 999px;
+  background: var(--bk-line);
+}
+
+.bk-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.65rem;
+  border: 1px solid var(--bk-border);
+  background: transparent;
+  color: var(--bk-text-2);
+}
+
+.theme-dot-active {
+  outline: 2px solid var(--bk-accent);
+  outline-offset: 2px;
+}
+
+.gradient-mask-btn {
+  border: none;
+}
