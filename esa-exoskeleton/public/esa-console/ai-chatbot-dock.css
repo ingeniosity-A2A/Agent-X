@@ -1,15 +1,26 @@
-/* Unified AI Chatbot Ingestion — Bento beige/green/black
+/* AI Chatbot Ingestion — Bento beige/green/black
  *
- *  ┌──────────────────────────┬────────┐
- *  │  typing / input          │        │
- *  ├──────────────────────────┤  LENS  │  ← Lens spans TOP + BOTTOM
- *  │  [icons…] [ Send ]       │        │  ← Send on BOTTOM row
- *  └──────────────────────────┴────────┘
+ *   🔊  ┌──────────────────────────┬────────┐  🔊
+ *       │  typing / input          │        │
+ *       ├──────────────────────────┤  LENS  │  ← Lens spans TOP + BOTTOM
+ *       │  [icons…] [➤]            │        │  ← Send on BOTTOM row
+ *       └──────────────────────────┴────────┘
+ *
+ * Contract (docs/ESA-LAYOUT-CONTRACT.md):
+ *   - One unified AI Chatbot Ingestion dock — no "esa" in product titles.
+ *   - Lens = tall column on the far right (spans prompt + bottom rows).
+ *   - Send = bottom row only, with the icon dock.
+ *   - Icons = bottom-left under the input, with tooltips.
+ *   - Two speakers OUTSIDE the chatbot — one bookend on each side of the
+ *     shell (left = inbound Sound I / mic, right = outbound agent voice).
+ *
+ * Page placement (grid-area: chat) is owned by shell-layout.css; this file
+ * only styles the dock surface and its children, so it can be wired into
+ * any host grid (index.html workspace included) without layout surprises.
  */
 
-#esa-ai-chatbot,
+#ai-chatbot,
 #esa-ingestion {
-  grid-area: chat;
   position: relative;
   z-index: 40;
   border-top: 1px solid var(--esa-line, rgba(244, 244, 238, 0.12));
@@ -20,7 +31,20 @@
   padding: 10px 12px 12px;
 }
 
-.esa-ai-shell {
+/* Speakers bookend the chatbot from the OUTSIDE — shell sits between them */
+.ai-dock-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  max-width: 1040px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.ai-shell {
+  flex: 1 1 auto;
+  min-width: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-rows: auto auto;
@@ -35,8 +59,9 @@
 }
 
 /* TOP: input only */
-.esa-ai-prompt-row {
+.ai-prompt-row {
   grid-area: prompt;
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -48,8 +73,10 @@
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
 }
 
-.esa-ai-prompt-row input,
-.esa-ai-prompt-row textarea {
+.ai-prompt-row input,
+.ai-prompt-row textarea {
+  position: relative;
+  z-index: 1; /* above the audio visualizer overlay */
   flex: 1;
   min-width: 0;
   border: none;
@@ -61,13 +88,13 @@
   resize: none;
 }
 
-.esa-ai-prompt-row input::placeholder,
-.esa-ai-prompt-row textarea::placeholder {
+.ai-prompt-row input::placeholder,
+.ai-prompt-row textarea::placeholder {
   color: var(--esa-beige-muted, rgba(244, 244, 238, 0.45));
 }
 
 /* BOTTOM: icon dock (left) + Send */
-.esa-ai-bottom {
+.ai-bottom {
   grid-area: bottom;
   display: flex;
   flex-direction: row;
@@ -77,8 +104,8 @@
   min-width: 0;
 }
 
-.esa-ai-toolbar,
-.esa-ai-icon-dock {
+.ai-toolbar,
+.ai-icon-dock {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -93,8 +120,8 @@
   margin: 0;
 }
 
-/* Send sits on BOTTOM row (with icons), not on the typing row */
-.esa-ai-send {
+/* Send sits on the BOTTOM row (with icons), pushed toward the Lens side */
+.ai-send {
   flex: none;
   width: 40px;
   height: 40px;
@@ -107,21 +134,21 @@
   align-items: center;
   justify-content: center;
   font-size: 16px;
-  margin-left: auto; /* push toward Lens side */
+  margin-left: auto;
 }
 
-.esa-ai-send:disabled {
+.ai-send:disabled {
   opacity: 0.35;
   cursor: not-allowed;
 }
 
-.esa-ai-send:hover:not(:disabled) {
+.ai-send:hover:not(:disabled) {
   background: var(--esa-green, #7ec8a0);
   border-color: var(--esa-green, #7ec8a0);
 }
 
 /* Big Lens — spans TOP + BOTTOM (full shell height) */
-.esa-ai-lens {
+.ai-lens {
   grid-area: lens;
   align-self: stretch;
   width: 64px;
@@ -141,20 +168,25 @@
   transition: transform 0.12s, box-shadow 0.15s, border-color 0.15s;
 }
 
-.esa-ai-lens:hover {
+.ai-lens:hover {
   transform: scale(1.02);
   border-color: var(--esa-green, #7ec8a0);
   box-shadow: 0 0 24px rgba(126, 200, 160, 0.28);
 }
 
-.esa-ai-lens:active {
+.ai-lens:active {
   transform: scale(0.98);
 }
 
+.ai-lens:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
 /* Icon buttons + tooltips */
-.esa-ai-toolbar button,
-.esa-ai-icon-dock button,
-.esa-ai-tool {
+.ai-toolbar button,
+.ai-icon-dock button,
+.ai-tool {
   position: relative;
   flex: 0 0 auto;
   width: 36px;
@@ -171,17 +203,59 @@
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
-.esa-ai-toolbar button:hover,
-.esa-ai-icon-dock button:hover,
-.esa-ai-tool:hover {
+.ai-toolbar button:hover,
+.ai-icon-dock button:hover,
+.ai-tool:hover {
   background: #222;
   border-color: var(--esa-green, #7ec8a0);
   color: var(--esa-green, #7ec8a0);
 }
 
-.esa-ai-toolbar button[data-tip]::after,
-.esa-ai-icon-dock button[data-tip]::after,
-.esa-ai-tool[data-tip]::after {
+/* Speakers — OUTSIDE the chatbot, one bookend on each side.
+   Left = inbound (Sound I / mic), right = outbound (agent voice).
+   .active marks an open channel (mic live / voice speaking). */
+.ai-speaker {
+  position: relative;
+  flex: none;
+  align-self: center;
+  width: 44px;
+  min-height: 72px;
+  border-radius: 12px;
+  border: 1px solid var(--esa-line, rgba(244, 244, 238, 0.12));
+  background: var(--esa-black-3, #1a1a1a);
+  color: var(--esa-beige, #f4f4ee);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.15s;
+}
+
+.ai-speaker:hover {
+  background: #222;
+  border-color: var(--esa-green, #7ec8a0);
+  color: var(--esa-green, #7ec8a0);
+  transform: scale(1.03);
+}
+
+.ai-speaker:active {
+  transform: scale(0.97);
+}
+
+.ai-speaker.active {
+  background: rgba(126, 200, 160, 0.15);
+  border-color: var(--esa-green, #7ec8a0);
+  color: var(--esa-green, #7ec8a0);
+  box-shadow: 0 0 12px rgba(126, 200, 160, 0.25);
+}
+
+/* Tooltips (icon dock + speakers) */
+.ai-toolbar button[data-tip]::after,
+.ai-icon-dock button[data-tip]::after,
+.ai-tool[data-tip]::after,
+.ai-speaker[data-tip]::after {
   content: attr(data-tip);
   position: absolute;
   bottom: calc(100% + 8px);
@@ -200,31 +274,60 @@
   z-index: 50;
 }
 
-.esa-ai-toolbar button[data-tip]:hover::after,
-.esa-ai-toolbar button[data-tip]:focus-visible::after,
-.esa-ai-icon-dock button[data-tip]:hover::after,
-.esa-ai-icon-dock button[data-tip]:focus-visible::after,
-.esa-ai-tool[data-tip]:hover::after,
-.esa-ai-tool[data-tip]:focus-visible::after {
+.ai-toolbar button[data-tip]:hover::after,
+.ai-toolbar button[data-tip]:focus-visible::after,
+.ai-icon-dock button[data-tip]:hover::after,
+.ai-icon-dock button[data-tip]:focus-visible::after,
+.ai-tool[data-tip]:hover::after,
+.ai-tool[data-tip]:focus-visible::after,
+.ai-speaker[data-tip]:hover::after,
+.ai-speaker[data-tip]:focus-visible::after {
   opacity: 1;
 }
 
-#esa-ingestion-chat-card,
-#esa-ingestion-chat-card.esa-merged-away {
+/* Popup menus anchored above their trigger inside the icon dock */
+.ai-icon-dock .esa-dock-pop {
+  left: 0;
+}
+
+/* Chat thread card lives in the stage ("one card above chat", per the
+   layout contract). It is hidden ONLY when a host explicitly merges it
+   away — never unconditionally, or the chatbot ships without messages. */
+#esa-ingestion-chat-card.esa-merged-away,
+#ai-ingestion-chat-card.ai-merged-away {
   display: none !important;
 }
 
+#esa-ingestion-chat-card {
+  min-height: 420px;
+}
+
 @media (max-width: 768px) {
-  #esa-ai-chatbot,
+  #ai-chatbot,
   #esa-ingestion {
     position: sticky;
     bottom: 0;
     padding-bottom: max(12px, env(safe-area-inset-bottom));
   }
 
-  .esa-ai-lens {
+  #esa-ingestion-chat-card {
+    min-height: 320px;
+  }
+
+  .ai-lens {
     width: 56px;
     min-height: 88px;
     font-size: 24px;
+  }
+
+  .ai-dock-row {
+    gap: 8px;
+  }
+
+  .ai-speaker {
+    width: 36px;
+    min-height: 56px;
+    font-size: 16px;
+    border-radius: 10px;
   }
 }

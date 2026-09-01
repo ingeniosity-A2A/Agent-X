@@ -1,34 +1,29 @@
 /**
- * Prefer id=esa-ai-chatbot. Keep legacy esa-ingestion for ESA.Ingestion.mount.
+ * Prefer id=ai-chatbot. Keep legacy esa-ingestion / esa-ai-chatbot mounts
+ * working for ESA.Ingestion.mount and existing integrations.
  */
 (function () {
-  function alias() {
-    let primary = document.getElementById('esa-ai-chatbot');
-    let legacy = document.getElementById('esa-ingestion');
+  var PREFERRED = 'ai-chatbot';
+  var LEGACY = 'esa-ingestion';
 
-    if (!primary && legacy) {
-      legacy.id = 'esa-ai-chatbot';
-      legacy.setAttribute('data-legacy-id', 'esa-ingestion');
-      legacy.setAttribute('aria-label', 'AI Chatbot Ingestion');
-      // dual lookup: synthetic id map for getElementById('esa-ingestion')
-      Object.defineProperty(legacy, 'id', {
-        configurable: true,
-        get() {
-          return 'esa-ai-chatbot';
-        },
-        set() {},
-      });
-      // simpler approach: also set attribute and patch getElementById once
-      primary = legacy;
-    }
+  function alias() {
+    var primary =
+      document.getElementById(PREFERRED) ||
+      document.getElementById('esa-ai-chatbot');
+    var legacy = document.getElementById(LEGACY);
+
+    if (!primary && legacy) primary = legacy;
 
     if (primary) {
       primary.setAttribute('aria-label', 'AI Chatbot Ingestion');
-      primary.classList.add('esa-ai-chatbot-root');
-      // Ensure integration can still find #esa-ingestion
-      if (!document.getElementById('esa-ingestion')) {
-        primary.setAttribute('id', 'esa-ingestion');
-        // visible name stays AI Chatbot Ingestion via aria-label
+      primary.classList.add('ai-chatbot-root');
+
+      // Legacy ESA.Ingestion.mount lookup → resolve to the preferred node
+      if (!legacy && primary.id !== LEGACY) {
+        var nativeGetById = document.getElementById.bind(document);
+        document.getElementById = function (id) {
+          return id === LEGACY ? primary : nativeGetById(id);
+        };
       }
     }
   }

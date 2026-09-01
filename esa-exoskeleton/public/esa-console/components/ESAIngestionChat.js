@@ -445,7 +445,7 @@ function ChatCard({ chat }) {
 
       <!-- top -->
       <div className="std-head">
-        <div className="std-brand"><span className="std-brand-tile">ESA</span> ESA INGESTION</div>
+        <div className="std-brand"><span className="std-brand-tile">AI</span> AI INGESTION</div>
         <span className="std-pill warm"><span className="std-dot flat"></span>ESA CONTENT ONLY</span>
       </div>
       <div className="std-title">Ingestion <em>Hub</em></div>
@@ -527,7 +527,8 @@ function DockVisualizer({ audio }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// DOCK — the bottom Ingestion Interface (floating prompt bar)
+// DOCK — AI Chatbot Ingestion (locked layout: prompt row + bottom row +
+// tall Lens column on the far right; speakers on each END of the bottom)
 // ─────────────────────────────────────────────────────────────────────
 
 const ADD_ACTIONS = [
@@ -606,6 +607,14 @@ function Dock({ chat, audio, onEmail }) {
     }
   };
 
+  // Agent voice chime — outbound speaker on the right END of the bottom row
+  const testVoice = () => {
+    if (!audio) return;
+    audio.triggerAvaVoice(523, 0.6, { duration: 0.22 });
+    setTimeout(() => audio.triggerAvaVoice(659, 0.6, { duration: 0.22 }), 220);
+    setTimeout(() => audio.triggerAvaVoice(784, 0.8, { duration: 0.4 }), 460);
+  };
+
   const handleAdd = (id) => {
     if (id === 'photo') activateLens();
     else if (id === 'file') { if (fileRef.current) fileRef.current.click(); }
@@ -633,84 +642,103 @@ function Dock({ chat, audio, onEmail }) {
         </div>
       ` : ''}
 
-      <div className="esa-dock">
-        <div className="esa-dock-side">
-          <${SoundPanel} side="left" audio=${audio} compact />
+      <div className="ai-dock-row">
+        <!-- Speaker LEFT — OUTSIDE the chatbot (inbound Sound I / mic) -->
+        <button
+          className=${`ai-speaker ai-speaker-left${micOn ? ' active' : ''}`}
+          onClick=${() => toggleMic()}
+          data-tip=${micOn ? 'Sound I — stop mic' : 'Sound I — mic'}
+          aria-pressed=${micOn ? 'true' : 'false'}
+        >🎤</button>
+
+        <div className="ai-shell">
+        <div className="ai-prompt-row">
+          <${DockVisualizer} audio=${audio} />
+          <input
+            type="text"
+            value=${chat.input}
+            onChange=${e => chat.setInput(e.target.value)}
+            onKeyDown=${e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); chat.send(); } }}
+            placeholder="Add… (SKU, part, or question)"
+            aria-label="AI Chatbot Ingestion prompt"
+          />
         </div>
 
-        <div className="esa-dock-bar">
-          <!-- Add menu -->
-          <button
-            className=${`esa-dock-btn${menu === 'add' ? ' add-open' : ''}`}
-            onClick=${() => setMenu(menu === 'add' ? null : 'add')}
-            title="Add"
-          >+</button>
-          ${menu === 'add' ? html`
-            <div className="esa-dock-pop">
-              ${ADD_ACTIONS.map(a => html`
-                <button key=${a.id} className="esa-dock-pop-item" onClick=${() => { setMenu(null); handleAdd(a.id); }}>
-                  <span className="esa-dock-pop-ico">${a.icon}</span>
-                  <span>
-                    <span style=${{ display: 'block', fontSize: '12px', color: '#e6e6e6' }}>${a.label}</span>
-                    <span style=${{ display: 'block', fontSize: '9px', color: '#6f6f6f', letterSpacing: '0.3px' }}>${a.sub}</span>
-                  </span>
-                </button>
-              `)}
+        <div className="ai-bottom">
+          <div className="ai-icon-dock">
+            <!-- Add menu -->
+            <div style=${{ position: 'relative', display: 'flex' }}>
+              <button
+                className=${`ai-tool${menu === 'add' ? ' add-open' : ''}`}
+                onClick=${() => setMenu(menu === 'add' ? null : 'add')}
+                data-tip="Add"
+                aria-expanded=${menu === 'add' ? 'true' : 'false'}
+              >+</button>
+              ${menu === 'add' ? html`
+                <div className="esa-dock-pop">
+                  ${ADD_ACTIONS.map(a => html`
+                    <button key=${a.id} className="esa-dock-pop-item" onClick=${() => { setMenu(null); handleAdd(a.id); }}>
+                      <span className="esa-dock-pop-ico">${a.icon}</span>
+                      <span>
+                        <span style=${{ display: 'block', fontSize: '12px', color: '#e6e6e6' }}>${a.label}</span>
+                        <span style=${{ display: 'block', fontSize: '9px', color: '#6f6f6f', letterSpacing: '0.3px' }}>${a.sub}</span>
+                      </span>
+                    </button>
+                  `)}
+                </div>
+              ` : ''}
             </div>
-          ` : ''}
 
-          <!-- Inspiration -->
-          <button
-            className=${`esa-dock-btn${menu === 'inspire' ? ' add-open' : ''}`}
-            onClick=${() => setMenu(menu === 'inspire' ? null : 'inspire')}
-            title="Inspiration — quick catalog prompts"
-          >✨</button>
-          ${menu === 'inspire' ? html`
-            <div className="esa-dock-pop">
-              ${QUICK_PROMPTS.map(p => html`
-                <button key=${p.label} className="esa-dock-pop-item" onClick=${() => runPrompt(p.text)}>
-                  <span className="esa-dock-pop-ico">${p.icon}</span>
-                  <span style=${{ color: '#e6e6e6' }}>${p.label}</span>
-                </button>
-              `)}
+            <!-- Inspiration -->
+            <div style=${{ position: 'relative', display: 'flex' }}>
+              <button
+                className=${`ai-tool${menu === 'inspire' ? ' add-open' : ''}`}
+                onClick=${() => setMenu(menu === 'inspire' ? null : 'inspire')}
+                data-tip="Inspiration — quick catalog prompts"
+                aria-expanded=${menu === 'inspire' ? 'true' : 'false'}
+              >✨</button>
+              ${menu === 'inspire' ? html`
+                <div className="esa-dock-pop">
+                  ${QUICK_PROMPTS.map(p => html`
+                    <button key=${p.label} className="esa-dock-pop-item" onClick=${() => runPrompt(p.text)}>
+                      <span className="esa-dock-pop-ico">${p.icon}</span>
+                      <span style=${{ color: '#e6e6e6' }}>${p.label}</span>
+                    </button>
+                  `)}
+                </div>
+              ` : ''}
             </div>
-          ` : ''}
 
-          <!-- Input + audio visualizer overlay -->
-          <div style=${{ position: 'relative', flex: 1, minWidth: 0 }}>
-            <${DockVisualizer} audio=${audio} />
-            <input
-              className="esa-dock-input"
-              type="text"
-              value=${chat.input}
-              onChange=${e => chat.setInput(e.target.value)}
-              onKeyDown=${e => { if (e.key === 'Enter') chat.send(); }}
-              placeholder="Add… (SKU, part, or question)"
-            />
+            <!-- Attach PDF / TXT -->
+            <button
+              className="ai-tool"
+              onClick=${() => { if (fileRef.current) fileRef.current.click(); }}
+              data-tip="Attach PDF / TXT"
+            >📎</button>
           </div>
 
-          <!-- Mic (Sound I) -->
+          <!-- Send — BOTTOM row only -->
           <button
-            className="esa-dock-btn"
-            onClick=${() => toggleMic()}
-            title=${micOn ? 'Stop microphone' : 'Sound I microphone'}
-            style=${{ background: micOn ? '#2a6f4e' : undefined, borderColor: micOn ? '#3f9a6c' : undefined, color: micOn ? '#ffffff' : undefined }}
-          >🎤</button>
-
-          <!-- Send -->
-          <button
-            className="esa-dock-send"
+            className="ai-send"
             onClick=${() => chat.send()}
             disabled=${!canSend}
-            title="Send"
+            aria-label="Send"
           >➤</button>
 
           <input ref=${fileRef} type="file" accept=".pdf,.txt" style=${{ display: 'none' }} onChange=${e => handleUpload(e)} />
         </div>
 
-        <div className="esa-dock-side">
-          <${SoundPanel} side="right" audio=${audio} compact />
+        <!-- Lens — tall column spanning TOP + BOTTOM -->
+        <button
+          className="ai-lens"
+          aria-label="Lens"
+          onClick=${() => activateLens()}
+          disabled=${busy}
+        >◉</button>
         </div>
+
+        <!-- Speaker RIGHT — OUTSIDE the chatbot (outbound agent voice) -->
+        <button className="ai-speaker ai-speaker-right" onClick=${testVoice} data-tip="Agent voice">🔊</button>
       </div>
 
       <div className="esa-dock-meta">

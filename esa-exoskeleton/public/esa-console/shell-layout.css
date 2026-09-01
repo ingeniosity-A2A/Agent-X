@@ -91,6 +91,7 @@
 }
 
 /* chat area owned by ai-chatbot-dock.css */
+#ai-chatbot,
 #esa-ai-chatbot,
 #esa-ingestion {
   grid-area: chat;

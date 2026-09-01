@@ -327,7 +327,7 @@ const WELCOME = {
 export function useESAChat() {
   const [messages, setMessages] = useState([WELCOME]);
   const [status, setStatus] = useState('ready'); // ready | submitting | streaming
-  const [input, setInput] = useState('');
+  const [input, setInputState] = useState('');
   const [attachments, setAttachments] = useState([]);
   const [catalogStatus, setCatalogStatus] = useState('idle');
   const [speakSignal, setSpeakSignal] = useState(0);
@@ -336,6 +336,14 @@ export function useESAChat() {
   const idRef = useRef(0);
   const inputRef = useRef('');
   const attachmentsRef = useRef([]);
+
+  // Keep the ref in sync so send()/Enter always see the typed text
+  // (mirrors useChat: input state and submit read the same source).
+  const setInput = useCallback((value) => {
+    const next = typeof value === 'function' ? value(inputRef.current) : value;
+    inputRef.current = String(next ?? '');
+    setInputState(inputRef.current);
+  }, []);
 
   const nextId = () => `esa-msg-${++idRef.current}`;
 
