@@ -1,26 +1,14 @@
-/* AI Chatbot Ingestion — Bento beige/green/black
+/* AI Chatbot Ingestion — speakers on each end, Bento beige/green/black
  *
- *   🔊  ┌──────────────────────────┬────────┐  🔊
- *       │  typing / input          │        │
- *       ├──────────────────────────┤  LENS  │  ← Lens spans TOP + BOTTOM
- *       │  [icons…] [➤]            │        │  ← Send on BOTTOM row
- *       └──────────────────────────┴────────┘
+ *  [ SPEAKER L ]  [ prompt + tools + send + lens ]  [ SPEAKER R ]
  *
- * Contract (docs/ESA-LAYOUT-CONTRACT.md):
- *   - One unified AI Chatbot Ingestion dock — no "esa" in product titles.
- *   - Lens = tall column on the far right (spans prompt + bottom rows).
- *   - Send = bottom row only, with the icon dock.
- *   - Icons = bottom-left under the input, with tooltips.
- *   - Two speakers OUTSIDE the chatbot — one bookend on each side of the
- *     shell (left = inbound Sound I / mic, right = outbound agent voice).
- *
- * Page placement (grid-area: chat) is owned by shell-layout.css; this file
- * only styles the dock surface and its children, so it can be wired into
- * any host grid (index.html workspace included) without layout surprises.
+ * Pattern aligned with AI Elements PromptInput + dual audio ends.
+ * https://elements.ai-sdk.dev/examples/chatbot
  */
 
-#ai-chatbot,
+#esa-ai-chatbot,
 #esa-ingestion {
+  grid-area: chat;
   position: relative;
   z-index: 40;
   border-top: 1px solid var(--esa-line, rgba(244, 244, 238, 0.12));
@@ -31,303 +19,163 @@
   padding: 10px 12px 12px;
 }
 
-/* Speakers bookend the chatbot from the OUTSIDE — shell sits between them */
-.ai-dock-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 12px;
-  max-width: 1040px;
-  margin: 0 auto;
+.esa-dock-wrap {
   width: 100%;
-}
-
-.ai-shell {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: auto auto;
-  grid-template-areas:
-    "prompt lens"
-    "bottom lens";
-  gap: 8px 10px;
-  max-width: 920px;
+  max-width: 1100px;
   margin: 0 auto;
-  width: 100%;
-  align-items: stretch;
-}
-
-/* TOP: input only */
-.ai-prompt-row {
-  grid-area: prompt;
   position: relative;
+}
+
+/* Three-column: left speaker | bar | right speaker */
+.esa-dock {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+
+/* SPEAKERS — one on each end (always visible) */
+.esa-dock-side,
+.esa-speaker-end {
+  flex: 0 0 auto;
+  width: 120px;
+  min-width: 88px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.esa-dock-bar {
+  flex: 1;
+  max-width: 720px;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 0;
   background: rgba(18, 18, 18, 0.98);
   border: 1px solid var(--esa-line, rgba(244, 244, 238, 0.12));
   border-radius: 999px;
-  padding: 6px 12px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
-}
-
-.ai-prompt-row input,
-.ai-prompt-row textarea {
+  padding: 8px 10px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
   position: relative;
-  z-index: 1; /* above the audio visualizer overlay */
-  flex: 1;
-  min-width: 0;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: var(--esa-beige, #f4f4ee);
-  font-size: 14px;
-  padding: 8px 4px;
-  resize: none;
 }
 
-.ai-prompt-row input::placeholder,
-.ai-prompt-row textarea::placeholder {
-  color: var(--esa-beige-muted, rgba(244, 244, 238, 0.45));
-}
-
-/* BOTTOM: icon dock (left) + Send */
-.ai-bottom {
-  grid-area: bottom;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 8px;
-  min-width: 0;
-}
-
-.ai-toolbar,
-.ai-icon-dock {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 6px;
-  flex-wrap: nowrap;
-  overflow: visible;
-  scroll-snap-type: none;
-  flex: 1;
-  min-width: 0;
-  padding: 0;
-  margin: 0;
-}
-
-/* Send sits on the BOTTOM row (with icons), pushed toward the Lens side */
-.ai-send {
-  flex: none;
-  width: 40px;
-  height: 40px;
+.esa-dock-btn {
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  border: 1px solid var(--esa-line, rgba(244, 244, 238, 0.14));
-  background: var(--esa-beige, #f4f4ee);
-  color: var(--esa-black, #0a0a0a);
-  cursor: pointer;
-  display: inline-flex;
+  border: 1px solid #2e2e2e;
+  background: #1d1d1d;
+  color: var(--esa-beige, #f4f4ee);
+  font-size: 15px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  margin-left: auto;
+  cursor: pointer;
+  flex: none;
 }
 
-.ai-send:disabled {
+.esa-dock-btn:hover {
+  background: #2a2a2a;
+  border-color: var(--esa-green, #7ec8a0);
+  color: var(--esa-green, #7ec8a0);
+}
+
+.esa-dock-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--esa-beige, #f4f4ee);
+  font-size: 13px;
+  padding: 10px 4px;
+}
+
+.esa-dock-input::placeholder {
+  color: rgba(244, 244, 238, 0.4);
+}
+
+.esa-dock-send,
+.esa-ai-send {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: var(--esa-beige, #f4f4ee);
+  color: #0a0a0a;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex: none;
+}
+
+.esa-dock-send:disabled,
+.esa-ai-send:disabled {
   opacity: 0.35;
   cursor: not-allowed;
 }
 
-.ai-send:hover:not(:disabled) {
+.esa-dock-send:hover:not(:disabled),
+.esa-ai-send:hover:not(:disabled) {
   background: var(--esa-green, #7ec8a0);
-  border-color: var(--esa-green, #7ec8a0);
 }
 
-/* Big Lens — spans TOP + BOTTOM (full shell height) */
-.ai-lens {
-  grid-area: lens;
-  align-self: stretch;
-  width: 64px;
-  min-height: 96px;
-  border-radius: 16px;
-  border: 1px solid var(--esa-line-strong, rgba(126, 200, 160, 0.35));
-  background: linear-gradient(160deg, #1a1a1a 0%, #0a0a0a 100%);
-  color: var(--esa-green, #7ec8a0);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  box-shadow:
-    0 0 0 1px rgba(126, 200, 160, 0.12),
-    0 8px 24px rgba(0, 0, 0, 0.45);
-  transition: transform 0.12s, box-shadow 0.15s, border-color 0.15s;
+/* Big Lens — right of Send, before right speaker */
+.esa-ai-lens {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(126, 200, 160, 0.35) !important;
+  color: var(--esa-green, #7ec8a0) !important;
+  background: linear-gradient(160deg, #1a1a1a, #0a0a0a) !important;
+  font-size: 20px !important;
 }
 
-.ai-lens:hover {
-  transform: scale(1.02);
-  border-color: var(--esa-green, #7ec8a0);
-  box-shadow: 0 0 24px rgba(126, 200, 160, 0.28);
+.esa-ai-lens:hover {
+  box-shadow: 0 0 18px rgba(126, 200, 160, 0.25);
 }
 
-.ai-lens:active {
-  transform: scale(0.98);
-}
-
-.ai-lens:disabled {
-  opacity: 0.5;
-  cursor: wait;
-}
-
-/* Icon buttons + tooltips */
-.ai-toolbar button,
-.ai-icon-dock button,
-.ai-tool {
-  position: relative;
-  flex: 0 0 auto;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid var(--esa-line, rgba(244, 244, 238, 0.12));
-  background: var(--esa-black-3, #1a1a1a);
-  color: var(--esa-beige, #f4f4ee);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  user-select: none;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
-}
-
-.ai-toolbar button:hover,
-.ai-icon-dock button:hover,
-.ai-tool:hover {
-  background: #222;
-  border-color: var(--esa-green, #7ec8a0);
-  color: var(--esa-green, #7ec8a0);
-}
-
-/* Speakers — OUTSIDE the chatbot, one bookend on each side.
-   Left = inbound (Sound I / mic), right = outbound (agent voice).
-   .active marks an open channel (mic live / voice speaking). */
-.ai-speaker {
-  position: relative;
-  flex: none;
-  align-self: center;
-  width: 44px;
-  min-height: 72px;
-  border-radius: 12px;
-  border: 1px solid var(--esa-line, rgba(244, 244, 238, 0.12));
-  background: var(--esa-black-3, #1a1a1a);
-  color: var(--esa-beige, #f4f4ee);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  cursor: pointer;
-  user-select: none;
-  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.15s;
-}
-
-.ai-speaker:hover {
-  background: #222;
-  border-color: var(--esa-green, #7ec8a0);
-  color: var(--esa-green, #7ec8a0);
-  transform: scale(1.03);
-}
-
-.ai-speaker:active {
-  transform: scale(0.97);
-}
-
-.ai-speaker.active {
-  background: rgba(126, 200, 160, 0.15);
-  border-color: var(--esa-green, #7ec8a0);
-  color: var(--esa-green, #7ec8a0);
-  box-shadow: 0 0 12px rgba(126, 200, 160, 0.25);
-}
-
-/* Tooltips (icon dock + speakers) */
-.ai-toolbar button[data-tip]::after,
-.ai-icon-dock button[data-tip]::after,
-.ai-tool[data-tip]::after,
-.ai-speaker[data-tip]::after {
-  content: attr(data-tip);
+.esa-dock-pop {
   position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--esa-black, #0a0a0a);
-  background: var(--esa-beige, #f4f4ee);
-  border-radius: 6px;
-  padding: 4px 8px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.12s;
+  bottom: calc(100% + 12px);
+  left: 0;
+  min-width: 250px;
+  background: #1a1a1a;
+  border: 1px solid #2c2c2c;
+  border-radius: 14px;
+  padding: 6px;
   z-index: 50;
 }
 
-.ai-toolbar button[data-tip]:hover::after,
-.ai-toolbar button[data-tip]:focus-visible::after,
-.ai-icon-dock button[data-tip]:hover::after,
-.ai-icon-dock button[data-tip]:focus-visible::after,
-.ai-tool[data-tip]:hover::after,
-.ai-tool[data-tip]:focus-visible::after,
-.ai-speaker[data-tip]:hover::after,
-.ai-speaker[data-tip]:focus-visible::after {
-  opacity: 1;
-}
-
-/* Popup menus anchored above their trigger inside the icon dock */
-.ai-icon-dock .esa-dock-pop {
-  left: 0;
-}
-
-/* Chat thread card lives in the stage ("one card above chat", per the
-   layout contract). It is hidden ONLY when a host explicitly merges it
-   away — never unconditionally, or the chatbot ships without messages. */
-#esa-ingestion-chat-card.esa-merged-away,
-#ai-ingestion-chat-card.ai-merged-away {
-  display: none !important;
+.esa-dock-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 8.5px;
+  letter-spacing: 1px;
+  color: #5f5f5f;
+  padding: 8px 10px 0;
 }
 
 #esa-ingestion-chat-card {
-  min-height: 420px;
+  display: none !important;
 }
 
-@media (max-width: 768px) {
-  #ai-chatbot,
-  #esa-ingestion {
-    position: sticky;
-    bottom: 0;
-    padding-bottom: max(12px, env(safe-area-inset-bottom));
+/* Mobile: keep both speakers, shrink width */
+@media (max-width: 900px) {
+  .esa-dock-side,
+  .esa-speaker-end {
+    display: flex !important;
+    width: 64px;
+    min-width: 56px;
   }
 
-  #esa-ingestion-chat-card {
-    min-height: 320px;
-  }
-
-  .ai-lens {
-    width: 56px;
-    min-height: 88px;
-    font-size: 24px;
-  }
-
-  .ai-dock-row {
-    gap: 8px;
-  }
-
-  .ai-speaker {
-    width: 36px;
-    min-height: 56px;
-    font-size: 16px;
-    border-radius: 10px;
+  .esa-dock-bar {
+    max-width: 100%;
   }
 }
