@@ -3,8 +3,12 @@
  * ============================================
  * PTAC DIAGNOSTIC SERVICE PANEL
  * 
- * CRITICAL FIX: All ${} removed from style attributes!
- * Dynamic styling now via post-mount DOM manipulation only.
+ * FIX 1: All ${} removed from style attributes (hardcoded styles only).
+ * FIX 2: Template root <div> is now properly closed — Arrow.js threw
+ *        "Invalid HTML position" on the unbalanced template.
+ * FIX 3: Module-scope `methods` binding — scanForCodes and the post-mount
+ *        block call methods.* which previously threw "methods is not defined".
+ * Dynamic styling via post-mount DOM manipulation only.
  */
 
 import { reactive, html } from 'https://esm.sh/@arrow-js/core';
@@ -31,6 +35,11 @@ const PTAC_DIAGNOSTICS = {
   'HP': { status: 'High Pressure', severity: 'critical', voice: 'High pressure switch tripped.', warranty: true },
   'UR': { status: 'Voltage Range Fault', severity: 'critical', voice: 'Voltage out of acceptable range.', warranty: false }
 };
+
+// Module-scope methods binding. Assigned right after the component below is
+// created; the wrapper now exposes .methods. Lets methods call each other
+// (methods.speak) and lets the post-mount block reach them.
+let methods = null;
 
 export const ESADiagnosticCard = ESAVerifyComponent({
   name: 'DiagnosticCard',
@@ -203,7 +212,7 @@ export const ESADiagnosticCard = ESAVerifyComponent({
   template: (props, state, methods) => html`
     <div class="esa-diagnostic-card" style="position: relative; width: 100%; max-width: 600px; margin: 20px auto;">
       <div style="position: relative; background: #32302f; border: 2px solid #3c3836; border-radius: 12px; overflow: hidden; transition: all 0.4s ease; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);">
-        <!-- Header - HARDCODED transform, will be updated via DOM -->
+        
         <div
           id="esa-diag-header"
           style="background: linear-gradient(135deg, #458588, #b16286); color: #ebdbb2; padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;"
@@ -218,10 +227,10 @@ export const ESADiagnosticCard = ESAVerifyComponent({
           <div id="esa-diag-header-arrow" style="transition: transform 0.3s ease;">▼</div>
         </div>
         
-        <!-- Sliding Content - HARDCODED max-height/opacity, updated via DOM -->
+        
         <div id="esa-diag-content" style="max-height: 0; opacity: 0; transition: all 0.4s ease; overflow: hidden;">
           <div style="padding: 20px;">
-            <!-- Scan Button -->
+            
             <button
               id="esa-scan-btn"
               style="width: 100%; padding: 16px; background: #98971a; color: #282828; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer;"
@@ -229,7 +238,7 @@ export const ESADiagnosticCard = ESAVerifyComponent({
               🔍 SCAN FOR DIAGNOSTIC CODES
             </button>
             
-            <!-- Manual Code Entry -->
+            
             <div style="margin-top: 16px; display: flex; gap: 8px;">
               <input
                 type="text"
@@ -247,12 +256,16 @@ export const ESADiagnosticCard = ESAVerifyComponent({
             </div>
           </div>
           
-          <!-- Results Panel - Rendered dynamically via DOM -->
+          
           <div id="esa-diag-results" style="padding: 0 20px 20px;"></div>
         </div>
       </div>
+    </div>
     `
 });
+
+// Bind the component's methods for scanForCodes + the post-mount block below
+methods = ESADiagnosticCard.methods;
 
 // Setup event listeners after mount
 const origDiagMount = ESADiagnosticCard.mount;

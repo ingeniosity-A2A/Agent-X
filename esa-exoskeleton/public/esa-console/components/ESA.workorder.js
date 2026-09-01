@@ -3,8 +3,13 @@
  * ============================================
  * UNIFIED MAINTENANCE WORKORDER SYSTEM
  * 
- * CRITICAL FIX: All ${} removed from style attributes!
- * Dynamic styling now via post-mount DOM manipulation only.
+ * FIX 1: All ${} removed from style attributes (hardcoded styles only).
+ * FIX 2: Template root <div> is now properly closed — Arrow.js threw
+ *        "Invalid HTML position" on the unbalanced template.
+ * FIX 3: Module-scope `methods` binding — the helpers (renderPartsList,
+ *        renderCatalog, updateCostDisplay) and post-mount listeners call
+ *        methods.* which previously threw "methods is not defined".
+ * Dynamic styling via post-mount DOM manipulation only.
  */
 
 import { reactive, html } from 'https://esm.sh/@arrow-js/core';
@@ -25,6 +30,11 @@ const G = {
   border: '#3c3836',
   fg_soft: '#a89984'
 };
+
+// Module-scope methods binding. Assigned right after the component below is
+// created; the wrapper now exposes .methods. Lets the module-scope helpers
+// (renderPartsList, renderCatalog, updateCostDisplay, ...) reach the methods.
+let methods = null;
 
 export const ESAWorkorder = ESAVerifyComponent({
   name: 'workorder',
@@ -159,7 +169,7 @@ export const ESAWorkorder = ESAVerifyComponent({
       border-radius: 12px;
       overflow: hidden;
     ">
-      <!-- Side Navigation -->
+      
       <div style="
         width: 220px;
         background: #32302f;
@@ -173,7 +183,7 @@ export const ESAWorkorder = ESAVerifyComponent({
           <div id="wo-id-display" style="font-size: 11px; color: #a89984;">${() => state.workorderId}</div>
         </div>
         
-        <!-- Side Tabs - HARDCODED styles, active state via DOM -->
+        
         <button class="wo-side-tab" data-tab="workorder" style="
           width: 100%;
           padding: 14px 20px;
@@ -230,7 +240,7 @@ export const ESAWorkorder = ESAVerifyComponent({
           transition: all 0.2s;
         ">📜 History</button>
         
-        <!-- Status Indicator -->
+        
         <div style="margin-top: auto; padding: 20px;">
           <div id="wo-status-badge" style="
             padding: 12px;
@@ -246,15 +256,15 @@ export const ESAWorkorder = ESAVerifyComponent({
         </div>
       </div>
       
-      <!-- Main Content -->
+      
       <div style="flex: 1; padding: 24px; overflow-y: auto;">
         
-        <!-- WORKORDER TAB -->
+        
         <div class="wo-tab-panel" data-panel="workorder" id="wo-panel-workorder" style="display: block;">
           <div style="max-width: 800px;">
             <h2 style="color: #d79921; margin-bottom: 24px;">Workorder Details</h2>
             
-            <!-- Unit Information -->
+            
             <div style="
               background: #32302f;
               border: 1px solid #3c3836;
@@ -283,7 +293,7 @@ export const ESAWorkorder = ESAVerifyComponent({
               </div>
             </div>
             
-            <!-- Parts Used -->
+            
             <div style="
               background: #32302f;
               border: 1px solid #3c3836;
@@ -307,7 +317,7 @@ export const ESAWorkorder = ESAVerifyComponent({
                 >+ ADD PART</button>
               </div>
               
-              <!-- Parts Catalog (toggleable) -->
+              
               <div id="wo-parts-catalog" style="
                 margin-bottom: 16px;
                 padding: 16px;
@@ -320,10 +330,10 @@ export const ESAWorkorder = ESAVerifyComponent({
                 <div id="wo-catalog-list" style="display: grid; gap: 8px;"></div>
               </div>
               
-              <!-- Parts List Container -->
+              
               <div id="wo-parts-list" style="display: grid; gap: 12px;"></div>
               
-              <!-- Cost Summary -->
+              
               <div style="
                 margin-top: 20px;
                 padding-top: 16px;
@@ -347,7 +357,7 @@ export const ESAWorkorder = ESAVerifyComponent({
               </div>
             </div>
             
-            <!-- Notes & Completion -->
+            
             <div style="
               background: #32302f;
               border: 1px solid #3c3836;
@@ -429,13 +439,13 @@ export const ESAWorkorder = ESAVerifyComponent({
           </div>
         </div>
         
-        <!-- PARTS TAB -->
+        
         <div class="wo-tab-panel" data-panel="parts" id="wo-panel-parts" style="display: none;">
           <h2 style="color: #d79921; margin-bottom: 24px;">Parts Inventory</h2>
           <div id="wo-parts-inventory" style="display: grid; gap: 12px;"></div>
         </div>
         
-        <!-- DIAGNOSTICS TAB -->
+        
         <div class="wo-tab-panel" data-panel="diagnostics" id="wo-panel-diagnostics" style="display: none;">
           <h2 style="color: #d79921; margin-bottom: 24px;">Diagnostic Codes</h2>
           <div style="
@@ -488,15 +498,19 @@ export const ESAWorkorder = ESAVerifyComponent({
           </div>
         </div>
         
-        <!-- HISTORY TAB -->
+        
         <div class="wo-tab-panel" data-panel="history" id="wo-panel-history" style="display: none;">
           <h2 style="color: #d79921; margin-bottom: 24px;">Workorder History</h2>
           <div id="wo-history-list" style="display: grid; gap: 12px;"></div>
         </div>
         
       </div>
+    </div>
     `
 });
+
+// Bind the component's methods for the helpers + post-mount block below
+methods = ESAWorkorder.methods;
 
 // Global reference for DOM updates
 let container = null;

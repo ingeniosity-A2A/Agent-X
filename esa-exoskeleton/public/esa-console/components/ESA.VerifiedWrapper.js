@@ -105,6 +105,13 @@ export function ESAVerifyComponent(config) {
     state: componentState,
     
     /**
+     * Expose the methods object so module-scope helpers and post-mount
+     * code can call component methods without an import cycle
+     * (fixes 'methods is not defined' in card post-mount blocks)
+     */
+    methods,
+    
+    /**
      * Mark as verified
      */
     ESAVerify: () => {
