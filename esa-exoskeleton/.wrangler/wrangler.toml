@@ -1,5 +1,4 @@
 name = "esa-exoskeleton"
-main = "workers/index.js"
 compatibility_date = "2024-01-01"
 
 # Pages deployment (static site)

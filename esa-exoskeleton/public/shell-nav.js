@@ -30,11 +30,11 @@
     const head = document.createElement('button');
     head.type = 'button';
     head.className = 'esa-service-head';
-    head.setAttribute('aria-expanded', 'true');
+    head.setAttribute('aria-expanded', 'false');
     head.innerHTML = '<span>ESA</span><span aria-hidden="true">▾</span>';
 
     const tree = document.createElement('div');
-    tree.className = 'esa-card-tree open';
+    tree.className = 'esa-card-tree';
     tree.setAttribute('role', 'listbox');
     tree.setAttribute('aria-label', 'Card types');
 
@@ -48,17 +48,11 @@
       tree.appendChild(btn);
     });
 
-    // Keep log output under the tree if present
-    const log = $('#esa-console-output', aside);
+    // The console sidebar is gone — this nav IS the left rail:
+    // ESA title (click → dropdown) → card renders in the viewport.
     aside.innerHTML = '';
     aside.appendChild(head);
     aside.appendChild(tree);
-    if (log) {
-      log.style.marginTop = '12px';
-      log.style.fontSize = '11px';
-      log.style.opacity = '0.7';
-      aside.appendChild(log);
-    }
 
     head.addEventListener('click', () => {
       const open = head.getAttribute('aria-expanded') === 'true';
@@ -74,6 +68,9 @@
       tree.querySelectorAll('button').forEach((b) => {
         b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
       });
+      // Dropdown collapses once a card is chosen
+      head.setAttribute('aria-expanded', 'false');
+      tree.classList.remove('open');
     });
 
     return aside;

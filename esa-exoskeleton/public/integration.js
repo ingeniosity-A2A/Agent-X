@@ -83,150 +83,15 @@ async function initESAExoskeleton() {
   };
 
   // ============================================
-  // 1. ESA CONSOLE (left sidebar — scene/layers panel style)
+  // 1. LOG — the console sidebar is gone (agent-browser shell:
+  //    left nav | viewport | bottom chat). ESA.log stays API-compatible
+  //    as an in-memory ring buffer so every component can keep calling it.
   // ============================================
-  const consoleBox = document.getElementById('esa-console');
-  const consoleOutput = document.getElementById('esa-console-output');
-  if (consoleBox && consoleOutput) {
-    // Header — icon + title + subtitle + chevron
-    const header = document.createElement('div');
-    header.className = 'esa-console-header';
-    header.innerHTML =
-      '<div class="esa-console-logo">✦</div>' +
-      '<div><div class="esa-console-title">ESA Console</div>' +
-      '<div class="esa-console-subtitle">Hotel maintenance · Ava007 voice</div></div>' +
-      '<span class="esa-console-chevron">⌄</span>';
-
-    // Segmented toggle — Console / Library
-    const toggle = document.createElement('div');
-    toggle.className = 'esa-console-toggle';
-    const btnConsole = document.createElement('button');
-    btnConsole.textContent = 'Console';
-    const btnLibrary = document.createElement('button');
-    btnLibrary.textContent = 'Library';
-    toggle.appendChild(btnConsole);
-    toggle.appendChild(btnLibrary);
-
-    // Library pane (rendering cards), hidden until the Library tab is active
-    const libPane = document.createElement('div');
-    libPane.className = 'esa-lib-pane';
-    const libList = document.createElement('div');
-    libPane.appendChild(libList);
-
-    // Search footer
-    const search = document.createElement('div');
-    search.className = 'esa-console-search';
-    const searchIcon = document.createElement('span');
-    searchIcon.textContent = '🔍';
-    const searchInput = document.createElement('input');
-    searchInput.placeholder = 'Search…';
-    search.appendChild(searchIcon);
-    search.appendChild(searchInput);
-
-    consoleBox.appendChild(header);
-    consoleBox.appendChild(toggle);
-    consoleBox.appendChild(consoleOutput);
-    consoleBox.appendChild(libPane);
-    consoleBox.appendChild(search);
-
-    // ---- log rendering ----
-    const LOG_ICONS = { info: '·', success: '✓', error: '✕', warning: '▲' };
-    const LOG_COLORS = {
-      info: '#3a332b',
-      success: '#5b8c5a',
-      error: '#c0392b',
-      warning: '#a8742a'
-    };
-    let logFilter = '';
-
-    const applyFilter = () => {
-      const term = logFilter;
-      consoleOutput.querySelectorAll('.esa-log-row').forEach(row => {
-        row.style.display = !term || row.textContent.toLowerCase().includes(term) ? '' : 'none';
-      });
-      libList.querySelectorAll('.esa-lib-row').forEach(row => {
-        row.style.display = !term || row.textContent.toLowerCase().includes(term) ? '' : 'none';
-      });
-    };
-
-    const setView = (view) => {
-      const isConsole = view === 'console';
-      btnConsole.classList.toggle('active', isConsole);
-      btnLibrary.classList.toggle('active', !isConsole);
-      consoleOutput.style.display = isConsole ? '' : 'none';
-      libPane.style.display = isConsole ? 'none' : '';
-    };
-    btnConsole.addEventListener('click', () => setView('console'));
-    btnLibrary.addEventListener('click', () => setView('library'));
-    setView('console');
-
-    searchInput.addEventListener('input', () => {
-      logFilter = searchInput.value.trim().toLowerCase();
-      applyFilter();
-    });
-
-    window.ESA.log = (msg, type = 'info') => {
-      const row = document.createElement('div');
-      row.className = 'esa-log-row';
-      const icon = document.createElement('span');
-      icon.className = 'esa-log-icon';
-      icon.textContent = LOG_ICONS[type] || LOG_ICONS.info;
-      icon.style.color = LOG_COLORS[type] || LOG_COLORS.info;
-      const time = document.createElement('span');
-      time.className = 'esa-log-time';
-      time.textContent = new Date().toLocaleTimeString([], { hour12: false });
-      const text = document.createElement('span');
-      text.className = 'esa-log-msg';
-      text.textContent = msg;
-      text.style.color = LOG_COLORS[type] || LOG_COLORS.info;
-      row.appendChild(icon);
-      row.appendChild(time);
-      row.appendChild(text);
-      consoleOutput.appendChild(row);
-      consoleOutput.scrollTop = consoleOutput.scrollHeight;
-      while (consoleOutput.children.length > 300) {
-        consoleOutput.removeChild(consoleOutput.firstChild);
-      }
-      applyFilter();
-    };
-
-    // Library view — every rendering card is a scene item
-    const MODULES = [
-      { id: 'esa-ingestion-chat-card', badge: 'A', badgeBg: '#2a6f4e', name: 'AI Ingestion Chat', sub: 'React · communication hub' },
-      { id: 'esa-diagnostics', badge: 'D', badgeBg: '#5b8def', name: 'Diagnostic', sub: 'Arrow · systems check' },
-      { id: 'esa-parts-card', badge: 'P', badgeBg: '#c9a227', name: 'Broadcast Parts', sub: 'Arrow · HD Supply' },
-      { id: 'esa-workorder', badge: 'W', badgeBg: '#b05a5a', name: 'Workorder System', sub: 'Arrow · dispatch' },
-      { id: 'esa-maintenance-checklist', badge: 'T', badgeBg: '#3a9db8', name: 'Daily To-Do List', sub: 'React · SOP checklist' }
-    ];
-
-    const buildLibrary = () => {
-      libList.innerHTML = '';
-      MODULES.forEach(mod => {
-        const el = document.getElementById(mod.id);
-        const mounted = !!el && el.children.length > 0;
-        const row = document.createElement('div');
-        row.className = 'esa-lib-row';
-        row.innerHTML =
-          `<div class="esa-lib-badge" style="background:${mod.badgeBg}">${mod.badge}</div>` +
-          `<div><div class="esa-lib-name">${mod.name}</div>` +
-          `<div class="esa-lib-sub">${mounted ? '✓ mounted · ' : ''}${mod.sub}</div></div>`;
-        row.addEventListener('click', () => {
-          if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            libList.querySelectorAll('.esa-lib-row').forEach(r => r.classList.remove('active'));
-            row.classList.add('active');
-          }
-        });
-        libList.appendChild(row);
-      });
-      applyFilter();
-    };
-
-    // Exposed so the mount phase can refresh the library after components land
-    window.ESA._console = { setView, buildLibrary, applyFilter };
-
-    window.ESA.log('ESA EXOSKELETON v' + window.ESA.version + ' — console online', 'success');
-  }
+  window.ESA.log = (msg, type = 'info') => {
+    window.ESA.logBuffer = window.ESA.logBuffer || [];
+    window.ESA.logBuffer.push({ msg, type, t: Date.now() });
+    if (window.ESA.logBuffer.length > 300) window.ESA.logBuffer.shift();
+  };
 
   // ============================================
   // LOAD COMPONENTS
@@ -423,12 +288,22 @@ async function initESAExoskeleton() {
     bar.appendChild(label);
 
     let cursor = 0;
-    const cards = () => CARD_IDS.map(id => document.getElementById(id)).filter(el => el && el.children.length > 0);
+    // Cards live one-per-viewport in the agent-browser shell; the merged-away
+    // chat card (dock owns chat) is not part of the cycle.
+    const cards = () => CARD_IDS
+      .filter(id => id !== 'esa-ingestion-chat-card')
+      .map(id => document.getElementById(id))
+      .filter(el => el && el.children.length > 0);
     const jump = dir => {
       const list = cards();
       if (!list.length) return;
       cursor = (cursor + dir + list.length) % list.length;
-      list[cursor].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const target = list[cursor];
+      if (window.ESAShell && typeof window.ESAShell.showCard === 'function') {
+        window.ESAShell.showCard(target.id);
+      } else {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     };
     prev.addEventListener('click', () => jump(-1));
     next.addEventListener('click', () => jump(1));
@@ -438,10 +313,6 @@ async function initESAExoskeleton() {
       refresh: () => { label.textContent = `${cards().length} MODULES · RENDERING VIEW`; }
     };
     window.ESA._toolbar.refresh();
-  }
-
-  if (window.ESA._console && typeof window.ESA._console.buildLibrary === 'function') {
-    window.ESA._console.buildLibrary();
   }
 
   // Tell the shell navigator (shell-nav.js) all cards are mounted, so it can
@@ -481,7 +352,7 @@ async function initESAExoskeleton() {
   // 7. GSAP ANIMATIONS (subtle entrance)
   try {
     if (typeof gsap !== 'undefined') {
-      gsap.from('#esa-console', { duration: 0.5, opacity: 0, x: -16, ease: 'power2.out' });
+      gsap.from('#esa-service-nav', { duration: 0.5, opacity: 0, x: -16, ease: 'power2.out' });
       gsap.from('#esa-ingestion-chat-card', { duration: 0.5, opacity: 0, y: 20, ease: 'power2.out' });
       gsap.from('#esa-diagnostics', { duration: 0.5, opacity: 0, y: 20, delay: 0.1, ease: 'power2.out' });
       gsap.from('#esa-parts-card', { duration: 0.5, opacity: 0, y: 20, delay: 0.15, ease: 'power2.out' });
