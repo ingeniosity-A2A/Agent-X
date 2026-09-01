@@ -1,0 +1,13 @@
+# Cloudflare Pages — build configuration from source.
+# When this file exists at the repo root with pages_build_output_dir,
+# Cloudflare Pages reads it INSTEAD of the dashboard build settings,
+# so the output directory can never drift again.
+# Docs: https://developers.cloudflare.com/pages/configuration/wrangler-configuration/
+#
+# Project = static shell (no framework, no build step):
+#   Framework preset : None   |   Build command: (empty)
+#   Output is published as-is from the single UI root below.
+
+name = "esa-exoskeleton"
+compatibility_date = "2026-01-01"
+pages_build_output_dir = "esa-exoskeleton/public"
