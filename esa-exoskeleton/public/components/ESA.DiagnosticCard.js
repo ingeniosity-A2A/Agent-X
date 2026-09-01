@@ -1,14 +1,20 @@
 /**
- * ESA.DiagnosticCard.js (Arrow.js Compatible - FULLY FIXED)
+ * ESA.DiagnosticCard.js — BENTO EDITION
  * ============================================
- * PTAC DIAGNOSTIC SERVICE PANEL
- * 
- * FIX 1: All ${} removed from style attributes (hardcoded styles only).
- * FIX 2: Template root <div> is now properly closed — Arrow.js threw
- *        "Invalid HTML position" on the unbalanced template.
- * FIX 3: Module-scope `methods` binding — scanForCodes and the post-mount
- *        block call methods.* which previously threw "methods is not defined".
- * Dynamic styling via post-mount DOM manipulation only.
+ * PTAC DIAGNOSTIC SERVICE PANEL — official Bento card.
+ *
+ * One framework: Bento (docs/BENTO-OFFICIAL-UI.md).
+ * Structure:  .bento-card > .bento-demo (scan viewport) + .bento-text
+ * Tokens:     --bk-* (bento-tokens.css) — Beige · Green · Black.
+ * Polish:     punch-border + gradient-mask-btn (v6-exoskel-polish.css).
+ *
+ * Contract kept identical for integration.js + shell-nav.js:
+ *   - .mount(container)  (ESAVerifyComponent wrapper)
+ *   - esa:diagnostic hub event
+ *   - Ava007 voice (speechSynthesis + DynamicAudioBroadcaster)
+ *
+ * Arrow.js rules honored: no HTML comments inside html`` templates,
+ * no ${} inside style attributes (static classes + post-mount DOM only).
  */
 
 import { reactive, html } from 'https://esm.sh/@arrow-js/core';
@@ -36,90 +42,80 @@ const PTAC_DIAGNOSTICS = {
   'UR': { status: 'Voltage Range Fault', severity: 'critical', voice: 'Voltage out of acceptable range.', warranty: false }
 };
 
-// Module-scope methods binding. Assigned right after the component below is
-// created; the wrapper now exposes .methods. Lets methods call each other
-// (methods.speak) and lets the post-mount block reach them.
+// Module-scope methods binding (wrapper exposes .methods). Lets scanForCodes
+// and the post-mount block call methods.* without an import cycle.
 let methods = null;
 
 export const ESADiagnosticCard = ESAVerifyComponent({
   name: 'DiagnosticCard',
-  version: '1.0.1',
+  version: '3.0.0',
   verified: true,
-  
+
   state: {
-    isSlidOpen: false,
     diagnosticCode: '',
     detectedCode: null,
     voiceEnabled: true,
     audioEngine: null,
     scanning: false
   },
-  
+
   methods: {
     initAudio: (state) => {
       if (!state.audioEngine) {
         state.audioEngine = new DynamicAudioBroadcaster();
       }
     },
-    
+
     speak: (state, text) => {
       if (!state.voiceEnabled) return;
-      
+
       if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.rate = 0.9;
         utterance.pitch = 1.1;
-        
+
         const voices = speechSynthesis.getVoices();
-        const femaleVoice = voices.find(v => 
-          v.name.includes('Zira') || 
-          v.name.includes('Samantha') || 
+        const femaleVoice = voices.find(v =>
+          v.name.includes('Zira') ||
+          v.name.includes('Samantha') ||
           v.name.includes('Female')
         );
         if (femaleVoice) {
           utterance.voice = femaleVoice;
         }
-        
+
         speechSynthesis.speak(utterance);
       }
-      
+
       if (state.audioEngine) {
         state.audioEngine.triggerAvaVoice(440, 0.85);
       }
     },
-    
-    slideOpen: (state) => { 
-      state.isSlidOpen = true; 
-    },
-    slideClose: (state) => { 
-      state.isSlidOpen = false; 
-    },
-    
+
     scanForCodes: async (state) => {
       state.scanning = true;
-      state.isSlidOpen = true;
-      
+
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       const codes = Object.keys(PTAC_DIAGNOSTICS);
       const randomCode = codes[Math.floor(Math.random() * codes.length)];
-      
+
       state.detectedCode = randomCode;
       state.diagnosticCode = randomCode;
       state.scanning = false;
-      
+
       const diag = PTAC_DIAGNOSTICS[randomCode];
       methods.speak(state, `Diagnostic code ${randomCode} detected. ${diag.voice}`);
-      
+
       window.dispatchEvent(new CustomEvent('esa:diagnostic', {
         detail: { code: randomCode, ...diag }
       }));
     },
-    
+
     getRecommendation: (state, code) => {
       const diag = PTAC_DIAGNOSTICS[code];
       if (!diag) return null;
-      
+
       return {
         code,
         status: diag.status,
@@ -130,135 +126,99 @@ export const ESADiagnosticCard = ESAVerifyComponent({
         repairType: diag.repair || 'service'
       };
     },
-    
-    updateSlideState: (state, container) => {
-      // Update header arrow rotation
-      const header = container.querySelector('#esa-diag-header-arrow');
-      if (header) {
-        header.style.transform = state.isSlidOpen ? 'rotate(180deg)' : 'rotate(0deg)';
-      }
-      
-      // Update content panel visibility
-      const content = container.querySelector('#esa-diag-content');
-      if (content) {
-        content.style.maxHeight = state.isSlidOpen ? '800px' : '0';
-        content.style.opacity = state.isSlidOpen ? '1' : '0';
-      }
-    },
-    
+
     renderResults: (state, container) => {
       const resultsContainer = container.querySelector('#esa-diag-results');
-      if (!resultsContainer || !state.detectedCode) {
-        if (resultsContainer) resultsContainer.innerHTML = '';
+      if (!resultsContainer) return;
+
+      if (!state.detectedCode) {
+        resultsContainer.innerHTML = '';
         return;
       }
-      
+
       const recommendation = methods.getRecommendation(state, state.detectedCode);
-      const diag = PTAC_DIAGNOSTICS[state.detectedCode];
       if (!recommendation) return;
-      
+
       const isCritical = recommendation.severity === 'critical';
       const underWarranty = recommendation.warrantyStatus === 'under_warranty';
-      const bgColor = isCritical ? '#cc241d' : '#458588';
-      const warrantyBgColor = underWarranty ? '#98971a' : '#cc241d';
-      const warrantyText = underWarranty ? '✓ UNDER WARRANTY' : '⚠ WARRANTY EXPIRED';
-      
+      const sevColor = isCritical ? 'var(--bk-danger)' : 'var(--bk-warn)';
+      const sevPill = isCritical ? 'bk-pill danger' : 'bk-pill warn';
+
       let html = `
-        <div style="background: ${bgColor}; color: #ebdbb2; padding: 16px; border-radius: 8px; margin-bottom: 16px; text-align: center;">
-          <div style="font-size: 32px; font-weight: bold;">CODE: ${state.detectedCode}</div>
-          <div style="font-size: 14px; font-weight: bold;">${recommendation.status}</div>
-        </div>
-        
-        <div style="background: ${warrantyBgColor}; color: #282828; padding: 12px; border-radius: 6px; margin-bottom: 16px; font-weight: bold; text-align: center;">
-          ${warrantyText}
-        </div>
-        
-        <div style="margin-bottom: 16px;">
-          <button id="esa-voice-btn" style="background: #b16286; color: #ebdbb2; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">
-            🔊 REPEAT DIAGNOSIS (Ava007)
-          </button>
-        </div>
-        
-        <div style="background: #282828; border: 1px solid #3c3836; border-radius: 8px; padding: 16px;">
-          <div style="font-weight: bold; margin-bottom: 8px; color: #689d6a;">VOICE GUIDANCE:</div>
-          <div style="font-size: 13px;">${recommendation.voice}</div>
+        <div style="border:1px solid var(--bk-border);background:var(--bk-panel-2);border-radius:0.85rem;padding:1rem;text-align:center;margin-bottom:0.7rem;">
+          <div style="font-family:'DM Serif Display',serif;font-size:2rem;line-height:1;color:${sevColor};">${state.detectedCode}</div>
+          <div style="font-size:0.78rem;font-weight:600;color:var(--bk-text);margin-top:0.35rem;">${recommendation.status}</div>
+          <div style="margin-top:0.6rem;display:flex;justify-content:center;gap:0.4rem;flex-wrap:wrap;">
+            <span class="${sevPill}"><span class="bk-dot"></span>${isCritical ? 'CRITICAL' : 'WARNING'}</span>
+            <span class="${underWarranty ? 'bk-pill' : 'bk-pill danger'}"><span class="bk-dot"></span>${underWarranty ? 'UNDER WARRANTY' : 'WARRANTY EXPIRED'}</span>
+          </div>
         </div>
       `;
-      
+
       if (recommendation.shouldReplace) {
         html += `
-          <div style="margin-top: 16px; padding: 12px; background: #cc241d; color: #ebdbb2; border-radius: 6px; text-align: center; font-weight: bold;">
-            ⚠️ UNIT REPLACEMENT RECOMMENDED
+          <div class="bk-pill danger" style="width:100%;justify-content:center;padding:0.45rem 0.6rem;margin-bottom:0.7rem;">
+            <span class="bk-dot"></span>UNIT REPLACEMENT RECOMMENDED
           </div>
         `;
       }
-      
+
+      html += `
+        <div class="bk-row" style="align-items:flex-start;">
+          <div style="flex:1;min-width:0;">
+            <div class="bk-meta" style="margin-bottom:0.25rem;">VOICE GUIDANCE · AVA007</div>
+            <div style="font-size:0.78rem;line-height:1.45;color:var(--bk-text-2);">${recommendation.voice}</div>
+          </div>
+        </div>
+      `;
+
       resultsContainer.innerHTML = html;
-      
-      // Re-attach voice button listener
-      const voiceBtn = container.querySelector('#esa-voice-btn');
-      if (voiceBtn) {
-        voiceBtn.addEventListener('click', () => {
-          if (state.detectedCode) {
-            const rec = methods.getRecommendation(state, state.detectedCode);
-            if (rec) methods.speak(state, rec.voice);
-          }
-        });
-      }
     }
   },
-  
-  // Template with ALL HARDCODED STYLES - no ${} in any style attribute!
+
+  // Bento template — static style attributes only, no HTML comments.
   template: (props, state, methods) => html`
-    <div class="esa-diagnostic-card" style="position: relative; width: 100%; max-width: 600px; margin: 20px auto;">
-      <div style="position: relative; background: #32302f; border: 2px solid #3c3836; border-radius: 12px; overflow: hidden; transition: all 0.4s ease; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);">
-        
-        <div
-          id="esa-diag-header"
-          style="background: linear-gradient(135deg, #458588, #b16286); color: #ebdbb2; padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;"
-        >
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="font-size: 24px;">🔧</span>
-            <div>
-              <div style="font-weight: bold; font-size: 14px;">ESA DIAGNOSTIC SERVICE PANEL</div>
-              <div style="font-size: 11px; opacity: 0.9;">Slide to reveal AI diagnostics</div>
-            </div>
-          </div>
-          <div id="esa-diag-header-arrow" style="transition: transform 0.3s ease;">▼</div>
+    <div class="bento-card punch-border" style="width:100%;max-width:600px;margin:0 auto;">
+      <div class="bento-demo" style="padding:1.25rem;display:flex;flex-direction:column;gap:0.85rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;">
+          <span class="bk-pill"><span class="bk-dot pulse"></span>PTAC DIAGNOSTIC</span>
+          <span class="bk-meta">SEASONS SP09EA2-20</span>
         </div>
-        
-        
-        <div id="esa-diag-content" style="max-height: 0; opacity: 0; transition: all 0.4s ease; overflow: hidden;">
-          <div style="padding: 20px;">
-            
-            <button
-              id="esa-scan-btn"
-              style="width: 100%; padding: 16px; background: #98971a; color: #282828; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer;"
-            >
-              🔍 SCAN FOR DIAGNOSTIC CODES
-            </button>
-            
-            
-            <div style="margin-top: 16px; display: flex; gap: 8px;">
-              <input
-                type="text"
-                id="esa-diag-input"
-                placeholder="Enter code (e.g., F1, C3)"
-                maxlength="2"
-                style="flex: 1; background: #282828; border: 1px solid #3c3836; color: #ebdbb2; padding: 12px; border-radius: 6px; text-transform: uppercase; font-family: monospace; font-size: 18px; text-align: center;"
-              />
-              <button
-                id="esa-analyze-btn"
-                style="background: #458588; color: #ebdbb2; border: none; padding: 0 24px; border-radius: 6px; cursor: pointer; font-weight: bold;"
-              >
-                ANALYZE
-              </button>
-            </div>
-          </div>
-          
-          
-          <div id="esa-diag-results" style="padding: 0 20px 20px;"></div>
+
+        <div style="display:flex;gap:0.5rem;">
+          <input
+            type="text"
+            id="esa-diag-input"
+            class="bk-input"
+            placeholder="Enter code (e.g. F1, C3)"
+            maxlength="2"
+            style="flex:1;text-transform:uppercase;font-family:monospace;font-size:1rem;text-align:center;letter-spacing:0.2rem;"
+          />
+          <button
+            id="esa-analyze-btn"
+            class="bk-btn"
+            style="margin-top:0;"
+          >Analyze</button>
         </div>
+
+        <button
+          id="esa-scan-btn"
+          class="gradient-mask-btn"
+          style="width:100%;padding:0.8rem;border:none;border-radius:999px;background:linear-gradient(135deg,var(--bk-accent),var(--bk-accent-2));color:var(--bk-on-accent);font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.08rem;text-transform:uppercase;cursor:pointer;"
+        >Scan for diagnostic codes</button>
+
+        <div id="esa-diag-results"></div>
+      </div>
+
+      <div class="bento-text">
+        <h3 class="bento-title">Diagnostic <em>service</em></h3>
+        <p class="bento-desc">Scan the PTAC control board for fault codes, analyze any code manually, and get warranty-aware repair guidance with Ava007 voice.</p>
+        <button id="esa-voice-btn" class="bk-btn" style="margin-top:0.75rem;">
+          Repeat diagnosis
+          <svg viewBox="0 0 12 12" style="width:0.6rem;height:0.6rem;" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M2 10 L10 2 M4 2 h6 v6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
       </div>
     </div>
     `
@@ -271,55 +231,58 @@ methods = ESADiagnosticCard.methods;
 const origDiagMount = ESADiagnosticCard.mount;
 ESADiagnosticCard.mount = function(container) {
   const result = origDiagMount.call(this, container);
-  
+
   setTimeout(() => {
-    // Header click - toggle slide
-    const header = container.querySelector('#esa-diag-header');
-    if (header) {
-      header.addEventListener('click', () => {
-        if (this.state.isSlidOpen) {
-          methods.slideClose(this.state);
-        } else {
-          methods.slideOpen(this.state);
-        }
-        methods.updateSlideState(this.state, container);
-      });
-    }
-    
     // Scan button
     const scanBtn = container.querySelector('#esa-scan-btn');
     if (scanBtn) {
       scanBtn.addEventListener('click', async () => {
-        scanBtn.textContent = '🔍 Scanning...';
+        scanBtn.disabled = true;
+        scanBtn.textContent = 'Scanning board…';
         await methods.scanForCodes(this.state);
-        scanBtn.textContent = '🔍 SCAN FOR DIAGNOSTIC CODES';
-        methods.updateSlideState(this.state, container);
+        scanBtn.disabled = false;
+        scanBtn.textContent = 'Scan for diagnostic codes';
         methods.renderResults(this.state, container);
       });
     }
-    
+
     // Analyze button
     const analyzeBtn = container.querySelector('#esa-analyze-btn');
     if (analyzeBtn) {
       analyzeBtn.addEventListener('click', () => {
         const input = container.querySelector('#esa-diag-input');
-        if (input && input.value && PTAC_DIAGNOSTICS[input.value.toUpperCase()]) {
-          this.state.detectedCode = input.value.toUpperCase();
-          this.state.diagnosticCode = input.value.toUpperCase();
-          this.state.isSlidOpen = true;
-          const diag = PTAC_DIAGNOSTICS[input.value.toUpperCase()];
-          methods.speak(this.state, `Code ${input.value.toUpperCase()}. ${diag.voice}`);
-          methods.updateSlideState(this.state, container);
+        const code = input && input.value ? input.value.toUpperCase() : '';
+        if (code && PTAC_DIAGNOSTICS[code]) {
+          this.state.detectedCode = code;
+          this.state.diagnosticCode = code;
+          const diag = PTAC_DIAGNOSTICS[code];
+          methods.speak(this.state, `Code ${code}. ${diag.voice}`);
           methods.renderResults(this.state, container);
+          window.dispatchEvent(new CustomEvent('esa:diagnostic', {
+            detail: { code, ...diag, source: 'manual' }
+          }));
         }
       });
     }
-    
+
+    // Voice repeat button — re-speaks the current recommendation
+    const voiceBtn = container.querySelector('#esa-voice-btn');
+    if (voiceBtn) {
+      voiceBtn.addEventListener('click', () => {
+        if (this.state.detectedCode) {
+          const rec = methods.getRecommendation(this.state, this.state.detectedCode);
+          if (rec) methods.speak(this.state, rec.voice);
+        } else {
+          methods.speak(this.state, 'No diagnostic code detected yet. Run a scan first.');
+        }
+      });
+    }
+
     // Initialize audio
     methods.initAudio(this.state);
-    
+
   }, 100);
-  
+
   return result;
 };
 

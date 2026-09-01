@@ -54,18 +54,8 @@ function hubSummary(detail) {
   }
 }
 
-// Decorate a module container as a "Rendering Card"
-function decorateCard(container, title) {
-  if (!container || container.querySelector('.esa-card-header')) return;
-  const header = document.createElement('div');
-  header.className = 'esa-card-header';
-  header.textContent = title;
-  header.style.cssText =
-    'padding:14px 16px;font-weight:600;font-size:10px;letter-spacing:1.2px;' +
-    'color:#cfcfcf;background:rgba(13,13,13,0.5);border-bottom:1px solid rgba(200,168,130,0.18);' +
-    'border-radius:30px 30px 0 0;margin:-28px -28px 0;user-select:none;';
-  container.insertBefore(header, container.firstChild);
-}
+// Bento cards bring their own structure (bento-title / bento-desc),
+// so module containers are NOT decorated with legacy card headers anymore.
 
 // ============================================
 // MAIN INITIALIZATION
@@ -173,7 +163,6 @@ async function initESAExoskeleton() {
       const diagnosticContainer = document.getElementById('esa-diagnostics');
       if (diagnosticContainer) {
         diagnosticContainer.innerHTML = '';
-        decorateCard(diagnosticContainer, '🩺 DIAGNOSTIC CARD');
         const mountResult = ESADiagnosticCard.mount(diagnosticContainer);
         if (mountResult) {
           window.ESA.components.diagnosticCard = mountResult;
@@ -192,7 +181,6 @@ async function initESAExoskeleton() {
       const partsCardContainer = document.getElementById('esa-parts-card');
       if (partsCardContainer) {
         partsCardContainer.innerHTML = '';
-        decorateCard(partsCardContainer, '📦 BROADCAST PARTS');
         const mountResult = ESAInvPartsCardB.mount(partsCardContainer);
         if (mountResult) {
           window.ESA.components.invPartsCard = mountResult;
@@ -211,7 +199,6 @@ async function initESAExoskeleton() {
       const workorderContainer = document.getElementById('esa-workorder');
       if (workorderContainer) {
         workorderContainer.innerHTML = '';
-        decorateCard(workorderContainer, '📋 WORKORDER SYSTEM');
         const mountResult = ESAWorkorder.mount(workorderContainer);
         if (mountResult) {
           window.ESA.components.workorder = mountResult;
@@ -310,7 +297,7 @@ async function initESAExoskeleton() {
 
     renderArea.insertBefore(bar, renderArea.firstChild);
     window.ESA._toolbar = {
-      refresh: () => { label.textContent = `${cards().length} MODULES · RENDERING VIEW`; }
+      refresh: () => { label.textContent = `${cards().length} CARDS · BENTO VIEW`; }
     };
     window.ESA._toolbar.refresh();
   }

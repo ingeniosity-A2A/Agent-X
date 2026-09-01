@@ -1162,13 +1162,16 @@
   </script>
   
   <!-- Shell wiring: service nav + stage + AI Chatbot Ingestion dock (LOAD-SHELL.md).
-       Order matters: shell-layout.css first, dock css LAST so it wins the cascade. -->
+       Order matters: shell-layout.css first, then Bento tokens + v6 polish,
+       dock css LAST so it wins the cascade. -->
   <link rel="stylesheet" href="./shell-layout.css">
+  <link rel="stylesheet" href="./bento-tokens.css">
+  <link rel="stylesheet" href="./v6-exoskel-polish.css">
   <link rel="stylesheet" href="./ai-chatbot-dock.css">
   <script src="./mount-alias.js"></script>
   <script src="./shell-nav.js" defer></script>
 
   <!-- MAIN APPLICATION MODULE -->
-  <script type="module" src="./integration.js?v=402"></script>
+  <script type="module" src="./integration.js?v=403"></script>
 </body>
 </html>

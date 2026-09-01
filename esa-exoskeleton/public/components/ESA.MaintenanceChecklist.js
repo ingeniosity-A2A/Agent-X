@@ -1,23 +1,19 @@
 /**
- * ESA.MaintenanceChecklist.js
+ * ESA.MaintenanceChecklist.js — BENTO EDITION
  * ============================================
- * DAILY MAINTENANCE WORKFLOW — REACT MODULE
- * ============================================
+ * DAILY MAINTENANCE WORKFLOW — official Bento card.
  *
- * The daily to-do list card, styled like the dark glassmorphic "Checklist"
- * mockup:
- *   - header title + progress pill + refresh button
- *   - shift header fields (Date / Shift AM-PM / Employee / Manager sign-off)
- *   - category sections with colored circular icons + connector lines
- *   - rounded checkboxes with strikethrough on completion
- *   - skeleton loaders on mount / reset
- *   - "Shift Notes & Green Shield Tracking Log" table
+ * One framework: Bento (docs/BENTO-OFFICIAL-UI.md).
+ * Structure:  .bento-card > header (title + gel progress) + shift fields +
+ *             SOP sections + Green Shield tracking log
+ * Tokens:     --bk-* (bento-tokens.css) — Beige · Green · Black.
+ * Polish:     punch-border + gel-progress-track (v6-exoskel-polish.css).
  *
  * Content follows the printed DAILY MAINTENANCE WORKFLOW — Standard
  * Operating Procedure & Shift Checklist (Done / Task / SOP rows).
  *
- * React (esm.sh CDN, no build step); Arrow.js sandboxes the rest of the
- * Exoskeleton. State persists to localStorage.
+ * React (esm.sh CDN, no build step). State persists to localStorage.
+ * Contract kept identical for integration.js: .mount() + esa:checklist events.
  */
 
 import { html, useState, useEffect, useRef, useCallback } from './ESA.ReactMount.js';
@@ -103,7 +99,7 @@ function CheckBox({ checked, color, onToggle }) {
       onClick=${onToggle}
       aria-pressed=${checked}
       title=${checked ? 'Mark incomplete' : 'Mark complete'}
-      style=${{ width: '19px', height: '19px', borderRadius: '6px', border: `2px solid ${checked ? color : '#55555c'}`, background: checked ? color : 'rgba(255,255,255,0.03)', color: '#101014', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold', lineHeight: 1, padding: 0, flexShrink: 0, marginTop: '2px', boxShadow: checked ? `0 0 10px ${color}66` : 'inset 0 1px 2px rgba(0,0,0,0.45)', transition: 'all 0.15s' }}
+      style=${{ width: '19px', height: '19px', borderRadius: '6px', border: `2px solid ${checked ? color : 'var(--bk-border)'}`, background: checked ? color : 'var(--bk-panel-2)', color: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold', lineHeight: 1, padding: 0, flexShrink: 0, marginTop: '2px', boxShadow: checked ? `0 0 10px ${color}66` : 'var(--bk-inset-soft)', transition: 'all 0.15s' }}
     >${checked ? '✓' : ''}</button>
   `;
 }
@@ -113,8 +109,8 @@ function ChecklistItem({ section, index, task, sop, checked, onToggle }) {
     <div style=${{ display: 'flex', gap: '10px', padding: '6px 0', alignItems: 'flex-start' }}>
       <${CheckBox} checked=${checked} color=${section.color} onToggle=${onToggle} />
       <div style=${{ flex: 1, minWidth: 0 }}>
-        <div style=${{ fontSize: '13px', color: checked ? '#8a8a92' : '#ebdbb2', textDecoration: checked ? 'line-through' : 'none', fontWeight: checked ? 'normal' : 500, lineHeight: '1.35', transition: 'all 0.15s' }}>${task}</div>
-        <div style=${{ fontSize: '11px', color: '#7d7d85', marginTop: '2px', lineHeight: '1.45' }}>${sop}</div>
+        <div style=${{ fontSize: '13px', color: checked ? 'var(--bk-text-3)' : 'var(--bk-text)', textDecoration: checked ? 'line-through' : 'none', fontWeight: checked ? 'normal' : 500, lineHeight: '1.35', transition: 'all 0.15s' }}>${task}</div>
+        <div style=${{ fontSize: '11px', color: 'var(--bk-text-3)', marginTop: '2px', lineHeight: '1.45' }}>${sop}</div>
       </div>
     </div>
   `;
@@ -124,10 +120,10 @@ function SkeletonRow() {
   return html`
     <div style=${{ padding: '7px 0' }}>
       <div style=${{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-        <div style=${{ width: '19px', height: '19px', borderRadius: '6px', background: '#333338', flexShrink: 0 }}></div>
+        <div style=${{ width: '19px', height: '19px', borderRadius: '6px', background: 'var(--bk-chip)', flexShrink: 0 }}></div>
         <div style=${{ flex: 1 }}>
-          <div style=${{ height: '10px', width: '62%', borderRadius: '4px', background: 'linear-gradient(90deg,#333338,#3f3f46,#333338)', backgroundSize: '200% 100%', animation: 'esa-skel 1.4s infinite' }}></div>
-          <div style=${{ height: '8px', width: '88%', marginTop: '7px', borderRadius: '4px', background: 'linear-gradient(90deg,#333338,#3f3f46,#333338)', backgroundSize: '200% 100%', animation: 'esa-skel 1.4s infinite 0.25s' }}></div>
+          <div style=${{ height: '10px', width: '62%', borderRadius: '4px', background: 'linear-gradient(90deg,var(--bk-chip),var(--bk-line),var(--bk-chip))', backgroundSize: '200% 100%', animation: 'esa-skel 1.4s infinite' }}></div>
+          <div style=${{ height: '8px', width: '88%', marginTop: '7px', borderRadius: '4px', background: 'linear-gradient(90deg,var(--bk-chip),var(--bk-line),var(--bk-chip))', backgroundSize: '200% 100%', animation: 'esa-skel 1.4s infinite 0.25s' }}></div>
         </div>
       </div>
     </div>
@@ -142,15 +138,15 @@ function SectionBlock({ section, checks, onToggle, skeleton }) {
   return html`
     <div style=${{ margin: '18px 0 4px' }}>
       <div style=${{ display: 'flex', alignItems: 'center', gap: '12px', position: 'relative' }}>
-        <div style=${{ width: '30px', height: '30px', borderRadius: '50%', background: section.color, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0, boxShadow: `0 0 14px ${section.color}55` }}>${section.icon}</div>
+        <div className="bk-tile" style=${{ background: section.color, boxShadow: `0 0 14px ${section.color}55` }}>${section.icon}</div>
         <div style=${{ flex: 1, minWidth: 0 }}>
-          <div style=${{ fontSize: '14px', fontWeight: 'bold', color: '#ebdbb2', lineHeight: '1.25' }}>${section.title}</div>
-          <div style=${{ fontSize: '10px', color: '#8a8a92', letterSpacing: '1px', marginTop: '1px' }}>${done}/${total} · ${pct}%</div>
+          <div style=${{ fontSize: '14px', fontWeight: 'bold', color: 'var(--bk-text)', lineHeight: '1.25' }}>${section.title}</div>
+          <div style=${{ fontSize: '10px', color: 'var(--bk-text-3)', letterSpacing: '1px', marginTop: '1px' }}>${done}/${total} · ${pct}%</div>
         </div>
       </div>
 
       <div style=${{ position: 'relative', marginLeft: '14px', paddingLeft: '14px' }}>
-        <div style=${{ position: 'absolute', left: '0', top: '2px', bottom: '4px', width: '2px', background: 'linear-gradient(180deg, ' + section.color + '88, #3a3a42)' }}></div>
+        <div style=${{ position: 'absolute', left: '0', top: '2px', bottom: '4px', width: '2px', background: 'linear-gradient(180deg, ' + section.color + '88, var(--bk-border-soft))' }}></div>
         <div style=${{ padding: '4px 0 2px' }}>
           ${skeleton
             ? Array.from({ length: 2 }).map((_, i) => html`<${SkeletonRow} key=${i} />`)
@@ -173,8 +169,8 @@ function SectionBlock({ section, checks, onToggle, skeleton }) {
 
 function Field({ label, children }) {
   return html`
-    <div style=${{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-      <span style=${{ fontSize: '9px', letterSpacing: '1px', color: '#8a8a92', fontWeight: 'bold' }}>${label}</span>
+    <div className="bk-field">
+      <span className="bk-field-label">${label}</span>
       ${children}
     </div>
   `;
@@ -183,13 +179,14 @@ function Field({ label, children }) {
 const inputStyle = {
   width: '100%',
   boxSizing: 'border-box',
-  background: '#26262c',
-  border: '1px solid #3a3a42',
-  color: '#ebdbb2',
+  background: 'var(--bk-panel-2)',
+  border: '1px solid var(--bk-border)',
+  color: 'var(--bk-text)',
   padding: '8px 10px',
   borderRadius: '7px',
   fontSize: '12px',
-  outline: 'none'
+  outline: 'none',
+  fontFamily: "'DM Sans', sans-serif"
 };
 
 // ─────────────────────────────────────────────────────────────────────
@@ -219,6 +216,7 @@ function ESA_MaintenanceChecklistView() {
   }, []);
 
   const doneCount = Object.values(checks).filter(Boolean).length;
+  const donePct = Math.round((doneCount / TOTAL) * 100);
 
   // Persist
   useEffect(() => {
@@ -273,40 +271,43 @@ function ESA_MaintenanceChecklistView() {
   const removeNote = (i) => setNotes(rows => rows.filter((_, ri) => ri !== i));
 
   return html`
-    <div style=${{ width: '100%', boxSizing: 'border-box' }}>
-      <style>
-        @keyframes esa-skel { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
-      </style>
+    <div className="bento-card punch-border" style=${{ width: '100%', margin: '0 auto' }}>
+      <style>${'@keyframes esa-skel { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0 0; } }'}</style>
 
-      <div style=${{ background: 'transparent', padding: '1.75rem', boxSizing: 'border-box', position: 'relative' }}>
-        <!-- Header -->
-        <div style=${{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', marginBottom: '14px', flexWrap: 'wrap' }}>
+      <div style=${{ padding: '1.5rem 1.4rem 1.3rem', boxSizing: 'border-box', position: 'relative' }}>
+        <!-- Header: title + progress pill + refresh -->
+        <div style=${{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', marginBottom: '12px', flexWrap: 'wrap' }}>
           <div>
-            <div style=${{ fontSize: '17px', fontWeight: 'bold', color: '#ebdbb2', letterSpacing: '0.5px' }}>Daily Maintenance</div>
-            <div style=${{ fontSize: '10px', color: '#8a8a92', marginTop: '2px' }}>Standard Operating Procedure & Shift Checklist</div>
+            <div className="bento-title" style=${{ fontSize: '1.3rem' }}>Daily <em>maintenance</em></div>
+            <div className="bento-desc" style=${{ marginTop: '2px' }}>Standard Operating Procedure & Shift Checklist</div>
           </div>
           <div style=${{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style=${{ display: 'flex', alignItems: 'center', gap: '7px', background: 'rgba(0,0,0,0.35)', border: '1px solid #3a3a42', borderRadius: '20px', padding: '6px 14px' }}>
-              <span style=${{ width: '8px', height: '8px', borderRadius: '50%', background: '#2bc4f3', boxShadow: '0 0 8px #2bc4f3' }}></span>
-              <span style=${{ fontSize: '11px', color: '#d9d9de', fontWeight: 'bold' }}>${doneCount}/${TOTAL}</span>
+            <div className="bk-pill" style=${{ padding: '0.3rem 0.7rem', fontSize: '0.62rem' }}>
+              <span className="bk-dot pulse"></span>${doneCount}/${TOTAL}
             </div>
             <button
               onClick=${() => reset()}
               title="Reset checklist"
-              style=${{ width: '30px', height: '30px', borderRadius: '50%', background: '#2f2f36', border: '1px solid #3f3f47', color: '#a9a9b0', cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}
+              className="bk-icon-btn"
+              style=${{ width: '30px', height: '30px', borderRadius: '50%', fontSize: '14px' }}
             >↻</button>
           </div>
         </div>
 
+        <!-- Gel progress -->
+        <div className="gel-progress-track" style=${{ '--gel-progress': donePct + '%', marginBottom: '14px' }}>
+          <div className="gel-progress-fill"></div>
+        </div>
+
         <!-- Shift header fields -->
-        <div style=${{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px', padding: '12px', background: 'rgba(0,0,0,0.25)', border: '1px solid #3a3a42', borderRadius: '10px', marginBottom: '8px' }}>
+        <div style=${{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px', padding: '12px', background: 'var(--bk-panel)', border: '1px solid var(--bk-border-soft)', borderRadius: '12px', marginBottom: '8px' }}>
           <${Field} label="DATE">
             <input type="date" value=${date} onChange=${e => setDate(e.target.value)} style=${inputStyle} />
           </${Field}>
           <${Field} label="SHIFT">
-            <div style=${{ display: 'flex', background: '#202026', border: '1px solid #3a3a42', borderRadius: '7px', padding: '2px', gap: '2px' }}>
+            <div style=${{ display: 'flex', background: 'var(--bk-panel-2)', border: '1px solid var(--bk-border)', borderRadius: '7px', padding: '2px', gap: '2px' }}>
               ${['AM', 'PM'].map(m => html`
-                <button key=${m} onClick=${() => setShift(m)} style=${{ flex: 1, padding: '6px 0', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold', background: shift === m ? '#5b8def' : 'transparent', color: shift === m ? '#fff' : '#8a8a92', transition: 'all 0.15s' }}>${m}</button>
+                <button key=${m} onClick=${() => setShift(m)} style=${{ flex: 1, padding: '6px 0', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold', background: shift === m ? 'var(--bk-accent)' : 'transparent', color: shift === m ? 'var(--bk-on-accent)' : 'var(--bk-text-3)', transition: 'all 0.15s', fontFamily: "'DM Sans', sans-serif" }}>${m}</button>
               `)}
             </div>
           </${Field}>
@@ -324,30 +325,30 @@ function ESA_MaintenanceChecklistView() {
         <!-- Shift Notes & Green Shield Tracking Log -->
         <div style=${{ marginTop: '22px' }}>
           <div style=${{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style=${{ width: '30px', height: '30px', borderRadius: '50%', background: '#2bc4f3', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', boxShadow: '0 0 14px #2bc4f355' }}>📝</div>
-            <div style=${{ fontSize: '14px', fontWeight: 'bold', color: '#ebdbb2' }}>Shift Notes & Green Shield Tracking Log</div>
+            <div className="bk-tile" style=${{ background: '#2bc4f3', boxShadow: '0 0 14px #2bc4f355' }}>📝</div>
+            <div style=${{ fontSize: '14px', fontWeight: 'bold', color: 'var(--bk-text)' }}>Shift Notes & Green Shield Tracking Log</div>
           </div>
-          <div style=${{ fontSize: '11px', fontStyle: 'italic', color: '#8a8a92', margin: '8px 0 12px', lineHeight: '1.5' }}>
+          <div style=${{ fontSize: '11px', fontStyle: 'italic', color: 'var(--bk-text-3)', margin: '8px 0 12px', lineHeight: '1.5' }}>
             Use this section to record any dynamic Green Shield tasks completed or complex property hazards encountered:
           </div>
 
-          <div style=${{ borderRadius: '10px', overflow: 'hidden', border: '1px solid #3a3a42' }}>
-            <div style=${{ display: 'flex', background: '#2f2f36', color: '#d7b46a' }}>
+          <div style=${{ borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--bk-border)' }}>
+            <div style=${{ display: 'flex', background: 'var(--bk-chip)', color: 'var(--bk-text-2)' }}>
               <div style=${{ flex: 1, padding: '9px 12px', fontSize: '10px', fontWeight: 'bold', letterSpacing: '1px' }}>TARGET AREA / GREEN SHIELD CYCLE</div>
-              <div style=${{ flex: '1.5', padding: '9px 12px', fontSize: '10px', fontWeight: 'bold', letterSpacing: '1px', borderLeft: '1px solid #3a3a42' }}>MAINTENANCE ACTIONS LOGGED & PARTS USED</div>
+              <div style=${{ flex: '1.5', padding: '9px 12px', fontSize: '10px', fontWeight: 'bold', letterSpacing: '1px', borderLeft: '1px solid var(--bk-border-soft)' }}>MAINTENANCE ACTIONS LOGGED & PARTS USED</div>
             </div>
             ${notes.map((row, i) => html`
-              <div key=${i} style=${{ display: 'flex', borderTop: '1px solid #33333a', background: i % 2 ? 'rgba(255,255,255,0.015)' : 'transparent' }}>
+              <div key=${i} style=${{ display: 'flex', borderTop: '1px solid var(--bk-border-soft)', background: i % 2 ? 'rgba(255,255,255,0.015)' : 'transparent' }}>
                 <input value=${row.area} onChange=${e => updateNote(i, 'area', e.target.value)} placeholder="e.g. Lobby / Weekly" style=${{ ...inputStyle, border: 'none', borderRadius: 0, background: 'transparent' }} />
-                <input value=${row.actions} onChange=${e => updateNote(i, 'actions', e.target.value)} placeholder="e.g. Replaced filter HD-9033" style=${{ ...inputStyle, border: 'none', borderRadius: 0, borderLeft: '1px solid #33333a', background: 'transparent' }} />
-                <button onClick=${() => removeNote(i)} title="Remove entry" style=${{ width: '32px', flexShrink: 0, border: 'none', borderLeft: '1px solid #33333a', background: 'transparent', color: '#cc241d', cursor: 'pointer', fontSize: '14px' }}>×</button>
+                <input value=${row.actions} onChange=${e => updateNote(i, 'actions', e.target.value)} placeholder="e.g. Replaced filter HD-9033" style=${{ ...inputStyle, border: 'none', borderRadius: 0, borderLeft: '1px solid var(--bk-border-soft)', background: 'transparent' }} />
+                <button onClick=${() => removeNote(i)} title="Remove entry" style=${{ width: '32px', flexShrink: 0, border: 'none', borderLeft: '1px solid var(--bk-border-soft)', background: 'transparent', color: 'var(--bk-danger)', cursor: 'pointer', fontSize: '14px' }}>×</button>
               </div>
             `)}
           </div>
 
           <button
             onClick=${() => setNotes(rows => [...rows, { area: '', actions: '' }])}
-            style=${{ marginTop: '10px', padding: '8px 16px', background: 'rgba(43,196,243,0.12)', color: '#2bc4f3', border: '1px solid #2bc4f355', borderRadius: '8px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold', letterSpacing: '1px' }}
+            style=${{ marginTop: '10px', padding: '8px 16px', background: 'rgba(126,200,160,0.12)', color: 'var(--bk-accent)', border: '1px solid rgba(126,200,160,0.35)', borderRadius: '8px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold', letterSpacing: '1px', fontFamily: "'DM Sans', sans-serif" }}
           >+ ADD LOG ENTRY</button>
         </div>
       </div>
@@ -357,7 +358,7 @@ function ESA_MaintenanceChecklistView() {
 
 export const ESAMaintenanceChecklist = {
   name: 'MaintenanceChecklist',
-  version: '3.0.0',
+  version: '4.0.0',
   kind: 'react',
 
   /**

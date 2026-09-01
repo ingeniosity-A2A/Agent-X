@@ -1,17 +1,17 @@
 /**
- * ESA.invpartscard-B.js
+ * ESA.invpartscard-B.js — BENTO EDITION
  * ============================================
- * BROADCAST SERVICE PARTS CARD — REACT MODULE
- * ============================================
+ * BROADCAST SERVICE PARTS CARD — official Bento card.
  *
- * Follows the APPROVED 3D RENDERING CARD STANDARD:
- *   size   24rem wide · 2rem radius · 1.75rem padding · warm glass
- *   middle fixed 11rem — meta col (5.6rem) | model zone | stepper (1.3rem)
- *   top / bottom are product-specific; middle and card size stay standard.
+ * One framework: Bento (docs/BENTO-OFFICIAL-UI.md).
+ * Structure:  .bento-card > .bento-demo (3D model zone) + .bento-text
+ * Tokens:     --bk-* (bento-tokens.css) — Beige · Green · Black.
+ * Polish:     punch-border + gradient-mask-btn (v6-exoskel-polish.css).
  *
  * Product: Seasons 9000 BTU PTAC (HD Supply #223532). Keeps the .mount()
- * contract and the hub events (esa:order-part / esa:broadcast) so
- * integration.js wiring stays intact. React loads from esm.sh (no build).
+ * contract and the hub events (esa:order-part / esa:broadcast-toggle /
+ * esa:broadcast) so integration.js wiring stays intact.
+ * React loads from esm.sh (no build).
  */
 
 import { html, useState, useEffect, useRef } from './ESA.ReactMount.js';
@@ -31,37 +31,25 @@ const PTAC = {
   price: 899.0
 };
 
-const CARD = {
-  ink: '#0d0d0d',
-  paper: '#f5f0eb',
-  warm: '#c8a882',
-  accent: '#b07d4f',
-  muted: 'rgba(245,240,235,0.35)',
-  glass: 'rgba(245,240,235,0.08)',
-  border: 'rgba(200,168,130,0.18)',
-  status: '#7ec8a0',
-  amber: '#d9a441'
-};
-
 // ─────────────────────────────────────────────────────────────────────
-// MODEL ZONE — PTAC sleeve visual (loader → rendered unit)
+// MODEL ZONE — PTAC sleeve visual (fallback when the GLB fails)
 // ─────────────────────────────────────────────────────────────────────
 
 function PTACUnitVisual() {
   return html`
     <div style=${{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem' }}>
-      <div style=${{ width: '9.2rem', height: '5.6rem', borderRadius: '0.65rem', border: '1px solid rgba(200,168,130,0.4)', background: 'linear-gradient(160deg, rgba(200,168,130,0.16) 0%, rgba(176,125,79,0.05) 100%)', position: 'relative', boxShadow: '0 16px 34px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08)' }}>
+      <div style=${{ width: '9.2rem', height: '5.6rem', borderRadius: '0.65rem', border: '1px solid var(--bk-border)', background: 'linear-gradient(160deg, rgba(126,200,160,0.14) 0%, rgba(126,200,160,0.03) 100%)', position: 'relative', boxShadow: '0 16px 34px rgba(0,0,0,0.55), var(--bk-inset-soft)' }}>
         <div style=${{ position: 'absolute', top: '0.55rem', left: '0.75rem', right: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
           ${Array.from({ length: 6 }).map((_, i) => html`
-            <div key=${i} style=${{ height: '2px', borderRadius: '2px', background: 'linear-gradient(90deg, rgba(200,168,130,0.55), rgba(200,168,130,0.15))' }}></div>
+            <div key=${i} style=${{ height: '2px', borderRadius: '2px', background: 'linear-gradient(90deg, rgba(244,244,238,0.4), rgba(244,244,238,0.1))' }}></div>
           `)}
         </div>
-        <div style=${{ position: 'absolute', bottom: '0.45rem', left: '0.75rem', width: '2.4rem', height: '0.55rem', borderRadius: '0.3rem', border: '1px solid rgba(200,168,130,0.45)', background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', gap: '0.18rem', padding: '0 0.25rem' }}>
-          <span style=${{ width: '0.3rem', height: '0.3rem', borderRadius: '50%', background: CARD.status, boxShadow: `0 0 6px ${CARD.status}` }}></span>
-          <span style=${{ width: '0.55rem', height: '1px', background: 'rgba(200,168,130,0.5)' }}></span>
+        <div style=${{ position: 'absolute', bottom: '0.45rem', left: '0.75rem', width: '2.4rem', height: '0.55rem', borderRadius: '0.3rem', border: '1px solid var(--bk-border)', background: 'var(--bk-panel-2)', display: 'flex', alignItems: 'center', gap: '0.18rem', padding: '0 0.25rem' }}>
+          <span style=${{ width: '0.3rem', height: '0.3rem', borderRadius: '50%', background: 'var(--bk-accent)', boxShadow: '0 0 6px var(--bk-accent)' }}></span>
+          <span style=${{ width: '0.55rem', height: '1px', background: 'var(--bk-line)' }}></span>
         </div>
       </div>
-      <div style=${{ width: '5.5rem', height: '0.8rem', borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(176,125,79,0.4) 0%, transparent 70%)' }}></div>
+      <div style=${{ width: '5.5rem', height: '0.8rem', borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(126,200,160,0.35) 0%, transparent 70%)' }}></div>
     </div>
   `;
 }
@@ -95,7 +83,7 @@ function Model3D() {
 // ROOT VIEW
 // ─────────────────────────────────────────────────────────────────────
 
-// Stepper wheel items — quotes and images scroll through these slides
+// Stepper wheel items — model / quote / specs / supply scroll through slides
 const SLIDES = [
   { id: 'model', label: 'Model view' },
   { id: 'quote', label: 'Service quote' },
@@ -158,11 +146,11 @@ function ESA_InvPartsCardBView() {
         { k: 'Est. total', v: '$1,049.00' }
       ];
       return html`<div style=${{ width: '100%', padding: '0.4rem 0.2rem' }}>
-        <div style=${{ fontSize: '0.48rem', letterSpacing: '0.1rem', color: CARD.muted, textTransform: 'uppercase', marginBottom: '0.5rem' }}>🧾 Service quote</div>
+        <div className="bk-meta" style=${{ marginBottom: '0.5rem' }}>Service quote</div>
         ${rows.map((r, ri) => html`
-          <div key=${ri} style=${{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.32rem 0', borderBottom: ri < rows.length - 1 ? `1px solid ${CARD.border}` : 'none', fontSize: '0.62rem' }}>
-            <span style=${{ color: CARD.muted }}>${r.k}</span>
-            <span style=${{ fontWeight: 600, color: ri === rows.length - 1 ? CARD.status : CARD.paper }}>${r.v}</span>
+          <div key=${ri} style=${{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.32rem 0', borderBottom: ri < rows.length - 1 ? '1px solid var(--bk-border-soft)' : 'none', fontSize: '0.72rem' }}>
+            <span style=${{ color: 'var(--bk-text-3)' }}>${r.k}</span>
+            <span style=${{ fontWeight: 600, color: ri === rows.length - 1 ? 'var(--bk-accent)' : 'var(--bk-text)' }}>${r.v}</span>
           </div>
         `)}
       </div>`;
@@ -175,115 +163,90 @@ function ESA_InvPartsCardBView() {
         { k: 'Amperage', v: '20A' }
       ];
       return html`<div style=${{ width: '100%', padding: '0.4rem 0.2rem' }}>
-        <div style=${{ fontSize: '0.48rem', letterSpacing: '0.1rem', color: CARD.muted, textTransform: 'uppercase', marginBottom: '0.5rem' }}>⚙️ Specs</div>
+        <div className="bk-meta" style=${{ marginBottom: '0.5rem' }}>Specs</div>
         ${rows.map((r, ri) => html`
-          <div key=${ri} style=${{ display: 'flex', justifyContent: 'space-between', padding: '0.32rem 0', borderBottom: ri < rows.length - 1 ? `1px solid ${CARD.border}` : 'none', fontSize: '0.62rem' }}>
-            <span style=${{ color: CARD.muted }}>${r.k}</span>
-            <span style=${{ fontWeight: 600, color: CARD.paper }}>${r.v}</span>
+          <div key=${ri} style=${{ display: 'flex', justifyContent: 'space-between', padding: '0.32rem 0', borderBottom: ri < rows.length - 1 ? '1px solid var(--bk-border-soft)' : 'none', fontSize: '0.72rem' }}>
+            <span style=${{ color: 'var(--bk-text-3)' }}>${r.k}</span>
+            <span style=${{ fontWeight: 600, color: 'var(--bk-text)' }}>${r.v}</span>
           </div>
         `)}
       </div>`;
     }
     return html`<div style=${{ width: '100%', padding: '0.4rem 0.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
-      <div style=${{ fontSize: '0.48rem', letterSpacing: '0.1rem', color: CARD.muted, textTransform: 'uppercase' }}>🔗 HD Supply</div>
+      <div className="bk-meta">HD Supply</div>
       <div style=${{ textAlign: 'center' }}>
-        <div style=${{ fontSize: '0.78rem', fontWeight: 600, color: CARD.paper }}>Part #${PTAC.partNumber}</div>
-        <div style=${{ fontSize: '0.58rem', color: CARD.muted, marginTop: '0.15rem' }}>${PTAC.brand} ${PTAC.model}</div>
+        <div style=${{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--bk-text)' }}>Part #${PTAC.partNumber}</div>
+        <div style=${{ fontSize: '0.65rem', color: 'var(--bk-text-3)', marginTop: '0.15rem' }}>${PTAC.brand} ${PTAC.model}</div>
       </div>
-      <a className="std-cta" href=${PTAC.hdSupplyUrl} target="_blank" rel="noopener noreferrer" style=${{ padding: '0.45rem 0.9rem', fontSize: '0.55rem' }}>Open HD Supply ↗</a>
+      <a className="bk-btn" style=${{ marginTop: 0 }} href=${PTAC.hdSupplyUrl} target="_blank" rel="noopener noreferrer">Open HD Supply ↗</a>
     </div>`;
   };
 
-  const meta = [
-    { icon: '🔤', label: 'MODEL', value: PTAC.modelCode },
-    { icon: '🛠️', label: 'SERVICE', value: 'PTAC Unit' },
-    { icon: '📦', label: 'QUANTITY', value: '1 Item' },
-    { icon: '✅', label: 'STATUS', mini: { text: broadcastOn ? 'Broadcasting' : 'In stock', processing: broadcastOn } }
-  ];
-
   return html`
-    <div style=${{ display: 'flex', flexDirection: 'column', height: '100%', padding: '1.75rem', boxSizing: 'border-box', position: 'relative' }}>
-      <div className="std-blob"></div>
-
-      <!-- top -->
-      <div className="std-head">
-        <div className="std-brand"><span className="std-brand-tile">HD</span> BROADCAST PARTS</div>
-        <div style=${{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+    <div className="bento-card punch-border" style=${{ width: '100%', maxWidth: '600px', margin: '0 auto' }}>
+      <div className="bento-demo" style=${{ height: '15rem' }} ref=${zoneRef}>
+        <div style=${{ position: 'absolute', top: '0.8rem', left: '0.9rem', right: '0.9rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 3 }}>
+          <span className="bk-pill"><span className="bk-dot pulse"></span>BROADCAST PARTS</span>
           <button
             onClick=${() => toggleBroadcast()}
             title="Broadcast this part to the console"
-            style=${{ background: 'transparent', border: `1px solid ${CARD.border}`, borderRadius: '3rem', color: broadcastOn ? CARD.amber : CARD.muted, fontSize: '0.48rem', letterSpacing: '0.08rem', textTransform: 'uppercase', fontWeight: 600, padding: '0.18rem 0.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem', whiteSpace: 'nowrap', transition: 'color 0.2s' }}
+            style=${{ background: 'transparent', border: '1px solid var(--bk-border)', borderRadius: '3rem', color: broadcastOn ? 'var(--bk-warn)' : 'var(--bk-text-3)', fontSize: '0.55rem', letterSpacing: '0.08rem', textTransform: 'uppercase', fontWeight: 600, padding: '0.22rem 0.6rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem', whiteSpace: 'nowrap', transition: 'color 0.2s', fontFamily: "'DM Sans', sans-serif" }}
           >📡 ${broadcastOn ? 'LIVE' : 'BROADCAST'}</button>
-          <span className="std-pill"><span className="std-dot"></span>IN STOCK</span>
-        </div>
-      </div>
-      <div className="std-title">Seasons <em>PTAC</em></div>
-      <div className="std-sub">Part #${PTAC.partNumber} · HD Supply</div>
-
-      <!-- middle: meta | model zone | stepper -->
-      <div className="std-middle">
-        <div className="std-meta">
-          ${meta.map(m => html`
-            <div key=${m.label} className="std-meta-item">
-              <span className="std-meta-icon">${m.icon}</span>
-              <div style=${{ minWidth: 0 }}>
-                <div className="std-meta-label">${m.label}</div>
-                ${m.mini
-                  ? html`<div className=${`std-status-mini${m.mini.processing ? ' processing' : ''}`}><span className="std-dot"></span>${m.mini.text}</div>`
-                  : html`<div className="std-meta-value">${m.value}</div>`}
-              </div>
-            </div>
-          `)}
         </div>
 
-        <div className="std-zone" ref=${zoneRef}>
+        <div style=${{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2.6rem 2.2rem 1.8rem 1.2rem' }}>
           ${loading && slide === 0 ? html`
-            <div className="std-loader">
-              <div className="std-loader-ring"></div>
-              <div className="std-loader-text">Loading model…</div>
+            <div style=${{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+              <div style=${{ width: '2rem', height: '2rem', border: '2px solid var(--bk-border)', borderTopColor: 'var(--bk-accent)', borderRadius: '50%', animation: 'bk-spin 0.9s linear infinite' }}></div>
+              <div className="bk-meta">Loading model…</div>
             </div>
           ` : html`
             <div key=${SLIDES[slide].id} className="std-slide" style=${{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               ${renderSlide(slide)}
             </div>
           `}
-          <div style=${{ position: 'absolute', bottom: '0.2rem', right: '1.6rem', fontSize: '0.46rem', letterSpacing: '0.08rem', color: 'rgba(245,240,235,0.3)' }}>
-            <span style=${{ color: CARD.warm }}>${String(slide + 1).padStart(2, '0')}</span> / ${String(SLIDES.length).padStart(2, '0')}
-          </div>
-          <div className="std-stepper">
+        </div>
+
+        <div style=${{ position: 'absolute', bottom: '0.55rem', left: '1.2rem', right: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 3 }}>
+          <div style=${{ display: 'flex', gap: '0.35rem' }}>
             ${SLIDES.map((s, i) => html`
-              <button key=${s.id} className=${`std-step${i === slide ? ' active' : ''}`} onClick=${() => setSlide(i)} title=${s.label}></button>
+              <button key=${s.id} title=${s.label} onClick=${() => setSlide(i)} style=${{ width: i === slide ? '1.1rem' : '0.7rem', height: '3px', borderRadius: '5px', border: 'none', padding: 0, cursor: 'pointer', background: i === slide ? 'var(--bk-accent)' : 'var(--bk-line)', opacity: i === slide ? 1 : 0.5, transition: 'width 0.25s cubic-bezier(0.22,1,0.36,1), opacity 0.25s' }}></button>
             `)}
           </div>
+          <div className="bk-meta" style=${{ fontSize: '0.55rem' }}>
+            <span style=${{ color: 'var(--bk-accent)' }}>${String(slide + 1).padStart(2, '0')}</span> / ${String(SLIDES.length).padStart(2, '0')}
+          </div>
         </div>
       </div>
 
-      <!-- bottom -->
-      <div className="std-divider"></div>
-
-      <div className="std-specs">
-        <div className="std-spec">
-          <div className="std-spec-label">🔥 BTU Cooling</div>
-          <div className="std-spec-value">${PTAC.specs.btuCooling}</div>
+      <div className="bento-text">
+        <div style=${{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '0.6rem' }}>
+          <h3 className="bento-title" style=${{ margin: 0 }}>Seasons <em>PTAC</em></h3>
+          <div style=${{ fontFamily: "'DM Serif Display', serif", fontSize: '1.5rem', lineHeight: 1, color: 'var(--bk-text)' }}>
+            <sup style=${{ fontSize: '0.8rem', opacity: 0.6, marginRight: '0.05rem' }}>$</sup>${priceInt}<span style=${{ fontSize: '0.85rem', opacity: 0.6, marginLeft: '0.1rem' }}>.${priceDec}</span>
+          </div>
         </div>
-        <div className="std-spec">
-          <div className="std-spec-label">⚡ Voltage</div>
-          <div className="std-spec-value">${PTAC.specs.voltage}</div>
-        </div>
-        <div className="std-spec">
-          <div className="std-spec-label">🧊 Refrigerant</div>
-          <div className="std-spec-value">${PTAC.specs.refrigerant}</div>
-        </div>
-      </div>
+        <p className="bento-desc">Part #${PTAC.partNumber} · HD Supply — Seasons 9000 BTU PTAC unit, in stock and ready to broadcast to the service desk.</p>
 
-      <div className="std-price-row">
-        <div className="std-price-tag"><sup>$</sup>${priceInt}<span style=${{ fontSize: '0.9rem', opacity: 0.6, marginLeft: '0.1rem' }}>.${priceDec}</span></div>
-        <div className="std-a2a"><span className="std-dot"></span>HD SUPPLY LIVE</div>
-      </div>
+        <div style=${{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.45rem', marginTop: '0.8rem' }}>
+          <div className="bk-row" style=${{ flexDirection: 'column', alignItems: 'flex-start', gap: '0.15rem', padding: '0.5rem 0.6rem' }}>
+            <span className="bk-meta" style=${{ fontSize: '0.5rem' }}>BTU Cooling</span>
+            <span style=${{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--bk-text)' }}>${PTAC.specs.btuCooling}</span>
+          </div>
+          <div className="bk-row" style=${{ flexDirection: 'column', alignItems: 'flex-start', gap: '0.15rem', padding: '0.5rem 0.6rem' }}>
+            <span className="bk-meta" style=${{ fontSize: '0.5rem' }}>Voltage</span>
+            <span style=${{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--bk-text)' }}>${PTAC.specs.voltage}</span>
+          </div>
+          <div className="bk-row" style=${{ flexDirection: 'column', alignItems: 'flex-start', gap: '0.15rem', padding: '0.5rem 0.6rem' }}>
+            <span className="bk-meta" style=${{ fontSize: '0.5rem' }}>Refrigerant</span>
+            <span style=${{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--bk-text)' }}>${PTAC.specs.refrigerant}</span>
+          </div>
+        </div>
 
-      <div className="std-cta-row">
-        <a className="std-cta" href=${PTAC.hdSupplyUrl} target="_blank" rel="noopener noreferrer">View HD Supply ↗</a>
-        <button className="std-cta primary" onClick=${() => orderPart()}>Order part</button>
+        <div style=${{ display: 'flex', gap: '0.45rem', marginTop: '0.9rem' }}>
+          <a className="bk-btn" style=${{ marginTop: 0, flex: 1, justifyContent: 'center' }} href=${PTAC.hdSupplyUrl} target="_blank" rel="noopener noreferrer">View HD Supply ↗</a>
+          <button className="bk-btn primary gradient-mask-btn" style=${{ marginTop: 0, flex: 1, justifyContent: 'center' }} onClick=${() => orderPart()}>Order part</button>
+        </div>
       </div>
     </div>
   `;
@@ -295,7 +258,7 @@ function ESA_InvPartsCardBView() {
 
 export const ESAInvPartsCardB = {
   name: 'invpartscard-B',
-  version: '2.0.0',
+  version: '3.0.0',
   kind: 'react',
 
   mount(container, props = {}) {
