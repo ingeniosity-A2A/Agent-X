@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Node.js console syntax (both exoskeletons)
+      - name: Node.js console syntax
         run: |
           find esa-exoskeleton -name '*.js' -not -path '*/node_modules/*' -print0 \
             | xargs -0 -n1 node --check || exit 1
@@ -24,7 +24,7 @@ jobs:
         run: |
           node -e '
             const fs = require("fs"), path = require("path");
-            const roots = ["esa-exoskeleton/public", "esa-exoskeleton/public/esa-console"];
+            const roots = ["esa-exoskeleton/public"];
             let bad = 0;
             for (const root of roots) {
               const files = [];
@@ -45,7 +45,7 @@ jobs:
               }
             }
             if (bad) process.exit(1);
-            console.log("Isolation OK: both exoskeletons self-contained");
+            console.log("Isolation OK: exoskeleton self-contained");
           '
 
       - name: Hub event symmetry (dispatched vs labeled)
@@ -68,5 +68,4 @@ jobs:
               else console.log(root + " events symmetric (" + dispatched.size + " dispatched)");
             }
             checkConsole(".");
-            checkConsole("esa-console");
           '

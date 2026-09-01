@@ -1,10 +1,15 @@
 /**
  * ESA.workorder.js (Arrow.js Compatible - FULLY FIXED)
  * ============================================
- * HELP ASSEMBLY JOB ORDER SYSTEM (furniture assembly)
+ * UNIFIED MAINTENANCE WORKORDER SYSTEM
  * 
- * CRITICAL FIX: All ${} removed from style attributes!
- * Dynamic styling now via post-mount DOM manipulation only.
+ * FIX 1: All ${} removed from style attributes (hardcoded styles only).
+ * FIX 2: Template root <div> is now properly closed — Arrow.js threw
+ *        "Invalid HTML position" on the unbalanced template.
+ * FIX 3: Module-scope `methods` binding — the helpers (renderPartsList,
+ *        renderCatalog, updateCostDisplay) and post-mount listeners call
+ *        methods.* which previously threw "methods is not defined".
+ * Dynamic styling via post-mount DOM manipulation only.
  */
 
 import { reactive, html } from 'https://esm.sh/@arrow-js/core';
@@ -26,6 +31,11 @@ const G = {
   fg_soft: '#a89984'
 };
 
+// Module-scope methods binding. Assigned right after the component below is
+// created; the wrapper now exposes .methods. Lets the module-scope helpers
+// (renderPartsList, renderCatalog, updateCostDisplay, ...) reach the methods.
+let methods = null;
+
 export const ESAWorkorder = ESAVerifyComponent({
   name: 'workorder',
   version: '2.0.1',
@@ -35,35 +45,35 @@ export const ESAWorkorder = ESAVerifyComponent({
     activeSideTab: 'workorder',
     workorderId: 'WO-2026-001',
     workorderData: {
-      customer: 'Marcus Bennett',
-      orderNumber: 'HA-ORD-1042',
-      location: '4120 Peachtree Rd NE, Atlanta',
-      technician: 'Marcus Bennett',
+      unitModel: 'SP09EA2-20',
+      serialNumber: 'YYMM080523',
+      location: 'Room 304 - Building A',
+      technician: 'John Smith',
       status: 'in_progress',
-      assemblyCode: 'W1',
-      laborHours: 2.0,
-      warrantyClaim: false,
+      diagnosticCode: 'F1',
+      laborHours: 1.5,
+      warrantyClaim: true,
       notes: '',
       createdAt: new Date().toISOString()
     },
     partsList: [
-      { part: 'HA-2001', name: 'Cam Lock Kit (50-pk)', qty: 1, cost: 12.99 }
+      { part: '203862', name: 'Indoor Ambient Thermistor', qty: 1, cost: 45.00 }
     ],
     maintenanceComplete: false,
     showPartsCatalog: false,
     
-    // Available parts from catalog (Help Assembly hardware)
+    // Available parts from catalog
     catalogParts: [
-      { sku: 'HA-2001', name: 'Cam Lock Kit (50-pk)', price: 12.99 },
-      { sku: 'HA-2002', name: 'Dowel Pin Set (8mm, 100-pk)', price: 8.50 },
-      { sku: 'HA-2007', name: 'Wall Anchor Kit (50-pk)', price: 11.25 },
-      { sku: 'HA-2003', name: 'Allen Wrench Set (Metric)', price: 15.00 }
+      { sku: 'HD-4421', name: 'Seasons 9000 BTU PTAC Unit', price: 899.00 },
+      { sku: 'HD-1180', name: 'PTAC Subbase 20A', price: 45.00 },
+      { sku: 'HD-9033', name: 'Double Packed Filter', price: 12.50 },
+      { sku: 'HD-2205', name: 'Wireless Thermostat', price: 159.00 }
     ],
     
-    // Job order history
+    // Workorder history
     history: [
-      { id: 'WO-2026-000', date: '2026-08-15', unit: 'HA-1001 Standard Assembly', status: 'completed', cost: 245.00 },
-      { id: 'WO-2025-042', date: '2026-08-10', unit: 'HA-1002 Premium Assembly', status: 'completed', cost: 89.00 }
+      { id: 'WO-2026-000', date: '2026-08-15', unit: 'SP09EA2-20', status: 'completed', cost: 245.00 },
+      { id: 'WO-2025-042', date: '2026-08-10', unit: 'SP09EA2-20', status: 'completed', cost: 89.00 }
     ]
   },
   
@@ -112,7 +122,7 @@ export const ESAWorkorder = ESAVerifyComponent({
       state.history.unshift({
         id: state.workorderId,
         date: new Date().toISOString().split('T')[0],
-        unit: state.workorderData.orderNumber + ' · ' + state.workorderData.customer,
+        unit: state.workorderData.unitModel,
         status: 'completed',
         cost: totalCost
       });
@@ -159,7 +169,7 @@ export const ESAWorkorder = ESAVerifyComponent({
       border-radius: 12px;
       overflow: hidden;
     ">
-      <!-- Side Navigation -->
+      
       <div style="
         width: 220px;
         background: #32302f;
@@ -167,12 +177,13 @@ export const ESAWorkorder = ESAVerifyComponent({
         display: flex;
         flex-direction: column;
         padding: 20px 0;
-      ">          <div style="padding: 0 20px 20px; border-bottom: 2px solid #3c3836; margin-bottom: 20px;">
-          <div style="font-weight: bold; color: #d79921;">HA JOB ORDER</div>
+      ">
+        <div style="padding: 0 20px 20px; border-bottom: 2px solid #3c3836; margin-bottom: 20px;">
+          <div style="font-weight: bold; color: #d79921;">ESA WORKORDER</div>
           <div id="wo-id-display" style="font-size: 11px; color: #a89984;">${() => state.workorderId}</div>
         </div>
         
-        <!-- Side Tabs - HARDCODED styles, active state via DOM -->
+        
         <button class="wo-side-tab" data-tab="workorder" style="
           width: 100%;
           padding: 14px 20px;
@@ -185,7 +196,7 @@ export const ESAWorkorder = ESAVerifyComponent({
           font-weight: bold;
           font-size: 13px;
           transition: all 0.2s;
-        ">📋 Job Order</button>
+        ">📋 Workorder</button>
         
         <button class="wo-side-tab" data-tab="parts" style="
           width: 100%;
@@ -213,7 +224,7 @@ export const ESAWorkorder = ESAVerifyComponent({
           font-weight: normal;
           font-size: 13px;
           transition: all 0.2s;
-        ">🔍 QA Check</button>
+        ">🔍 Diagnostics</button>
         
         <button class="wo-side-tab" data-tab="history" style="
           width: 100%;
@@ -229,7 +240,7 @@ export const ESAWorkorder = ESAVerifyComponent({
           transition: all 0.2s;
         ">📜 History</button>
         
-        <!-- Status Indicator -->
+        
         <div style="margin-top: auto; padding: 20px;">
           <div id="wo-status-badge" style="
             padding: 12px;
@@ -245,15 +256,15 @@ export const ESAWorkorder = ESAVerifyComponent({
         </div>
       </div>
       
-      <!-- Main Content -->
+      
       <div style="flex: 1; padding: 24px; overflow-y: auto;">
         
-        <!-- WORKORDER TAB -->
+        
         <div class="wo-tab-panel" data-panel="workorder" id="wo-panel-workorder" style="display: block;">
           <div style="max-width: 800px;">
-            <h2 style="color: #d79921; margin-bottom: 24px;">Job Order Details</h2>
+            <h2 style="color: #d79921; margin-bottom: 24px;">Workorder Details</h2>
             
-            <!-- Job Information -->
+            
             <div style="
               background: #32302f;
               border: 1px solid #3c3836;
@@ -261,19 +272,19 @@ export const ESAWorkorder = ESAVerifyComponent({
               padding: 20px;
               margin-bottom: 20px;
             ">
-              <h3 style="color: #689d6a; margin-bottom: 16px;">JOB INFORMATION</h3>
+              <h3 style="color: #689d6a; margin-bottom: 16px;">UNIT INFORMATION</h3>
               <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
                 <div>
-                  <div style="font-size: 11px; color: #a89984;">Customer</div>
-                  <div id="wo-unit-model" style="font-weight: bold;">Marcus Bennett</div>
+                  <div style="font-size: 11px; color: #a89984;">Model</div>
+                  <div id="wo-unit-model" style="font-weight: bold;">SP09EA2-20</div>
                 </div>
                 <div>
-                  <div style="font-size: 11px; color: #a89984;">Order #</div>
-                  <div id="wo-serial" style="font-weight: bold;">HA-ORD-1042</div>
+                  <div style="font-size: 11px; color: #a89984;">Serial</div>
+                  <div id="wo-serial" style="font-weight: bold;">YYMM080523</div>
                 </div>
                 <div>
                   <div style="font-size: 11px; color: #a89984;">Location</div>
-                  <div id="wo-location" style="font-weight: bold;">4120 Peachtree Rd NE, Atlanta</div>
+                  <div id="wo-location" style="font-weight: bold;">Room 304 - Building A</div>
                 </div>
                 <div>
                   <div style="font-size: 11px; color: #a89984;">Status</div>
@@ -282,7 +293,7 @@ export const ESAWorkorder = ESAVerifyComponent({
               </div>
             </div>
             
-            <!-- Parts Used -->
+            
             <div style="
               background: #32302f;
               border: 1px solid #3c3836;
@@ -306,7 +317,7 @@ export const ESAWorkorder = ESAVerifyComponent({
                 >+ ADD PART</button>
               </div>
               
-              <!-- Parts Catalog (toggleable) -->
+              
               <div id="wo-parts-catalog" style="
                 margin-bottom: 16px;
                 padding: 16px;
@@ -319,10 +330,10 @@ export const ESAWorkorder = ESAVerifyComponent({
                 <div id="wo-catalog-list" style="display: grid; gap: 8px;"></div>
               </div>
               
-              <!-- Parts List Container -->
+              
               <div id="wo-parts-list" style="display: grid; gap: 12px;"></div>
               
-              <!-- Cost Summary -->
+              
               <div style="
                 margin-top: 20px;
                 padding-top: 16px;
@@ -346,7 +357,7 @@ export const ESAWorkorder = ESAVerifyComponent({
               </div>
             </div>
             
-            <!-- Notes & Completion -->
+            
             <div style="
               background: #32302f;
               border: 1px solid #3c3836;
@@ -394,8 +405,8 @@ export const ESAWorkorder = ESAVerifyComponent({
               
               <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                  <input type="checkbox" id="wo-warranty-check" style="width: 18px; height: 18px;" />
-                  <span style="font-size: 13px;">Customer Sign-off</span>
+                  <input type="checkbox" id="wo-warranty-check" checked style="width: 18px; height: 18px;" />
+                  <span style="font-size: 13px;">Warranty Claim</span>
                 </label>
               </div>
               
@@ -412,7 +423,7 @@ export const ESAWorkorder = ESAVerifyComponent({
                   font-weight: bold;
                   cursor: pointer;
                 "
-              >✓ COMPLETE ASSEMBLY</button>
+              >✓ COMPLETE MAINTENANCE</button>
               
               <div id="wo-completion-msg" style="
                 margin-top: 12px;
@@ -428,15 +439,15 @@ export const ESAWorkorder = ESAVerifyComponent({
           </div>
         </div>
         
-        <!-- PARTS TAB -->
+        
         <div class="wo-tab-panel" data-panel="parts" id="wo-panel-parts" style="display: none;">
-          <h2 style="color: #d79921; margin-bottom: 24px;">Hardware Inventory</h2>
+          <h2 style="color: #d79921; margin-bottom: 24px;">Parts Inventory</h2>
           <div id="wo-parts-inventory" style="display: grid; gap: 12px;"></div>
         </div>
         
-        <!-- DIAGNOSTICS TAB (Assembly QA Check) -->
+        
         <div class="wo-tab-panel" data-panel="diagnostics" id="wo-panel-diagnostics" style="display: none;">
-          <h2 style="color: #d79921; margin-bottom: 24px;">Assembly QA Codes</h2>
+          <h2 style="color: #d79921; margin-bottom: 24px;">Diagnostic Codes</h2>
           <div style="
             background: #32302f;
             border: 1px solid #3c3836;
@@ -448,7 +459,7 @@ export const ESAWorkorder = ESAVerifyComponent({
                 id="wo-diag-input"
                 type="text"
                 maxlength="2"
-                placeholder="Enter QA code..."
+                placeholder="Enter code..."
                 style="
                   flex: 1;
                   background: #282828;
@@ -482,20 +493,24 @@ export const ESAWorkorder = ESAVerifyComponent({
               padding: 16px;
               min-height: 100px;
             ">
-              <p style="color: #a89984; text-align: center;">Enter an assembly QA code to lookup</p>
+              <p style="color: #a89984; text-align: center;">Enter a diagnostic code to lookup</p>
             </div>
           </div>
         </div>
         
-        <!-- HISTORY TAB -->
+        
         <div class="wo-tab-panel" data-panel="history" id="wo-panel-history" style="display: none;">
-          <h2 style="color: #d79921; margin-bottom: 24px;">Job Order History</h2>
+          <h2 style="color: #d79921; margin-bottom: 24px;">Workorder History</h2>
           <div id="wo-history-list" style="display: grid; gap: 12px;"></div>
         </div>
         
       </div>
+    </div>
     `
 });
+
+// Bind the component's methods for the helpers + post-mount block below
+methods = ESAWorkorder.methods;
 
 // Global reference for DOM updates
 let container = null;
@@ -658,7 +673,7 @@ function renderHistory(state, container) {
     ">
       <div>
         <div style="font-weight: bold; color: #d79921;">${item.id}</div>
-        <div style="font-size: 12px; color: #a89984;">${item.date} | Job: ${item.unit}</div>
+        <div style="font-size: 12px; color: #a89984;">${item.date} | Unit: ${item.unit}</div>
       </div>
       <div style="text-align: right">
         <div style="color: #98971a; font-weight: bold;">$${item.cost.toFixed(2)}</div>
@@ -681,7 +696,9 @@ function updateCostDisplay(state, container) {
 }
 
 function updateStatusBadge(state, container) {
-  if (!container) return;    const badge = container.querySelector('#wo-status-badge');
+  if (!container) return;
+  
+  const badge = container.querySelector('#wo-status-badge');
   const statusText = container.querySelector('#wo-status');
   const completeBtn = container.querySelector('#wo-complete-btn');
   const completionMsg = container.querySelector('#wo-completion-msg');
@@ -697,11 +714,11 @@ function updateStatusBadge(state, container) {
   if (completeBtn) {
     completeBtn.disabled = true;
     completeBtn.style.background = G.fg_soft;
-    completeBtn.textContent = '✓ ASSEMBLY COMPLETED';
+    completeBtn.textContent = '✓ MAINTENANCE COMPLETED';
   }
   if (completionMsg) {
     completionMsg.style.display = 'block';
-    completionMsg.textContent = `✓ Job completed at ${new Date().toLocaleString()}`;
+    completionMsg.textContent = `✓ Completed at ${new Date().toLocaleString()}`;
   }
 }
 
@@ -785,11 +802,11 @@ ESAWorkorder.mount = function(containerRef) {
         const resultEl = container.querySelector('#wo-diag-result');
         if (resultEl) {
           const diagnostics = {
-            'W1': 'Unit wobbles - tighten cam locks and re-check level',
-            'M1': 'Panel misaligned - loosen, realign, re-seat panels',
-            'H1': 'Missing hardware - verify parts list and install',
-            'T1': 'Cam lock not engaged - turn to locked position',
-            'S1': 'Surface damage - document and note for follow-up'
+            'F1': 'Indoor Thermistor Fault - Replace black thermistor',
+            'F2': 'Outdoor Thermistor Fault - Replace outdoor sensor',
+            'F3': 'Indoor Coil Sensor Fault - Check connection',
+            'F6': 'Communication Error - Check wiring harness',
+            'C1': 'Coil Freezing - Check refrigerant charge'
           };
           if (diagnostics[code]) {
             resultEl.innerHTML = `<div style="color: #98971a; font-weight: bold;">${code}: ${diagnostics[code]}</div>`;

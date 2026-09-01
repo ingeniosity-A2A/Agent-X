@@ -25,9 +25,8 @@
  * card / divider / list / stats / system), a chat hook (`useESAChat`,
  * mirroring `useChat`), attachments, and streaming status.
  *
- * Scope: HELP ASSEMBLY SERVICES ONLY. Sole communication hub for the
- * Help Assembly Exoskeleton console. Agent X provides logic & reasoning;
- * Ava007 provides voice. Not an Intellect host.
+ * Scope: HUB ACTIVE. Sole communication hub for the ESA EXOSKELETON
+ * console, routed to Cybernetic Ava007 via substrate. Not an Intellect host.
  */
 
 import {
@@ -56,7 +55,6 @@ const HUB_LABELS = {
   'esa:part-removed': ['➖', 'Part removed'],
   'esa:lookup-part': ['🔎', 'Part lookup'],
   'esa:run-diagnostic': ['🩺', 'Diagnostic run'],
-  'esa:open-diagnostics': ['🩺', 'Open diagnostics'],
   'esa:add-part-to-workorder': ['➕', 'Workorder part'],
   'esa:broadcast': ['📡', 'Broadcast'],
   'esa:broadcast-toggle': ['📡', 'Broadcast toggle'],
@@ -122,7 +120,7 @@ function SoundPanel({ side, audio, compact }) {
         setMicActive(true);
         setTimeout(() => startVisualizer(analyser), 60);
       } catch (err) {
-        console.warn('[HA.Ingestion] Mic denied:', err.message);
+        console.warn('[ESA.Ingestion] Mic denied:', err.message);
         setMicActive(false);
         setStatus('ERROR');
       }
@@ -222,7 +220,7 @@ function PartCard({ card }) {
   `;
 }
 
-// Lens picker — operator taps the item they photographed → renders product + quote
+// Lens picker — operator taps the part they photographed → renders product card
 function PartMatch({ part, chat }) {
   return html`
     <div style=${{ margin: '6px 0' }}>
@@ -243,7 +241,7 @@ function PartMatch({ part, chat }) {
   `;
 }
 
-// Product render card — the approved standard, with quote + book actions
+// 3D-style product render card — PTAC unit visual + info + inventory + workorder actions
 function PartProduct({ product, chat }) {
   const p = product || {};
   return html`
@@ -252,21 +250,40 @@ function PartProduct({ product, chat }) {
         <span style=${{ background: 'rgba(200,168,130,0.12)', color: CARD.warm, border: `1px solid ${CARD.border}`, borderRadius: '4px', padding: '2px 8px', fontSize: '9px', fontWeight: 'bold', letterSpacing: '1px' }}>${p.sku}</span>
         <span style=${{ fontSize: '8px', color: CARD.muted }}>${p.category}</span>
       </div>
-      <div style=${{ fontFamily: "'DM Serif Display', serif", fontSize: '15px', color: CARD.paper, marginBottom: '4px' }}>${p.name}</div>
+      <div style=${{ fontFamily: "'DM Serif Display', serif", fontSize: '15px', color: CARD.paper, marginBottom: '8px' }}>${p.name}</div>
       ${p.model ? html`
-        <model-viewer src=${p.model} alt=${p.name} auto-rotate camera-controls camera-orbit="0deg 78deg 105%" shadow-intensity="1" style=${{ width: '100%', height: '130px', margin: '4px 0 8px', background: 'transparent', borderRadius: '8px', display: 'block' }}></model-viewer>
-      ` : ''}
-      <div style=${{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '6px' }}>
-        <div>
-          <div style=${{ fontSize: '7px', letterSpacing: '1px', color: CARD.muted, textTransform: 'uppercase' }}>Quote</div>
-          <div style=${{ fontSize: '17px', fontWeight: 'bold', color: CARD.status }}>$${Number(p.price).toFixed(2)}</div>
+        <model-viewer src=${p.model} alt=${p.name} auto-rotate camera-controls camera-orbit="0deg 78deg 105%" shadow-intensity="1" style=${{ width: '100%', height: '130px', margin: '2px 0 8px', background: 'transparent', borderRadius: '8px', display: 'block' }}></model-viewer>
+      ` : html`
+        <!-- CSS 3D unit fallback: sleeve + vent slats + brand + LED -->
+        <div style=${{ position: 'relative', height: '74px', margin: '2px 0 10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style=${{ position: 'absolute', bottom: '2px', width: '120px', height: '14px', background: 'radial-gradient(ellipse, rgba(176,125,79,0.35) 0%, transparent 70%)' }}></div>
+          <div style=${{ position: 'relative', width: '128px', height: '58px', borderRadius: '10px', background: 'linear-gradient(180deg, #2b2620 0%, #1c1813 100%)', border: `1px solid ${CARD.border}`, boxShadow: '0 14px 26px rgba(0,0,0,0.55), inset 0 1px 0 rgba(200,168,130,0.25)' }}>
+            <div style=${{ position: 'absolute', inset: '8px 10px', display: 'flex', gap: '4px', alignItems: 'flex-end' }}>
+              ${[14, 18, 22, 18, 14].map((h, i) => html`<div key=${i} style=${{ flex: 1, height: h + 'px', background: 'rgba(200,168,130,0.5)', borderRadius: '2px 2px 0 0' }}></div>`)}
+            </div>
+            <div style=${{ position: 'absolute', top: '3px', left: '50%', transform: 'translateX(-50%)', fontSize: '6px', letterSpacing: '2px', color: 'rgba(200,168,130,0.6)', fontWeight: 'bold' }}>SEASONS</div>
+            <div style=${{ position: 'absolute', bottom: '4px', right: '7px', width: '5px', height: '5px', borderRadius: '50%', background: '#7ec8a0', boxShadow: '0 0 6px #7ec8a0' }}></div>
+          </div>
         </div>
-        <div style=${{ display: 'flex', gap: '6px' }}>
-          <button onClick=${() => chat && chat.send('quote ' + p.sku)} style=${{ background: CARD.glass, color: CARD.paper, border: `1px solid ${CARD.border}`, borderRadius: '999px', padding: '5px 10px', fontSize: '8.5px', fontWeight: 'bold', cursor: 'pointer' }}>📝 QUOTE</button>
-          <button onClick=${() => chat && chat.send('book ' + p.sku)} style=${{ background: 'linear-gradient(135deg, #b07d4f, #c8a882)', color: '#0d0d0d', border: 'none', borderRadius: '999px', padding: '5px 10px', fontSize: '8.5px', fontWeight: 'bold', cursor: 'pointer' }}>📅 BOOK</button>
+      `}
+      <div style=${{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5px', marginBottom: '8px' }}>
+        <div style=${{ background: CARD.glass, border: `1px solid ${CARD.border}`, borderRadius: '6px', padding: '4px 6px' }}>
+          <div style=${{ fontSize: '6.5px', letterSpacing: '1px', color: CARD.muted, textTransform: 'uppercase' }}>Price</div>
+          <div style=${{ fontSize: '13px', fontWeight: 'bold', color: CARD.status }}>$${Number(p.price).toFixed(2)}</div>
+        </div>
+        <div style=${{ background: CARD.glass, border: `1px solid ${CARD.border}`, borderRadius: '6px', padding: '4px 6px' }}>
+          <div style=${{ fontSize: '6.5px', letterSpacing: '1px', color: CARD.muted, textTransform: 'uppercase' }}>Inventory</div>
+          <div style=${{ fontSize: '13px', fontWeight: 'bold', color: CARD.paper }}>${p.inventory} @ ${p.location}</div>
         </div>
       </div>
-      <div style=${{ marginTop: '6px', fontSize: '8px', color: CARD.muted }}>📍 ${p.location} · ${Number(p.inventory) > 0 ? `${p.inventory} in stock` : 'Service — field scheduling'}</div>
+      <div style=${{ display: 'flex', gap: '6px' }}>
+        <button
+          onClick=${() => window.dispatchEvent(new CustomEvent('esa:order-part', { detail: { sku: p.sku, name: p.name, price: p.price } }))}
+          style=${{ flex: 1, background: 'linear-gradient(135deg, #b07d4f, #c8a882)', color: '#0d0d0d', border: 'none', borderRadius: '999px', padding: '6px 10px', fontSize: '8.5px', fontWeight: 'bold', cursor: 'pointer' }}>🛒 ORDER PART</button>
+        <button
+          onClick=${() => window.dispatchEvent(new CustomEvent('esa:create-workorder', { detail: { sku: p.sku, part: p.name } }))}
+          style=${{ flex: 1, background: CARD.glass, color: CARD.paper, border: `1px solid ${CARD.border}`, borderRadius: '999px', padding: '6px 10px', fontSize: '8.5px', fontWeight: 'bold', cursor: 'pointer' }}>📋 WORK ORDER</button>
+      </div>
     </div>
   `;
 }
@@ -338,7 +355,7 @@ function MessageBubble({ message, chat }) {
     <div style=${{ display: 'flex', justifyContent: isUser ? 'flex-end' : 'flex-start', margin: '7px 0' }}>
       <div style=${{ maxWidth: '88%', background: isUser ? 'rgba(245,240,235,0.07)' : 'rgba(200,168,130,0.09)', border: `1px solid ${CARD.border}`, borderRadius: '10px', padding: '6px 10px' }}>
         <div style=${{ fontSize: '7.5px', fontWeight: 'bold', marginBottom: '3px', letterSpacing: '1px', color: isUser ? CARD.warm : CARD.status }}>
-          ${isUser ? '👤 OPERATOR' : '🤖 AGENT X'}
+          ${isUser ? '👤 OPERATOR' : '🤖 AGENT'}
         </div>
         ${message.parts.map((part, i) => html`<${PartView} part=${part} key=${i} chat=${chat} />`)}
       </div>
@@ -428,11 +445,11 @@ function ChatCard({ chat }) {
 
       <!-- top -->
       <div className="std-head">
-        <div className="std-brand"><span className="std-brand-tile">HA</span> HELP ASSEMBLY</div>
-        <span className="std-pill warm"><span className="std-dot flat"></span>SERVICES HUB</span>
+        <div className="std-brand"><span className="std-brand-tile">AI</span> Chat</div>
+        <span className="std-pill warm"><span className="std-dot flat"></span>HUB ACTIVE</span>
       </div>
-      <div className="std-title">Assembly <em>Hub</em></div>
-      <div className="std-sub">Agent X reasoning · Ava007 voice</div>
+      <div className="std-title">Ingestion <em>Hub</em></div>
+      <div className="std-sub">Sole comms hub · Ava007 substrate</div>
 
       <!-- middle: meta | model zone (thread) | stepper -->
       <div className="std-middle">
@@ -510,20 +527,21 @@ function DockVisualizer({ audio }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// DOCK — the bottom Ingestion Interface (floating prompt bar)
+// DOCK — AI Chatbot Ingestion (locked layout: prompt row + bottom row +
+// tall Lens column on the far right; speakers on each END of the bottom)
 // ─────────────────────────────────────────────────────────────────────
 
 const ADD_ACTIONS = [
-  { id: 'photo', icon: '🖼️', label: 'Add photos or videos', sub: 'Lens capture → service catalog scan' },
+  { id: 'photo', icon: '🖼️', label: 'Add photos or videos', sub: 'Lens capture → HD Supply scan' },
   { id: 'file', icon: '📄', label: 'Add files (docs, txt…)', sub: 'PDF / TXT into Ingestion' },
   { id: 'email', icon: '✉️', label: 'Email to AgentMail', sub: 'ava007@agentmail.to' }
 ];
 
 const QUICK_PROMPTS = [
-  { icon: '📋', label: 'Service catalog', text: 'Show services by category' },
-  { icon: '📅', label: 'Availability today', text: 'Check same-day availability' },
-  { icon: '💰', label: 'Get a quote', text: 'Quote a furniture assembly service' },
-  { icon: '📦', label: 'Parts inventory', text: 'Show hardware and supplies stock' }
+  { icon: '📊', label: 'Inventory status', text: 'Show current inventory status' },
+  { icon: '🔎', label: 'Lookup a SKU', text: 'Look up part ' },
+  { icon: '🛠️', label: 'PTAC parts', text: 'Show PTAC parts in the catalog' },
+  { icon: '📦', label: 'Filter stock', text: 'Show filter stock in the catalog' }
 ];
 
 function Dock({ chat, audio, onEmail }) {
@@ -554,9 +572,9 @@ function Dock({ chat, audio, onEmail }) {
       setPreview(dataURL);
       const blob = dataURLToBlob(dataURL);
       const file = new File([blob], `esa_img_${Date.now()}.png`, { type: 'image/png' });
-      await handleFileToChat(chat, file, 'image'); // → lens → service catalog scan
+      await handleFileToChat(chat, file, 'image'); // → lens → HD Supply scan
     } catch (err) {
-      console.warn('[HA.Ingestion] Lens error:', err.message);
+      console.warn('[ESA.Ingestion] Lens error:', err.message);
       chat.pushSystem(`⚠️ Lens capture failed: ${err.message}`);
     } finally {
       setBusy(false);
@@ -580,13 +598,21 @@ function Dock({ chat, audio, onEmail }) {
         setMicOn(true);
         setMicErr(false);
       } catch (err) {
-        console.warn('[HA.Ingestion] Mic denied:', err.message);
+        console.warn('[ESA.Ingestion] Mic denied:', err.message);
         setMicErr(true);
       }
     } else {
       audio.disableMicrophone();
       setMicOn(false);
     }
+  };
+
+  // Agent voice chime — outbound speaker on the right END of the bottom row
+  const testVoice = () => {
+    if (!audio) return;
+    audio.triggerAvaVoice(523, 0.6, { duration: 0.22 });
+    setTimeout(() => audio.triggerAvaVoice(659, 0.6, { duration: 0.22 }), 220);
+    setTimeout(() => audio.triggerAvaVoice(784, 0.8, { duration: 0.4 }), 460);
   };
 
   const handleAdd = (id) => {
@@ -616,90 +642,109 @@ function Dock({ chat, audio, onEmail }) {
         </div>
       ` : ''}
 
-      <div className="esa-dock">
-        <div className="esa-dock-side">
-          <${SoundPanel} side="left" audio=${audio} compact />
+      <div className="ai-dock-row">
+        <!-- Speaker LEFT — OUTSIDE the chatbot (inbound Sound I / mic) -->
+        <button
+          className=${`ai-speaker ai-speaker-left${micOn ? ' active' : ''}`}
+          onClick=${() => toggleMic()}
+          data-tip=${micOn ? 'Sound I — stop mic' : 'Sound I — mic'}
+          aria-pressed=${micOn ? 'true' : 'false'}
+        >🎤</button>
+
+        <div className="ai-shell">
+        <div className="ai-prompt-row">
+          <${DockVisualizer} audio=${audio} />
+          <input
+            type="text"
+            value=${chat.input}
+            onChange=${e => chat.setInput(e.target.value)}
+            onKeyDown=${e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); chat.send(); } }}
+            placeholder="Add… (SKU, part, or question)"
+            aria-label="AI Chatbot Ingestion prompt"
+          />
         </div>
 
-        <div className="esa-dock-bar">
-          <!-- Add menu -->
-          <button
-            className=${`esa-dock-btn${menu === 'add' ? ' add-open' : ''}`}
-            onClick=${() => setMenu(menu === 'add' ? null : 'add')}
-            title="Add"
-          >+</button>
-          ${menu === 'add' ? html`
-            <div className="esa-dock-pop">
-              ${ADD_ACTIONS.map(a => html`
-                <button key=${a.id} className="esa-dock-pop-item" onClick=${() => { setMenu(null); handleAdd(a.id); }}>
-                  <span className="esa-dock-pop-ico">${a.icon}</span>
-                  <span>
-                    <span style=${{ display: 'block', fontSize: '12px', color: '#e6e6e6' }}>${a.label}</span>
-                    <span style=${{ display: 'block', fontSize: '9px', color: '#6f6f6f', letterSpacing: '0.3px' }}>${a.sub}</span>
-                  </span>
-                </button>
-              `)}
+        <div className="ai-bottom">
+          <div className="ai-icon-dock">
+            <!-- Add menu -->
+            <div style=${{ position: 'relative', display: 'flex' }}>
+              <button
+                className=${`ai-tool${menu === 'add' ? ' add-open' : ''}`}
+                onClick=${() => setMenu(menu === 'add' ? null : 'add')}
+                data-tip="Add"
+                aria-expanded=${menu === 'add' ? 'true' : 'false'}
+              >+</button>
+              ${menu === 'add' ? html`
+                <div className="esa-dock-pop">
+                  ${ADD_ACTIONS.map(a => html`
+                    <button key=${a.id} className="esa-dock-pop-item" onClick=${() => { setMenu(null); handleAdd(a.id); }}>
+                      <span className="esa-dock-pop-ico">${a.icon}</span>
+                      <span>
+                        <span style=${{ display: 'block', fontSize: '12px', color: '#e6e6e6' }}>${a.label}</span>
+                        <span style=${{ display: 'block', fontSize: '9px', color: '#6f6f6f', letterSpacing: '0.3px' }}>${a.sub}</span>
+                      </span>
+                    </button>
+                  `)}
+                </div>
+              ` : ''}
             </div>
-          ` : ''}
 
-          <!-- Inspiration -->
-          <button
-            className=${`esa-dock-btn${menu === 'inspire' ? ' add-open' : ''}`}
-            onClick=${() => setMenu(menu === 'inspire' ? null : 'inspire')}
-            title="Inspiration — quick catalog prompts"
-          >✨</button>
-          ${menu === 'inspire' ? html`
-            <div className="esa-dock-pop">
-              ${QUICK_PROMPTS.map(p => html`
-                <button key=${p.label} className="esa-dock-pop-item" onClick=${() => runPrompt(p.text)}>
-                  <span className="esa-dock-pop-ico">${p.icon}</span>
-                  <span style=${{ color: '#e6e6e6' }}>${p.label}</span>
-                </button>
-              `)}
+            <!-- Inspiration -->
+            <div style=${{ position: 'relative', display: 'flex' }}>
+              <button
+                className=${`ai-tool${menu === 'inspire' ? ' add-open' : ''}`}
+                onClick=${() => setMenu(menu === 'inspire' ? null : 'inspire')}
+                data-tip="Inspiration — quick catalog prompts"
+                aria-expanded=${menu === 'inspire' ? 'true' : 'false'}
+              >✨</button>
+              ${menu === 'inspire' ? html`
+                <div className="esa-dock-pop">
+                  ${QUICK_PROMPTS.map(p => html`
+                    <button key=${p.label} className="esa-dock-pop-item" onClick=${() => runPrompt(p.text)}>
+                      <span className="esa-dock-pop-ico">${p.icon}</span>
+                      <span style=${{ color: '#e6e6e6' }}>${p.label}</span>
+                    </button>
+                  `)}
+                </div>
+              ` : ''}
             </div>
-          ` : ''}
 
-          <!-- Input + audio visualizer overlay -->
-          <div style=${{ position: 'relative', flex: 1, minWidth: 0 }}>
-            <${DockVisualizer} audio=${audio} />
-            <input
-              className="esa-dock-input"
-              type="text"
-              value=${chat.input}
-              onChange=${e => chat.setInput(e.target.value)}
-              onKeyDown=${e => { if (e.key === 'Enter') chat.send(); }}
-              placeholder="Ask… (service, quote, or SKU)"
-            />
+            <!-- Attach PDF / TXT -->
+            <button
+              className="ai-tool"
+              onClick=${() => { if (fileRef.current) fileRef.current.click(); }}
+              data-tip="Attach PDF / TXT"
+            >📎</button>
           </div>
 
-          <!-- Mic (Sound I) -->
+          <!-- Send — BOTTOM row only -->
           <button
-            className="esa-dock-btn"
-            onClick=${() => toggleMic()}
-            title=${micOn ? 'Stop microphone' : 'Sound I microphone'}
-            style=${{ background: micOn ? '#2a6f4e' : undefined, borderColor: micOn ? '#3f9a6c' : undefined, color: micOn ? '#ffffff' : undefined }}
-          >🎤</button>
-
-          <!-- Send -->
-          <button
-            className="esa-dock-send"
+            className="ai-send"
             onClick=${() => chat.send()}
             disabled=${!canSend}
-            title="Send"
+            aria-label="Send"
           >➤</button>
 
           <input ref=${fileRef} type="file" accept=".pdf,.txt" style=${{ display: 'none' }} onChange=${e => handleUpload(e)} />
         </div>
 
-        <div className="esa-dock-side">
-          <${SoundPanel} side="right" audio=${audio} compact />
+        <!-- Lens — tall column spanning TOP + BOTTOM -->
+        <button
+          className="ai-lens"
+          aria-label="Lens"
+          onClick=${() => activateLens()}
+          disabled=${busy}
+        >◉</button>
         </div>
+
+        <!-- Speaker RIGHT — OUTSIDE the chatbot (outbound agent voice) -->
+        <button className="ai-speaker ai-speaker-right" onClick=${testVoice} data-tip="Agent voice">🔊</button>
       </div>
 
       <div className="esa-dock-meta">
         <span>${catalogLabel(chat.catalogStatus)}</span>
         <span>📡 HUB: ACTIVE</span>
-        <span>🔍 LENS → SERVICE CATALOG</span>
+        <span>🔍 LENS → HD SUPPLY</span>
         <span>✉️ EMAIL → AVA007@AGENTMAIL.TO</span>
         ${micErr ? html`<span style=${{ color: '#e06c5f' }}>🎤 MIC BLOCKED — CHECK PERMISSIONS</span>` : ''}
       </div>
@@ -784,10 +829,10 @@ function ESAIngestionInterface({ onReady }) {
   }, [chat.speakSignal]);
 
   const emailTo = () => {
-    const subject = encodeURIComponent('Help Assembly — Operator request');
+    const subject = encodeURIComponent('ESA Exoskeleton — Operator request');
     const body = encodeURIComponent(
       (chat.input.trim() ? `${chat.input.trim()}\n\n` : '') +
-      `— from Help Assembly console (${new Date().toLocaleString()})`
+      `— from ESA EXOSKELETON console (${new Date().toLocaleString()})`
     );
     window.location.href = `mailto:ava007@agentmail.to?subject=${subject}&body=${body}`;
   };

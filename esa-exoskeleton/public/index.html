@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Help Assembly Console</title>
+  <title>ESA EXOSKELETON</title>
   
   <!-- Cache Busting: Force fresh load -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -422,6 +422,10 @@
       min-height: 0;
       display: grid;
       grid-template-columns: repeat(auto-fit, 24rem);
+      /* Each row sizes to its tallest card — without this, async-mounted
+         card content (workorder 1044px, checklist 1908px) overflows its
+         collapsed track and paints over the neighbouring cards. */
+      grid-auto-rows: max-content;
       justify-content: center;
       gap: 20px;
       align-content: start;
@@ -1057,8 +1061,8 @@
   <div id="esa-loading">
     <div class="esa-loader"></div>
     <div class="esa-loading-brand">
-      <div class="esa-loading-title">HELP ASSEMBLY</div>
-      <div class="esa-loading-subtitle">Agent X reasoning · Ava007 voice</div>
+      <div class="esa-loading-title">ESA EXOSKELETON</div>
+      <div class="esa-loading-subtitle">Hotel Maintenance Service · Ava007 voice</div>
     </div>
   </div>
   
@@ -1067,7 +1071,7 @@
     <div class="esa-error-icon">⚠️</div>
     <div class="esa-error-title">System Initialization Failed</div>
     <div class="esa-error-message" id="esa-error-message">
-      The Help Assembly console failed to load. Please check your connection and try again.
+      The ESA Exoskeleton failed to load. Please check your connection and try again.
     </div>
     <button class="esa-error-retry" onclick="location.reload()">Reload System</button>
   </div>
@@ -1078,7 +1082,7 @@
     <header class="esa-header">
       <h1 class="esa-title">
         <span>🛡️</span>
-        <span>HELP ASSEMBLY</span>
+        <span>ESA EXOSKELETON</span>
       </h1>
       <div class="esa-status-badge">
         <div class="esa-status-dot"></div>
@@ -1159,7 +1163,14 @@
     }
   </script>
   
+  <!-- Shell wiring: service nav + stage + AI Chatbot Ingestion dock (LOAD-SHELL.md).
+       Order matters: shell-layout.css first, dock css LAST so it wins the cascade. -->
+  <link rel="stylesheet" href="./shell-layout.css">
+  <link rel="stylesheet" href="./ai-chatbot-dock.css">
+  <script src="./mount-alias.js"></script>
+  <script src="./shell-nav.js" defer></script>
+
   <!-- MAIN APPLICATION MODULE -->
-  <script type="module" src="./integration.js?v=332"></script>
+  <script type="module" src="./integration.js?v=401"></script>
 </body>
 </html>

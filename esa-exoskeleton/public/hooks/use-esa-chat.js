@@ -1,57 +1,50 @@
 /**
  * hooks/use-esa-chat.js
  * ============================================
- * useESAChat — REACT HOOK FOR THE HELP ASSEMBLY INGESTION INTERFACE
+ * useESAChat — REACT HOOK FOR THE ESA INGESTION INTERFACE
  * ============================================
  *
  * Modeled on the AI SDK chatbot example (`useChat` / message "parts"):
  *   - text parts     → operator / agent content
  *   - image parts    → lens captures rendered inline in the thread
  *   - attachment     → pdf/text payloads (chip, no inline render)
- *   - card parts     → Help Assembly service/hardware catalog rows (tool-call style cards)
+ *   - card parts     → HD Supply catalog rows (tool-call style cards)
  *   - divider/list/stats → structured assistant output
- *   - system parts   → hub events from other components
+ *   - system parts   → hub events from other ESA components
  *
- * Scope: HELP ASSEMBLY SERVICES ONLY — furniture assembly, quotes, bookings,
- * hardware/parts inventory. Agent X provides logic and reasoning; Ava007
- * provides voice. The Ingestion Interface is the sole communication hub for
- * the Help Assembly Exoskeleton console.
+ * Scope: ESA CONTENT ONLY. The Ingestion Interface is the sole communication
+ * hub for the ESA EXOSKELETON console. It routes ESA content to the AI agent
+ * (Cybernetic Ava007 via substrate) — it does not host an Intellect.
  *
- * The catalog engine prefers DuckDB WASM (streaming, zero local storage) and
- * falls back to an embedded catalog when WASM is unavailable.
+ * The catalog engine prefers DuckDB WASM (HD Supply streaming, zero local
+ * storage) and falls back to an embedded catalog when WASM is unavailable.
  */
 
 import { useState, useRef, useCallback } from '../components/ESA.ReactMount.js';
 
 // ─────────────────────────────────────────────────────────────────────
-// HELP ASSEMBLY CATALOG — embedded fallback (schema mirrors the DuckDB table)
+// HD SUPPLY CATALOG — embedded fallback (schema mirrors the DuckDB table)
 // ─────────────────────────────────────────────────────────────────────
 
 const FALLBACK_CATALOG = [
-  { sku: 'HA-1001', name: 'Standard Assembly — IKEA KALLAX',   category: 'Services',    price: 75.0,   inventory: 0,  location: 'Field' },
-  { sku: 'HA-1002', name: 'Premium Assembly — Murphy Bed',      category: 'Services',    price: 450.0,  inventory: 0,  location: 'Field' },
-  { sku: 'HA-1003', name: 'Outdoor Playset Assembly',           category: 'Services',    price: 300.0,  inventory: 0,  location: 'Field' },
-  { sku: 'HA-1004', name: 'Commercial Desk Cluster Setup',      category: 'Services',    price: 800.0,  inventory: 0,  location: 'Field' },
-  { sku: 'HA-2001', name: 'Cam Lock Kit (50-pk)',               category: 'Hardware',    price: 12.99,  inventory: 85,  location: 'Van Stock' },
-  { sku: 'HA-2002', name: 'Dowel Pin Set (8mm, 100-pk)',        category: 'Hardware',    price: 8.50,   inventory: 120, location: 'Warehouse' },
-  { sku: 'HA-2003', name: 'Allen Wrench Set (Metric)',          category: 'Tools',       price: 15.00,  inventory: 32,  location: 'Van Stock' },
-  { sku: 'HA-2004', name: 'Moving Blanket (72×80, 12-pk)',      category: 'Supplies',    price: 42.00,  inventory: 18,  location: 'Warehouse' },
-  { sku: 'HA-2005', name: 'Furniture Slider Kit',               category: 'Supplies',    price: 22.50,  inventory: 45,  location: 'Van Stock' },
-  { sku: 'HA-2006', name: 'Cordless Drill Kit (20V)',           category: 'Tools',       price: 189.00, inventory: 8,   location: 'Warehouse' },
-  { sku: 'HA-2007', name: 'Wall Anchor Kit (50-pk)',            category: 'Hardware',    price: 11.25,  inventory: 64,  location: 'Van Stock' },
-  { sku: 'HA-2008', name: 'Wood Glue (16 oz)',                  category: 'Supplies',    price: 6.99,   inventory: 40,  location: 'Warehouse' }
+  { sku: 'HD-4421', name: 'Seasons 9000 BTU PTAC Unit',   category: 'PTAC Units',  price: 899.0,  inventory: 15,  location: 'Warehouse A' },
+  { sku: 'HD-1180', name: 'PTAC Subbase 20A',            category: 'Accessories', price: 45.0,   inventory: 42,  location: 'Warehouse B' },
+  { sku: 'HD-9033', name: 'Double Packed Filter',        category: 'Filters',     price: 12.5,   inventory: 150, location: 'Warehouse A' },
+  { sku: 'HD-2205', name: 'Wireless Thermostat',         category: 'Controls',    price: 159.0,  inventory: 28,  location: 'Warehouse C' },
+  { sku: 'HD-3311', name: 'PTAC Filter Grille (18x18)',  category: 'Filters',     price: 24.99,  inventory: 63,  location: 'Warehouse B' },
+  { sku: 'HD-5540', name: 'Line Set Insulation Kit',     category: 'Accessories', price: 18.75,  inventory: 88,  location: 'Warehouse A' }
 ];
 
 // GLB 3D model per SKU — demo placeholders from the Khronos glTF sample set
 // (served via jsDelivr). Swap any entry for a real product GLB; a null entry
 // falls back to the CSS product visual.
 const MODEL_URLS = {
-  'HA-1001': 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Lantern/glTF-Binary/Lantern.glb',
-  'HA-1002': 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Duck/glTF-Binary/Duck.glb',
-  'HA-1003': 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/ToyCar/glTF-Binary/ToyCar.glb',
-  'HA-1004': 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/BoomBox/glTF-Binary/BoomBox.glb',
-  'HA-2003': 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/ReciprocatingSaw/glTF-Binary/ReciprocatingSaw.glb',
-  'HA-2006': 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/ReciprocatingSaw/glTF-Binary/ReciprocatingSaw.glb'
+  'HD-4421': 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/BoomBox/glTF-Binary/BoomBox.glb',
+  'HD-1180': 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Box/glTF-Binary/Box.glb',
+  'HD-9033': 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Box/glTF-Binary/Box.glb',
+  'HD-2205': 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Box/glTF-Binary/Box.glb',
+  'HD-3311': 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Box/glTF-Binary/Box.glb',
+  'HD-5540': 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Box/glTF-Binary/Box.glb'
 };
 
 const DUCKDB_URLS = {
@@ -60,7 +53,7 @@ const DUCKDB_URLS = {
   pthreadWorker: 'https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.28.0/dist/duckdb-browser-mvp.pthread.worker.js'
 };
 
-const SKU_RE = /HA-\d{3,5}/gi;
+const SKU_RE = /HD-\d{3,5}/gi;
 
 function escapeSql(value) {
   return String(value ?? '').replace(/'/g, "''");
@@ -98,14 +91,14 @@ async function createDuckDBEngine() {
   const conn = await db.connect();
 
   await conn.query(
-    `CREATE TABLE IF NOT EXISTS help_assembly_catalog (
+    `CREATE TABLE IF NOT EXISTS hd_supply_catalog (
        sku VARCHAR, name VARCHAR, category VARCHAR,
        price DOUBLE, inventory INTEGER, location VARCHAR
      )`
   );
   for (const item of FALLBACK_CATALOG) {
     await conn.query(
-      `INSERT OR REPLACE INTO help_assembly_catalog VALUES
+      `INSERT OR REPLACE INTO hd_supply_catalog VALUES
        ('${escapeSql(item.sku)}', '${escapeSql(item.name)}', '${escapeSql(item.category)}',
         ${item.price}, ${item.inventory}, '${escapeSql(item.location)}')`
     );
@@ -122,15 +115,15 @@ async function createDuckDBEngine() {
     search: async (query, limit = 4) => {
       const term = escapeSql((query || '').trim());
       const sql = term
-        ? `SELECT * FROM help_assembly_catalog
+        ? `SELECT * FROM hd_supply_catalog
            WHERE name ILIKE '%${term}%' OR sku ILIKE '%${term}%' OR category ILIKE '%${term}%'
            LIMIT ${limit}`
-        : `SELECT * FROM help_assembly_catalog LIMIT ${limit}`;
+        : `SELECT * FROM hd_supply_catalog LIMIT ${limit}`;
       return toRows(conn.query(sql));
     },
     bySKU: async (sku) => {
       const rows = await toRows(
-        conn.query(`SELECT * FROM help_assembly_catalog WHERE sku = '${escapeSql(sku)}' LIMIT 1`)
+        conn.query(`SELECT * FROM hd_supply_catalog WHERE sku = '${escapeSql(sku)}' LIMIT 1`)
       );
       return rows[0] || null;
     },
@@ -138,7 +131,7 @@ async function createDuckDBEngine() {
       const rows = await toRows(
         conn.query(
           `SELECT category, COUNT(*) AS count, SUM(inventory) AS stock
-           FROM help_assembly_catalog GROUP BY category ORDER BY count DESC`
+           FROM hd_supply_catalog GROUP BY category ORDER BY count DESC`
         )
       );
       return rows.map(r => ({ category: r.category, count: Number(r.count) || 0, stock: Number(r.stock) || 0 }));
@@ -185,10 +178,10 @@ export function ensureCatalog() {
     catalogPromise = (async () => {
       try {
         const engine = await createDuckDBEngine();
-        console.log('[HA.Chat] Help Assembly catalog engine: DuckDB WASM');
+        console.log('[ESA.Chat] HD Supply catalog engine: DuckDB WASM');
         return engine;
       } catch (err) {
-        console.warn('[HA.Chat] DuckDB unavailable, using embedded catalog:', err.message);
+        console.warn('[ESA.Chat] DuckDB unavailable, using embedded catalog:', err.message);
         return createFallbackEngine();
       }
     })();
@@ -206,7 +199,7 @@ export async function getCatalogStatus() {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// ASSISTANT PIPELINE — HELP ASSEMBLY SERVICES ONLY
+// ASSISTANT PIPELINE — ESA CONTENT ONLY
 // ─────────────────────────────────────────────────────────────────────
 
 function buildUserParts(text, attachments) {
@@ -234,23 +227,23 @@ async function respond(engine, text, attachments) {
 
   // ── Lens path: captured image → visual catalog match ──
   if (hasImage) {
-    parts.push({ type: 'text', text: '🔍 Lens capture received. Matching your photo against the Help Assembly catalog…' });
+    parts.push({ type: 'text', text: '🔍 Lens capture received. Matching your photo against the HD Supply catalog…' });
     const rows = q ? await engine.search(q, 6) : await engine.search('', 6);
     if (rows.length) {
-      parts.push({ type: 'match', rows, hint: 'Tap the item you captured to render its product info and quote.' });
+      parts.push({ type: 'match', rows, hint: 'Tap the part you photographed to render product info, 3D preview, inventory and workorder actions.' });
     } else {
-      parts.push({ type: 'text', text: 'No catalog matches for that capture. Try adding a service name, category, or SKU (e.g. HA-2004 for moving supplies).' });
+      parts.push({ type: 'text', text: 'No catalog matches for that capture. Try adding a part name, category, or SKU.' });
     }
     return parts;
   }
 
   // ── Select path: operator picks a match from the lens picker ──
-  const selected = q.match(/^(?:select|show|render)\s+(HA-\d{3,5})/i);
+  const selected = q.match(/^(?:select|show|render)\s+(HD-\d{3,5})/i);
   if (selected) {
     const row = await engine.bySKU(selected[1].toUpperCase());
     if (row) {
       parts.push({ type: 'product', product: row });
-      parts.push({ type: 'text', text: `✅ ${row.name} rendered. ${row.category === 'Services' ? `Base quote: $${Number(row.price).toFixed(2)} (actual estimate depends on items and location).` : `Price: $${Number(row.price).toFixed(2)} · ${row.inventory} in stock at ${row.location}.`} Reply "quote ${row.sku}" for pricing detail or "book ${row.sku}" to schedule.` });
+      parts.push({ type: 'text', text: `✅ ${row.name} rendered — product info, 3D preview and inventory shown above. ${row.inventory} in stock at ${row.location}. Tap "Order part" to add it to a workorder.` });
     } else {
       parts.push({ type: 'text', text: `No catalog entry for ${selected[1]}. Try another match.` });
     }
@@ -263,7 +256,7 @@ async function respond(engine, text, attachments) {
     if (row) {
       parts.push({ type: 'text', text: `Exact SKU match — ${row.sku}:` });
       parts.push({ type: 'product', product: row });
-      parts.push({ type: 'text', text: `${row.category === 'Services' ? 'Service — available for booking.' : `${row.inventory} in stock at ${row.location}.`} Say "quote ${row.sku}" for pricing details or "book ${row.sku}" to schedule.` });
+      parts.push({ type: 'text', text: `${row.inventory} in stock at ${row.location}. Say "order ${row.sku}" to add it to a workorder.` });
     } else {
       parts.push({ type: 'text', text: `No catalog entry for ${uniqueSkus[0]}. Check the SKU and try again.` });
     }
@@ -274,57 +267,23 @@ async function respond(engine, text, attachments) {
 
   // ── Help / capabilities ──
   if (/help|what can you|commands|capabilit|menu/.test(lower)) {
-    parts.push({ type: 'text', text: 'Agent X online — reasoning and logic for Help Assembly Services. Ava007 provides voice. Try:' });
+    parts.push({ type: 'text', text: 'This hub handles ESA content only — HD Supply parts, inventory, and diagnostics. Try:' });
     parts.push({
       type: 'list',
       items: [
-        '"quote a standard assembly" — get pricing for furniture assembly',
-        '"check availability" — same-day service availability',
-        '"HA-2004" — exact SKU lookup',
-        '"inventory status" — hardware/supplies stock summary',
-        'Lens button — capture an item and match it against the catalog'
+        '"look up PTAC filter" — search the HD Supply catalog',
+        '"HD-9033" — exact SKU lookup',
+        '"inventory status" — warehouse stock summary',
+        'Lens button — capture a part and match it against the catalog'
       ]
     });
     return parts;
   }
 
-  // ── Quote / pricing path ──
-  if (/quote|pricing|how much|cost|price/.test(lower)) {
-    const query = q.replace(/quote|pricing|how much|cost|price|get a/gi, '').trim();
-    const rows = await engine.search(query, 4);
-    if (rows.length) {
-      parts.push({ type: 'text', text: `Quote estimate for "${query || 'services'}":` });
-      parts.push({ type: 'divider', label: 'HELP ASSEMBLY — SERVICE QUOTES' });
-      pushCardParts(parts, rows);
-      parts.push({ type: 'text', text: `${rows.length} result(s). Prices are base estimates — actual quotes depend on items and location. Reply "book" to schedule or "availability" to check dates.` });
-    } else {
-      parts.push({ type: 'text', text: `No matching services for "${query}". Try: Standard Assembly, Premium Assembly, Outdoor Assembly, Commercial Assembly. Or ask "service catalog" for all categories.` });
-    }
-    return parts;
-  }
-
-  // ── Availability / scheduling ──
-  if (/availability|available|schedule|today|tomorrow|next week|book/.test(lower)) {
-    parts.push({
-      type: 'text',
-      text: '📅 Help Assembly Services — Metro Atlanta area (14 cities). Typical availability: same-day for standard assemblies, 1–2 day lead for premium/commercial. Technicians are dispatched via Agent X scheduling (A2A: `did:helpassembly:scheduler:001`). Reply with a service name for a quote or "book <service>" to initiate scheduling.'
-    });
-    return parts;
-  }
-
-  // ── Service catalog ──
-  if (/service catalog|services|all categor|list service/.test(lower)) {
-    const stats = await engine.stats();
-    parts.push({ type: 'text', text: 'Help Assembly — service catalog by category:' });
-    parts.push({ type: 'stats', stats });
-    parts.push({ type: 'text', text: 'Reply with a category name, SKU, or "quote <service>" for pricing. Agent X can create quotes, bookings, and dispatch via A2A agents.' });
-    return parts;
-  }
-
   // ── Inventory summary ──
-  if (/inventory|stock|status|count|warehouse|van stock|supplies/.test(lower)) {
+  if (/inventory|stock|status|count|warehouse|summary/.test(lower)) {
     const stats = await engine.stats();
-    parts.push({ type: 'text', text: 'Help Assembly — hardware/supplies inventory summary:' });
+    parts.push({ type: 'text', text: 'HD Supply inventory summary:' });
     parts.push({ type: 'stats', stats });
     return parts;
   }
@@ -334,11 +293,11 @@ async function respond(engine, text, attachments) {
     const rows = await engine.search(q);
     if (rows.length) {
       parts.push({ type: 'text', text: `Catalog results for "${q}":` });
-      parts.push({ type: 'divider', label: 'HELP ASSEMBLY — CATALOG RESULTS' });
+      parts.push({ type: 'divider', label: 'HD SUPPLY — CATALOG RESULTS' });
       pushCardParts(parts, rows);
-      parts.push({ type: 'text', text: `${rows.length} item(s) shown. Reply with a SKU for exact pricing or "book <sku>" to schedule.` });
+      parts.push({ type: 'text', text: `${rows.length} item(s) shown. Reply with a SKU for exact pricing and stock.` });
     } else {
-      parts.push({ type: 'text', text: `No Help Assembly matches for "${q}". Scope is furniture assembly services & hardware. Try a service name, category (Services/Hardware/Tools/Supplies), or SKU (HA-XXXX).` });
+      parts.push({ type: 'text', text: `No HD Supply matches for "${q}". Scope is ESA content only — try a part name, category, or SKU.` });
     }
     return parts;
   }
@@ -346,7 +305,7 @@ async function respond(engine, text, attachments) {
   // ── Bare send ──
   parts.push({
     type: 'text',
-    text: 'Agent X online — Help Assembly Services hub. Agent X provides reasoning & logic; Ava007 provides voice. Scope: furniture assembly services, quotes, bookings, hardware/parts. Ask a service query or press the lens button to scan an item.'
+    text: 'ESA Agent online — scope: ESA content only (HD Supply catalog, inventory, diagnostics). Ask a part query or press the lens button to capture a part.'
   });
   return parts;
 }
@@ -361,14 +320,14 @@ const WELCOME = {
   timestamp: new Date().toISOString(),
   parts: [{
     type: 'text',
-    text: '🛡️ Agent X online — communication hub for the Help Assembly Exoskeleton console.\nScope: Help Assembly Services only (furniture assembly, quotes, bookings, parts).\nAgent X provides logic & reasoning; Ava007 provides voice.\nUse the lens button to scan an item, or type a service name / SKU (HA-XXXX).'
+    text: '🛡️ ESA Agent online — communication hub for the ESA EXOSKELETON console.\nScope: ESA content only (HD Supply catalog, inventory, diagnostics).\nUse the lens button to capture a part, or type a part name / SKU.'
   }]
 };
 
 export function useESAChat() {
   const [messages, setMessages] = useState([WELCOME]);
   const [status, setStatus] = useState('ready'); // ready | submitting | streaming
-  const [input, setInput] = useState('');
+  const [input, setInputState] = useState('');
   const [attachments, setAttachments] = useState([]);
   const [catalogStatus, setCatalogStatus] = useState('idle');
   const [speakSignal, setSpeakSignal] = useState(0);
@@ -377,6 +336,14 @@ export function useESAChat() {
   const idRef = useRef(0);
   const inputRef = useRef('');
   const attachmentsRef = useRef([]);
+
+  // Keep the ref in sync so send()/Enter always see the typed text
+  // (mirrors useChat: input state and submit read the same source).
+  const setInput = useCallback((value) => {
+    const next = typeof value === 'function' ? value(inputRef.current) : value;
+    inputRef.current = String(next ?? '');
+    setInputState(inputRef.current);
+  }, []);
 
   const nextId = () => `esa-msg-${++idRef.current}`;
 
@@ -459,7 +426,7 @@ export function useESAChat() {
         id: nextId(),
         role: 'assistant',
         timestamp: new Date().toISOString(),
-        parts: [{ type: 'text', text: `[Agent X] Lookup failed: ${err.message}` }]
+        parts: [{ type: 'text', text: `[ESA Agent] Lookup failed: ${err.message}` }]
       }]);
     } finally {
       setStatus('ready');

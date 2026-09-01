@@ -1,12 +1,12 @@
 /**
  * integration.js
- * HELP ASSEMBLY - Production Component Wiring
+ * ESA EXOSKELETON - Production Component Wiring
  *
  * Layout:
  *   ┌─────────────────────────────────────────────────────────┐
  *   │ LEFT SIDEBAR: web console (logs)                        │
  *   │ RENDERING AREA: every module is a rendering card        │
- *   │   [ASSEMBLY HUB] [DIAGNOSTIC] [SERVICE] [TECH CHECKLIST]│
+ *   │   [AI INGESTION CHAT] [DIAGNOSTIC] [PARTS] [TO-DO LIST] │
  *   │ INGESTION DOCK (bottom): lens / PDF / email / audio     │
  *   └─────────────────────────────────────────────────────────┘
  *
@@ -93,8 +93,8 @@ async function initESAExoskeleton() {
     header.className = 'esa-console-header';
     header.innerHTML =
       '<div class="esa-console-logo">✦</div>' +
-      '<div><div class="esa-console-title">Assembly Console</div>' +
-      '<div class="esa-console-subtitle">Agent X logic · Ava007 voice</div></div>' +
+      '<div><div class="esa-console-title">ESA Console</div>' +
+      '<div class="esa-console-subtitle">Hotel maintenance · Ava007 voice</div></div>' +
       '<span class="esa-console-chevron">⌄</span>';
 
     // Segmented toggle — Console / Library
@@ -131,7 +131,6 @@ async function initESAExoskeleton() {
 
     // ---- log rendering ----
     const LOG_ICONS = { info: '·', success: '✓', error: '✕', warning: '▲' };
-    // Light console theme — darker, saturated tones read on the cream panel
     const LOG_COLORS = {
       info: '#3a332b',
       success: '#5b8c5a',
@@ -195,9 +194,9 @@ async function initESAExoskeleton() {
     const MODULES = [
       { id: 'esa-ingestion-chat-card', badge: 'A', badgeBg: '#2a6f4e', name: 'AI Ingestion Chat', sub: 'React · communication hub' },
       { id: 'esa-diagnostics', badge: 'D', badgeBg: '#5b8def', name: 'Diagnostic', sub: 'Arrow · systems check' },
-      { id: 'esa-parts-card', badge: 'P', badgeBg: '#c9a227', name: 'Broadcast Service', sub: 'React · furniture assembly' },
+      { id: 'esa-parts-card', badge: 'P', badgeBg: '#c9a227', name: 'Broadcast Parts', sub: 'Arrow · HD Supply' },
       { id: 'esa-workorder', badge: 'W', badgeBg: '#b05a5a', name: 'Workorder System', sub: 'Arrow · dispatch' },
-      { id: 'esa-maintenance-checklist', badge: 'T', badgeBg: '#3a9db8', name: 'Tech Shift Checklist', sub: 'React · tech workflow' }
+      { id: 'esa-maintenance-checklist', badge: 'T', badgeBg: '#3a9db8', name: 'Daily To-Do List', sub: 'React · SOP checklist' }
     ];
 
     const buildLibrary = () => {
@@ -226,7 +225,7 @@ async function initESAExoskeleton() {
     // Exposed so the mount phase can refresh the library after components land
     window.ESA._console = { setView, buildLibrary, applyFilter };
 
-    window.ESA.log('HELP ASSEMBLY v' + window.ESA.version + ' — console online', 'success');
+    window.ESA.log('ESA EXOSKELETON v' + window.ESA.version + ' — console online', 'success');
   }
 
   // ============================================
@@ -328,7 +327,7 @@ async function initESAExoskeleton() {
       const partsCardContainer = document.getElementById('esa-parts-card');
       if (partsCardContainer) {
         partsCardContainer.innerHTML = '';
-        decorateCard(partsCardContainer, '📦 BROADCAST SERVICE');
+        decorateCard(partsCardContainer, '📦 BROADCAST PARTS');
         const mountResult = ESAInvPartsCardB.mount(partsCardContainer);
         if (mountResult) {
           window.ESA.components.invPartsCard = mountResult;
@@ -371,7 +370,7 @@ async function initESAExoskeleton() {
         if (mountResult) {
           window.ESA.components.maintenanceChecklist = mountResult;
           window.ESA.mountedComponents.push(mountResult);
-          if (window.ESA.log) window.ESA.log('✓ Tech shift checklist mounted (React)', 'success');
+          if (window.ESA.log) window.ESA.log('✓ Daily maintenance checklist mounted (React)', 'success');
         }
       }
     } catch (err) {
@@ -445,6 +444,13 @@ async function initESAExoskeleton() {
     window.ESA._console.buildLibrary();
   }
 
+  // Tell the shell navigator (shell-nav.js) all cards are mounted, so it can
+  // tag them with data-esa-card and activate the default card.
+  window.dispatchEvent(new CustomEvent('esa:mounted'));
+
+  // Re-count modules once async mounts have fully settled
+  setTimeout(() => { if (window.ESA._toolbar) window.ESA._toolbar.refresh(); }, 400);
+
   // ============================================
   // 6. COMMUNICATION HUB — surface ESA component events into the Ingestion chat
   const HUB_EVENTS = {
@@ -457,7 +463,6 @@ async function initESAExoskeleton() {
     'esa:part-removed': ['➖', 'Part removed'],
     'esa:lookup-part': ['🔎', 'Part lookup'],
     'esa:run-diagnostic': ['🩺', 'Diagnostic run'],
-    'esa:open-diagnostics': ['🩺', 'Open diagnostics'],
     'esa:add-part-to-workorder': ['➕', 'Workorder part'],
     'esa:broadcast': ['📡', 'Broadcast'],
     'esa:broadcast-toggle': ['📡', 'Broadcast toggle'],
@@ -495,7 +500,7 @@ async function initESAExoskeleton() {
 
   if (window.ESA.log) {
     window.ESA.log('╔════════════════════════════════════════════════════╗', 'success');
-    window.ESA.log(`║ HELP ASSEMBLY v${window.ESA.version} — READY`, 'success');
+    window.ESA.log(`║ ESA EXOSKELETON v${window.ESA.version} — READY`, 'success');
     window.ESA.log('║ Ingestion dock + chat card (React)', 'success');
     window.ESA.log('╚════════════════════════════════════════════════════╝', 'success');
   }
