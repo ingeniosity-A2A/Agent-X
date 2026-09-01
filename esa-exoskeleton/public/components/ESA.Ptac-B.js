@@ -101,6 +101,9 @@ const BROADCAST_TEMPLATES = {
   ]
 };
 
+// Module-scope handle so methods.* can call each other (assigned after export).
+let methods = null;
+
 export const ESAPtacB = ESAVerifyComponent({
   name: 'Ptac-B',
   version: '1.0.0',
@@ -546,701 +549,394 @@ export const ESAPtacB = ESAVerifyComponent({
   
   template: (props, state, methods) => {
     return html`
-      <div style="
-        position: fixed;
-        right: ${state.isOpen ? '0' : '-420px'};
-        top: 60px;
-        width: 400px;
-        max-height: calc(100vh - 80px);
-        background: ${activeTheme.bg0};
-        border: 1px solid ${activeTheme.border};
-        border-right: none;
-        border-radius: 8px 0 0 8px;
-        box-shadow: -4px 0 20px var(--esa-shadow);
-        transition: right 0.3s ease;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      ">
-        <!-- Header -->
-        <div style="
-          background: ${activeTheme.bg1};
-          padding: 12px 16px;
-          border-bottom: 1px solid ${activeTheme.border};
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        ">
-          <div>
-            <div style="font-weight: bold; color: ${activeTheme.yellow}; font-size: 14px;">
-              📡 ESA-PTAC-B
-            </div>
-            <div style="font-size: 11px; color: ${activeTheme.fg_soft};">
-              Service Broadcasting • ${state.unit.hdSupply.partNumber}
-            </div>
-          </div>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <!-- Broadcast Toggle -->
-            <button 
-              @click=${() => state.broadcastMode ? methods.stopBroadcast(state) : methods.startBroadcast(state)}
-              style="
-                padding: 4px 8px;
-                border-radius: 4px;
-                border: 1px solid ${state.broadcastMode ? activeTheme.red : activeTheme.border};
-                background: ${state.broadcastMode ? `${activeTheme.red}20` : activeTheme.bg};
-                color: ${state.broadcastMode ? activeTheme.red : activeTheme.fg};
-                font-size: 11px;
-                cursor: pointer;
-                transition: all 0.2s;
-              "
-            >
-              ${state.broadcastMode ? '🔴 LIVE' : '⚫ OFF'}
-            </button>
-            
-            <!-- Close Button -->
-            <button 
-              @click=${() => methods.togglePanel(state, false)}
-              style="
-                width: 24px;
-                height: 24px;
-                border-radius: 4px;
-                border: 1px solid ${activeTheme.border};
-                background: ${activeTheme.bg};
-                color: ${activeTheme.fg};
-                cursor: pointer;
-                font-size: 14px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-              "
-            >✕</button>
-          </div>
-        </div>
-        
-        <!-- Tabs -->
-        <div style="
-          display: flex;
-          background: ${activeTheme.bg0};
-          border-bottom: 1px solid ${activeTheme.border};
-          padding: 0 8px;
-          overflow-x: auto;
-        ">
-          ${['overview', 'parts', 'service', 'diagnostics', 'broadcast'].map(tab => html`
-            <button
-              @click=${() => methods.switchTab(state, tab)}
-              style="
-                padding: 8px 12px;
-                border: none;
-                border-bottom: 2px solid ${state.activeTab === tab ? activeTheme.aqua : 'transparent'};
-                background: none;
-                color: ${state.activeTab === tab ? activeTheme.aqua : activeTheme.fg_soft};
-                font-size: 11px;
-                font-weight: ${state.activeTab === tab ? 'bold' : 'normal'};
-                cursor: pointer;
-                white-space: nowrap;
-                transition: all 0.2s;
-              "
-            >${tab.charAt(0).toUpperCase() + tab.slice(1)}</button>
-          `)}
-        </div>
-        
-        <!-- Content Area -->
-        <div style="flex: 1; overflow-y: auto; padding: 12px;">
-          
-          ${state.activeTab === 'overview' ? html`
-            <!-- OVERVIEW TAB -->
-            <div style="margin-bottom: 16px;">
-              <!-- HD Supply Link -->
-              <div style="
-                background: linear-gradient(135deg, ${activeTheme.bg1} 0%, ${activeTheme.bg0} 100%);
-                border: 1px solid ${activeTheme.blue};
-                border-radius: 8px;
-                padding: 12px;
-                margin-bottom: 12px;
-              ">
-                <div style="font-size: 10px; color: ${activeTheme.blue}; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">
-                  HD Supply Product
-                </div>
-                <div style="font-weight: bold; color: ${activeTheme.fg}; font-size: 13px; margin-bottom: 8px;">
-                  ${state.unit.hdSupply.fullTitle}
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span style="color: ${activeTheme.green}; font-size: 18px; font-weight: bold;">
-                    $${state.unit.hdSupply.price.toFixed(2)}
-                  </span>
-                  <button
-                    @click=${() => methods.openHDSupply(state)}
-                    style="
-                      padding: 6px 12px;
-                      background: ${activeTheme.blue};
-                      color: ${activeTheme.bg0};
-                      border: none;
-                      border-radius: 4px;
-                      font-size: 11px;
-                      font-weight: bold;
-                      cursor: pointer;
-                      transition: all 0.2s;
-                    "
-                    onmouseenter=${(e) => e.target.style.opacity = '0.8'}
-                    onmouseleave=${(e) => e.target.style.opacity = '1'}
-                  >
-                    View on HD Supply →
-                  </button>
-                </div>
-              </div>
-              
-              <!-- Quick Specs -->
-              <div style="margin-bottom: 12px;">
-                <div style="font-size: 11px; color: ${activeTheme.purple}; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
-                  Specifications
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                  ${Object.entries(state.unit.specs).map(([key, value]) => html`
-                    <div style="
-                      background: ${activeTheme.bg0};
-                      padding: 6px 8px;
-                      border-radius: 4px;
-                      font-size: 11px;
-                    ">
-                      <span style="color: ${activeTheme.fg_soft};">${key.replace(/([A-Z])/g, ' $1')}:</span>
-                      <span style="color: ${activeTheme.fg}; font-weight: 500;">${value}</span>
-                    </div>
-                  `)}
-                </div>
-              </div>
-              
-              <!-- Quick Actions -->
-              <div>
-                <div style="font-size: 11px; color: ${activeTheme.purple}; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
-                  Quick Actions
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 6px;">
-                  <button
-                    @click=${() => methods.createWorkorder(state)}
-                    style="
-                      padding: 8px 12px;
-                      background: ${activeTheme.green}20;
-                      border: 1px solid ${activeTheme.green};
-                      color: ${activeTheme.green};
-                      border-radius: 4px;
-                      font-size: 12px;
-                      cursor: pointer;
-                      text-align: left;
-                      transition: all 0.2s;
-                    "
-                    onmouseenter=${(e) => e.target.style.background = `${activeTheme.green}30`}
-                    onmouseleave=${(e) => e.target.style.background = `${activeTheme.green}20`}
-                  >
-                    📋 Create Workorder
-                  </button>
-                  
-                  <button
-                    @click=${() => methods.runDiagnostic(state, 'FP')}
-                    style="
-                      padding: 8px 12px;
-                      background: ${activeTheme.yellow}20;
-                      border: 1px solid ${activeTheme.yellow};
-                      color: ${activeTheme.yellow};
-                      border-radius: 4px;
-                      font-size: 12px;
-                      cursor: pointer;
-                      text-align: left;
-                      transition: all 0.2s;
-                    "
-                    onmouseenter=${(e) => e.target.style.background = `${activeTheme.yellow}30`}
-                    onmouseleave=${(e) => e.target.style.background = `${activeTheme.yellow}20`}
-                  >
-                    🔧 Run Diagnostics
-                  </button>
-                  
-                  <button
-                    @click=${() => methods.broadcastMessage(state, 'scheduled')}
-                    style="
-                      padding: 8px 12px;
-                      background: ${activeTheme.purple}20;
-                      border: 1px solid ${activeTheme.purple};
-                      color: ${activeTheme.purple};
-                      border-radius: 4px;
-                      font-size: 12px;
-                      cursor: pointer;
-                      text-align: left;
-                      transition: all 0.2s;
-                    "
-                    onmouseenter=${(e) => e.target.style.background = `${activeTheme.purple}30`}
-                    onmouseleave=${(e) => e.target.style.background = `${activeTheme.purple}20`}
-                  >
-                    📢 Send Broadcast
-                  </button>
-                </div>
-              </div>
-            </div>
-          ` : ''}
-          
-          ${state.activeTab === 'parts' ? html`
-            <!-- PARTS TAB -->
+      <style>
+        /* PTAC-B service broadcast card — V6 UI8 palette via ava-shell.css
+           tokens. Static classes ONLY: this Arrow build forbids dollar-brace
+           interpolation inside attribute positions (style/class/events), and
+           its reactive updates are broken across CDNs, so this card renders
+           ONCE and a post-mount wrapper (see below) syncs DOM from state
+           after every action. */
+        .ptac-card { color: var(--bk-text); }
+        .ptac-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--bk-border-soft); background: rgba(0,0,0,0.25); }
+        .ptac-live { padding: 4px 12px; border-radius: 999px; border: 1px solid var(--bk-border); background: var(--bk-panel-2); color: var(--bk-text-2); font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .ptac-live:hover { background: #232323; color: var(--bk-text); }
+        .ptac-card[data-broadcast="on"] .ptac-live { border-color: rgba(229,72,77,0.5); color: var(--bk-danger); background: rgba(229,72,77,0.12); }
+        .ptac-tabs { display: flex; gap: 2px; padding: 6px 10px 0; border-bottom: 1px solid var(--bk-border-soft); background: var(--bk-panel-2); overflow-x: auto; }
+        .ptac-tab { padding: 8px 12px; border: none; border-bottom: 2px solid transparent; background: none; color: var(--bk-text-3); font-size: 11px; cursor: pointer; white-space: nowrap; transition: color 0.15s; font-family: inherit; }
+        .ptac-tab:hover { color: var(--bk-text); }
+        .ptac-tab.active { color: var(--bk-accent); border-bottom-color: var(--bk-accent); font-weight: 600; }
+        .ptac-panel[hidden] { display: none; }
+        .ptac-body { flex: 1; overflow-y: auto; padding: 14px; max-height: 430px; }
+        .ptac-panel-h { font-size: 11px; color: var(--bk-accent-3); font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .ptac-hero { background: linear-gradient(135deg, var(--bk-panel) 0%, var(--bk-panel-2) 100%); border: 1px solid rgba(91,141,239,0.35); border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+        .ptac-kicker { font-size: 10px; color: var(--bk-info); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .ptac-product { font-weight: 700; color: var(--bk-text); font-size: 13px; margin-bottom: 8px; }
+        .ptac-price { color: var(--bk-accent); font-size: 18px; font-weight: 700; }
+        .ptac-row-between { display: flex; justify-content: space-between; align-items: center; }
+        .ptac-btn { padding: 6px 12px; background: var(--bk-info); color: #0a0a0a; border: none; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; font-family: inherit; }
+        .ptac-btn:hover { opacity: 0.85; }
+        .ptac-btn--ghost { background: var(--bk-panel-2); color: var(--bk-text); border: 1px solid var(--bk-border); font-weight: 500; }
+        .ptac-btn--ghost:hover { border-color: rgba(91,141,239,0.45); opacity: 1; color: #fff; }
+        .ptac-spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .ptac-spec { background: var(--bk-panel-2); border: 1px solid var(--bk-border-soft); padding: 6px 8px; border-radius: 6px; font-size: 11px; }
+        .ptac-spec-k { color: var(--bk-text-3); }
+        .ptac-spec-v { color: var(--bk-text); font-weight: 500; }
+        .ptact-quick { display: flex; flex-direction: column; gap: 6px; }
+        .ptac-qa { padding: 8px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; text-align: left; transition: filter 0.2s; font-family: inherit; border: 1px solid; background: rgba(0,0,0,0.2); }
+        .ptac-qa:hover { filter: brightness(1.25); }
+        .ptac-qa--ok { border-color: rgba(126,200,160,0.4); color: var(--bk-accent); }
+        .ptac-qa--warn { border-color: rgba(224,161,62,0.4); color: var(--bk-warn); }
+        .ptac-qa--info { border-color: rgba(139,92,246,0.4); color: #b39bff; }
+        .ptac-part { background: var(--bk-panel-2); border: 1px solid var(--bk-border-soft); border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; transition: border-color 0.2s; }
+        .ptac-part:hover { border-color: rgba(91,141,239,0.45); }
+        .ptac-part-name { font-weight: 500; color: var(--bk-text); font-size: 12px; }
+        .ptac-part-meta { font-size: 10px; color: var(--bk-text-3); margin-top: 2px; }
+        .ptac-freq { color: var(--bk-warn); }
+        .ptac-price-s { color: var(--bk-accent); font-weight: 700; font-size: 12px; }
+        .ptac-mini { padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer; font-family: inherit; transition: opacity 0.2s; }
+        .ptac-mini:hover { opacity: 0.85; }
+        .ptac-mini--primary { background: var(--bk-info); color: #0a0a0a; border: none; font-weight: 700; }
+        .ptac-mini--ghost { background: var(--bk-panel); color: var(--bk-text); border: 1px solid var(--bk-border); }
+        .ptac-svc-row { background: var(--bk-panel-2); border: 1px solid var(--bk-border-soft); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
+        .ptac-svc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .ptac-svc-name { font-weight: 500; color: var(--bk-text); font-size: 12px; }
+        .ptac-pill-s { font-size: 10px; padding: 2px 8px; border-radius: 999px; font-weight: 700; letter-spacing: 0.05em; }
+        .ptac-pill-danger { background: rgba(229,72,77,0.14); color: var(--bk-danger); border: 1px solid rgba(229,72,77,0.35); }
+        .ptac-pill-warn { background: rgba(224,161,62,0.14); color: var(--bk-warn); border: 1px solid rgba(224,161,62,0.35); }
+        .ptac-pill-ok { background: rgba(126,200,160,0.14); color: var(--bk-accent); border: 1px solid rgba(126,200,160,0.35); }
+        .ptac-meta { font-size: 10px; color: var(--bk-text-3); }
+        .ptac-hist-row { background: var(--bk-panel-2); padding: 8px 10px; margin-bottom: 6px; border-radius: 0 6px 6px 0; display: flex; gap: 8px; }
+        .ptac-bar { width: 3px; border-radius: 2px; flex-shrink: 0; }
+        .ptac-bar-danger { background: var(--bk-danger); }
+        .ptac-bar-info { background: var(--bk-info); }
+        .ptac-bar-ok { background: var(--bk-accent); }
+        .ptac-input { flex: 1; padding: 8px 10px; background: var(--bk-panel-2); border: 1px solid var(--bk-border); border-radius: 6px; color: var(--bk-text); font-size: 12px; font-family: ui-monospace, monospace; outline: none; }
+        .ptac-input:focus { border-color: rgba(126,200,160,0.45); }
+        .ptac-codes { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+        .ptac-code { padding: 6px 10px; background: var(--bk-panel); border: 1px solid var(--bk-border); color: var(--bk-text); border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .ptac-code:hover { border-color: rgba(224,161,62,0.5); color: var(--bk-warn); }
+        .ptac-status { background: var(--bk-panel-2); border: 1px solid var(--bk-border-soft); border-radius: 10px; padding: 14px; margin-bottom: 12px; text-align: center; transition: border-color 0.3s; }
+        .ptac-card[data-broadcast="on"] .ptac-status { border-color: rgba(126,200,160,0.45); background: rgba(126,200,160,0.06); }
+        .ptac-status-icon { font-size: 24px; margin-bottom: 4px; }
+        .ptac-status-label { font-weight: 700; color: var(--bk-text-3); }
+        .ptac-card[data-broadcast="on"] .ptac-status-label { color: var(--bk-accent); }
+        .ptac-quick-b { padding: 10px; border-radius: 8px; font-size: 12px; cursor: pointer; text-align: left; border: 1px solid; background: rgba(0,0,0,0.2); transition: filter 0.2s; font-family: inherit; }
+        .ptac-quick-b:hover { filter: brightness(1.25); }
+        .ptac-custom { width: 100%; min-height: 60px; padding: 8px 10px; background: var(--bk-panel-2); border: 1px solid var(--bk-border); border-radius: 6px; color: var(--bk-text); font-size: 12px; resize: vertical; font-family: inherit; margin-bottom: 8px; outline: none; box-sizing: border-box; }
+        .ptac-custom:focus { border-color: rgba(139,92,246,0.5); }
+        .ptac-footer { background: rgba(0,0,0,0.25); border-top: 1px solid var(--bk-border-soft); padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 9px; color: var(--bk-text-3); }
+        .ptac-hidden-v { display: none; }
+      </style>
+      <div class="bento-card ptac-card" data-broadcast="off">
+        <div class="bento-demo">
+          <div class="ptac-head">
             <div>
-              <div style="font-size: 11px; color: ${activeTheme.purple}; font-weight: bold; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">
-                Common Parts for ${state.unit.hdSupply.partNumber}
+              <div style="font-weight: 700; font-size: 13px; color: var(--bk-text);">📡 PTAC Service Broadcast</div>
+              <div style="font-size: 10.5px; color: var(--bk-text-3); margin-top: 2px;">HD Supply <span class="mono">#${state.unit.hdSupply.partNumber}</span> · live unit feed</div>
+            </div>
+            <button class="ptac-live" data-click="liveToggle">⚫ OFF</button>
+          </div>
+
+          <div class="ptac-tabs">
+            <button class="ptac-tab active" data-tab="overview">Overview</button>
+            <button class="ptac-tab" data-tab="parts">Parts</button>
+            <button class="ptac-tab" data-tab="service">Service</button>
+            <button class="ptac-tab" data-tab="diagnostics">Diagnostics</button>
+            <button class="ptac-tab" data-tab="broadcast">Broadcast</button>
+          </div>
+
+          <div class="ptac-body">
+            <div class="ptac-panel" data-panel="overview">
+              <div class="ptac-panel-h">HD Supply Product</div>
+              <div class="ptac-hero">
+                <div class="ptac-kicker">Seasons 9000 BTU PTAC</div>
+                <div class="ptac-product">${state.unit.hdSupply.fullTitle}</div>
+                <div class="ptac-row-between">
+                  <span class="ptac-price">$${state.unit.hdSupply.price.toFixed(2)}</span>
+                  <button class="ptac-btn" data-click="openHDSupply">View on HD Supply →</button>
+                </div>
               </div>
-              
+
+              <div class="ptac-panel-h">Specifications</div>
+              <div class="ptac-spec-grid">
+                ${Object.entries(state.unit.specs).map(([key, value]) => html`
+                  <div class="ptac-spec">
+                    <span class="ptac-spec-k">${key.replace(/([A-Z])/g, ' $1')}: </span>
+                    <span class="ptac-spec-v">${value}</span>
+                  </div>
+                `)}
+              </div>
+
+              <div class="ptac-panel-h" style="margin-top: 14px;">Quick Actions</div>
+              <div class="ptact-quick">
+                <button class="ptac-qa ptac-qa--ok" data-click="createWorkorder">📋 Create Workorder</button>
+                <button class="ptac-qa ptac-qa--warn" data-click="runCode"><i class="ptac-hidden-v">FP</i>🔧 Run Diagnostics</button>
+                <button class="ptac-qa ptac-qa--info" data-click="broadcast" data-arg="scheduled">📢 Send Broadcast</button>
+              </div>
+            </div>
+
+            <div class="ptac-panel" data-panel="parts" hidden>
+              <div class="ptac-panel-h">Common Parts for ${state.unit.hdSupply.partNumber}</div>
               <div style="display: flex; flex-direction: column; gap: 8px;">
                 ${state.unit.commonParts.map(part => html`
-                  <div style="
-                    background: ${activeTheme.bg0};
-                    border: 1px solid ${activeTheme.border};
-                    border-radius: 6px;
-                    padding: 10px;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    transition: all 0.2s;
-                  "
-                  onmouseenter=${(e) => e.target.style.borderColor = activeTheme.blue}
-                  onmouseleave=${(e) => e.target.style.borderColor = activeTheme.border}
-                  >
+                  <div class="ptac-part">
                     <div>
-                      <div style="font-weight: 500; color: ${activeTheme.fg}; font-size: 12px;">
-                        ${part.name}
-                      </div>
-                      <div style="font-size: 10px; color: ${activeTheme.fg_soft};">
-                        SKU: ${part.sku} • ${part.category}
-                        ${part.frequency ? html`<span style="color: ${activeTheme.yellow};">• ${part.frequency}</span>` : ''}
-                      </div>
+                      <div class="ptac-part-name">${part.name}</div>
+                      <div class="ptac-part-meta">SKU: ${part.sku} • ${part.category}${part.frequency ? html`<span class="ptac-freq"> • ${part.frequency}</span>` : ''}</div>
                     </div>
-                    <div style="display: flex; gap: 6px; align-items: center;">
-                      <span style="color: ${activeTheme.green}; font-weight: bold; font-size: 12px;">
-                        $${part.price.toFixed(2)}
-                      </span>
-                      <button
-                        @click=${() => methods.addPartToWorkorder(state, part)}
-                        style="
-                          padding: 4px 8px;
-                          background: ${activeTheme.blue};
-                          color: ${activeTheme.bg0};
-                          border: none;
-                          border-radius: 4px;
-                          font-size: 10px;
-                          cursor: pointer;
-                        "
-                      >+ WO</button>
-                      <button
-                        @click=${() => methods.lookupPart(state, part.sku)}
-                        style="
-                          padding: 4px 8px;
-                          background: ${activeTheme.bg1};
-                          color: ${activeTheme.fg};
-                          border: 1px solid ${activeTheme.border};
-                          border-radius: 4px;
-                          font-size: 10px;
-                          cursor: pointer;
-                        "
-                      >🔍</button>
+                    <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
+                      <span class="ptac-price-s">$${part.price.toFixed(2)}</span>
+                      <button class="ptac-mini ptac-mini--primary" data-click="addPart"><i class="ptac-hidden-v">${part.sku}</i>+ WO</button>
+                      <button class="ptac-mini ptac-mini--ghost" data-click="lookupPart" title="Lookup part"><i class="ptac-hidden-v">${part.sku}</i>🔍</button>
                     </div>
                   </div>
                 `)}
               </div>
             </div>
-          ` : ''}
-          
-          ${state.activeTab === 'service' ? html`
-            <!-- SERVICE TAB -->
-            <div>
-              <div style="font-size: 11px; color: ${activeTheme.purple}; font-weight: bold; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">
-                Service Schedule & History
-              </div>
-              
-              <!-- Service Intervals -->
-              <div style="margin-bottom: 16px;">
-                <div style="font-size: 11px; color: ${activeTheme.fg_soft}; margin-bottom: 8px;">
-                  Maintenance Intervals
-                </div>
-                ${Object.entries(methods.getServiceStatus(state)).map(([key, status]) => html`
-                  <div style="
-                    background: ${activeTheme.bg0};
-                    border: 1px solid ${status.status === 'overdue' ? activeTheme.red : status.status === 'due-soon' ? activeTheme.yellow : activeTheme.border};
-                    border-radius: 6px;
-                    padding: 10px;
-                    margin-bottom: 8px;
-                  ">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                      <span style="font-weight: 500; color: ${activeTheme.fg}; font-size: 12px;">
-                        ${key.replace(/([A-Z])/g, ' $1').trim()}
-                      </span>
-                      <span style="
-                        font-size: 10px;
-                        padding: 2px 6px;
-                        border-radius: 10px;
-                        background: ${status.status === 'overdue' ? `${activeTheme.red}20` : status.status === 'due-soon' ? `${activeTheme.yellow}20` : `${activeTheme.green}20`};
-                        color: ${status.status === 'overdue' ? activeTheme.red : status.status === 'due-soon' ? activeTheme.yellow : activeTheme.green};
-                      ">
-                        ${status.status === 'overdue' ? 'OVERDUE' : status.status === 'due-soon' ? 'Due Soon' : 'OK'}
-                      </span>
-                    </div>
-                    <div style="font-size: 10px; color: ${activeTheme.fg_soft};">
-                      Interval: ${status.interval} • Last: ${status.lastServiceDate} • Due: ${status.nextDueDate}
-                    </div>
+
+            <div class="ptac-panel" data-panel="service" hidden>
+              <div class="ptac-panel-h">Service Schedule & History</div>
+              <div class="ptac-meta" style="margin-bottom: 8px;">Maintenance Intervals</div>
+              ${Object.entries(methods.getServiceStatus(state)).map(([key, status]) => html`
+                <div class="ptac-svc-row">
+                  <div class="ptac-svc-top">
+                    <span class="ptac-svc-name">${key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                    ${status.status === 'overdue' ? html`<span class="ptac-pill-s ptac-pill-danger">OVERDUE</span>` : status.status === 'due-soon' ? html`<span class="ptac-pill-s ptac-pill-warn">Due Soon</span>` : html`<span class="ptac-pill-s ptac-pill-ok">OK</span>`}
                   </div>
-                `)}
-              </div>
-              
-              <!-- Service History -->
-              <div>
-                <div style="font-size: 11px; color: ${activeTheme.fg_soft}; margin-bottom: 8px;">
-                  Recent Service History
+                  <div class="ptac-meta">Interval: ${status.interval} • Last: ${status.lastServiceDate} • Due: ${status.nextDueDate}</div>
                 </div>
-                ${state.serviceHistory.map(entry => html`
-                  <div style="
-                    background: ${activeTheme.bg0};
-                    border-left: 3px solid ${entry.type === 'repair' ? activeTheme.red : entry.type === 'inspection' ? activeTheme.blue : activeTheme.green};
-                    padding: 8px 10px;
-                    margin-bottom: 6px;
-                    border-radius: 0 4px 4px 0;
-                  ">
+              `)}
+              <div class="ptac-meta" style="margin: 12px 0 8px;">Recent Service History</div>
+              ${state.serviceHistory.map(entry => html`
+                <div class="ptac-hist-row">
+                  ${entry.type === 'repair' ? html`<i class="ptac-bar ptac-bar-danger"></i>` : entry.type === 'inspection' ? html`<i class="ptac-bar ptac-bar-info"></i>` : html`<i class="ptac-bar ptac-bar-ok"></i>`}
+                  <div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
-                      <span style="font-weight: 500; color: ${activeTheme.fg}; font-size: 11px;">
-                        ${entry.type.charAt(0).toUpperCase() + entry.type.slice(1)}
-                      </span>
-                      <span style="font-size: 10px; color: ${activeTheme.fg_soft};">
-                        ${entry.date}
-                      </span>
+                      <span style="font-weight: 500; color: var(--bk-text); font-size: 11px;">${entry.type.charAt(0).toUpperCase() + entry.type.slice(1)}</span>
+                      <span class="ptac-meta">${entry.date}</span>
                     </div>
-                    <div style="font-size: 10px; color: ${activeTheme.fg_soft};">
-                      ${entry.technician} • ${entry.notes}
-                    </div>
+                    <div class="ptac-meta">${entry.technician} • ${entry.notes}</div>
                   </div>
-                `)}
-              </div>
+                </div>
+              `)}
             </div>
-          ` : ''}
-          
-          ${state.activeTab === 'diagnostics' ? html`
-            <!-- DIAGNOSTICS TAB -->
-            <div>
-              <div style="font-size: 11px; color: ${activeTheme.purple}; font-weight: bold; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">
-                Quick Diagnostics
-              </div>
-              
-              <!-- Code Input -->
+
+            <div class="ptac-panel" data-panel="diagnostics" hidden>
+              <div class="ptac-panel-h">Quick Diagnostics</div>
               <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                <input
-                  value=${state.selectedDiagnosticCode}
-                  @input=${(e) => state.selectedDiagnosticCode = e.target.value}
-                  placeholder="Enter code (F1, C3, etc.)"
-                  style="
-                    flex: 1;
-                    padding: 8px 10px;
-                    background: ${activeTheme.bg0};
-                    border: 1px solid ${activeTheme.border};
-                    border-radius: 4px;
-                    color: ${activeTheme.fg};
-                    font-size: 12px;
-                    font-family: monospace;
-                  "
-                />
-                <button
-                  @click=${() => methods.runDiagnostic(state)}
-                  style="
-                    padding: 8px 16px;
-                    background: ${activeTheme.yellow};
-                    color: ${activeTheme.bg0};
-                    border: none;
-                    border-radius: 4px;
-                    font-weight: bold;
-                    font-size: 12px;
-                    cursor: pointer;
-                  "
-                >Run</button>
+                <input class="ptac-input" data-ptac-input="selectedDiagnosticCode" placeholder="Enter code (F1, C3, etc.)" />
+                <button class="ptac-btn" style="background: var(--bk-warn);" data-click="runInput">Run</button>
               </div>
-              
-              <!-- Common Codes -->
-              <div style="font-size: 11px; color: ${activeTheme.fg_soft}; margin-bottom: 8px;">
-                Common Codes (click to run):
-              </div>
-              <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;">
+              <div class="ptac-meta" style="margin-bottom: 8px;">Common Codes (click to run):</div>
+              <div class="ptac-codes">
                 ${['F1', 'F2', 'F3', 'C3', 'C7', 'FP', 'Fd', 'Eo'].map(code => html`
-                  <button
-                    @click=${() => methods.runDiagnostic(state, code)}
-                    style="
-                      padding: 6px 10px;
-                      background: ${state.selectedDiagnosticCode === code ? activeTheme.yellow : activeTheme.bg1};
-                      border: 1px solid ${state.selectedDiagnosticCode === code ? activeTheme.yellow : activeTheme.border};
-                      color: ${state.selectedDiagnosticCode === code ? activeTheme.bg0 : activeTheme.fg};
-                      border-radius: 4px;
-                      font-family: monospace;
-                      font-size: 11px;
-                      font-weight: bold;
-                      cursor: pointer;
-                      transition: all 0.2s;
-                    "
-                  >${code}</button>
+                  <button class="ptac-code" data-click="runCode"><i class="ptac-hidden-v">${code}</i>${code}</button>
                 `)}
               </div>
-              
-              <!-- Link to Full Diagnostics -->
-              <div style="
-                background: ${activeTheme.bg0};
-                border: 1px solid ${activeTheme.border};
-                border-radius: 6px;
-                padding: 10px;
-                text-align: center;
-              ">
-                <div style="font-size: 11px; color: ${activeTheme.fg_soft}; margin-bottom: 6px;">
-                  For full diagnostics with voice feedback
-                </div>
-                <button
-                  @click=${() => {
-                    window.dispatchEvent(new CustomEvent('esa:open-diagnostics', { detail: { source: 'ESA-Ptac-B' } }));
-                    methods.switchTab(state, 'overview');
-                  }}
-                  style="
-                    padding: 6px 16px;
-                    background: transparent;
-                    border: 1px solid ${activeTheme.aqua};
-                    color: ${activeTheme.aqua};
-                    border-radius: 4px;
-                    font-size: 11px;
-                    cursor: pointer;
-                  "
-                >
-                  Open ESA.DiagnosticCard →
-                </button>
+              <div style="background: var(--bk-panel-2); border: 1px solid var(--bk-border-soft); border-radius: 8px; padding: 10px; text-align: center;">
+                <div class="ptac-meta" style="margin-bottom: 6px;">For full diagnostics with voice feedback</div>
+                <button class="ptac-btn ptac-btn--ghost" data-click="openDiagnostics">Open ESA.DiagnosticCard →</button>
               </div>
             </div>
-          ` : ''}
-          
-          ${state.activeTab === 'broadcast' ? html`
-            <!-- BROADCAST TAB -->
-            <div>
-              <div style="font-size: 11px; color: ${activeTheme.purple}; font-weight: bold; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">
-                Service Broadcasting Center
+
+            <div class="ptac-panel" data-panel="broadcast" hidden>
+              <div class="ptac-panel-h">Service Broadcasting Center</div>
+              <div class="ptac-status">
+                <div class="ptac-status-icon">📴</div>
+                <div class="ptac-status-label">BROADCASTING STANDBY</div>
+                <div class="ptac-meta ptac-status-last" style="margin-top: 4px; display: none;"></div>
               </div>
-              
-              <!-- Broadcast Status -->
-              <div style="
-                background: ${state.broadcastMode ? `${activeTheme.green}15` : activeTheme.bg0};
-                border: 1px solid ${state.broadcastMode ? activeTheme.green : activeTheme.border};
-                border-radius: 8px;
-                padding: 12px;
-                margin-bottom: 12px;
-                text-align: center;
-              ">
-                <div style="font-size: 24px; margin-bottom: 4px;">
-                  ${state.broadcastMode ? '📡' : '📴'}
-                </div>
-                <div style="font-weight: bold; color: ${state.broadcastMode ? activeTheme.green : activeTheme.fg_soft};">
-                  ${state.broadcastMode ? 'BROADCASTING ACTIVE' : 'BROADCASTING STANDBY'}
-                </div>
-                ${state.currentBroadcast ? html`
-                  <div style="font-size: 10px; color: ${activeTheme.fg_soft}; margin-top: 4px;">
-                    Last: ${state.currentBroadcast.message.substring(0, 50)}...
-                  </div>
-                ` : ''}
-              </div>
-              
-              <!-- Quick Broadcast Templates -->
-              <div style="font-size: 11px; color: ${activeTheme.fg_soft}; margin-bottom: 8px;">
-                Quick Broadcast:
-              </div>
+              <div class="ptac-meta" style="margin-bottom: 8px;">Quick Broadcast:</div>
               <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;">
-                <button
-                  @click=${() => methods.broadcastMessage(state, 'scheduled')}
-                  style="
-                    padding: 10px;
-                    background: ${activeTheme.blue}20;
-                    border: 1px solid ${activeTheme.blue};
-                    color: ${activeTheme.blue};
-                    border-radius: 6px;
-                    font-size: 12px;
-                    cursor: pointer;
-                    text-align: left;
-                    transition: all 0.2s;
-                  "
-                  onmouseenter=${(e) => e.target.style.background = `${activeTheme.blue}30`}
-                  onmouseleave=${(e) => e.target.style.background = `${activeTheme.blue}20`}
-                >
-                  📅 Scheduled Maintenance Reminder
-                </button>
-                
-                <button
-                  @click=${() => methods.broadcastMessage(state, 'urgent')}
-                  style="
-                    padding: 10px;
-                    background: ${activeTheme.red}20;
-                    border: 1px solid ${activeTheme.red};
-                    color: ${activeTheme.red};
-                    border-radius: 6px;
-                    font-size: 12px;
-                    cursor: pointer;
-                    text-align: left;
-                    transition: all 0.2s;
-                  "
-                  onmouseenter=${(e) => e.target.style.background = `${activeTheme.red}30`}
-                  onmouseleave=${(e) => e.target.style.background = `${activeTheme.red}20`}
-                >
-                  ⚠️ Urgent Alert
-                </button>
-                
-                <button
-                  @click=${() => methods.broadcastMessage(state, 'completed')}
-                  style="
-                    padding: 10px;
-                    background: ${activeTheme.green}20;
-                    border: 1px solid ${activeTheme.green};
-                    color: ${activeTheme.green};
-                    border-radius: 6px;
-                    font-size: 12px;
-                    cursor: pointer;
-                    text-align: left;
-                    transition: all 0.2s;
-                  "
-                  onmouseenter=${(e) => e.target.style.background = `${activeTheme.green}30`}
-                  onmouseleave=${(e) => e.target.style.background = `${activeTheme.green}20`}
-                >
-                  ✅ Service Complete
-                </button>
+                <button class="ptac-quick-b ptac-qa--info" data-click="broadcast" data-arg="scheduled">📅 Scheduled Maintenance Reminder</button>
+                <button class="ptac-quick-b ptac-qa--warn" data-click="broadcast" data-arg="urgent">⚠️ Urgent Alert</button>
+                <button class="ptac-quick-b ptac-qa--ok" data-click="broadcast" data-arg="completed">✅ Service Complete</button>
               </div>
-              
-              <!-- Custom Broadcast -->
-              <div style="font-size: 11px; color: ${activeTheme.fg_soft}; margin-bottom: 8px;">
-                Custom Message:
-              </div>
-              <textarea
-                placeholder="Type custom broadcast message..."
-                style="
-                  width: 100%;
-                  min-height: 60px;
-                  padding: 8px 10px;
-                  background: ${activeTheme.bg0};
-                  border: 1px solid ${activeTheme.border};
-                  border-radius: 4px;
-                  color: ${activeTheme.fg};
-                  font-size: 12px;
-                  resize: vertical;
-                  font-family: inherit;
-                  margin-bottom: 8px;
-                "
-              ></textarea>
-              
+              <div class="ptac-meta" style="margin-bottom: 8px;">Custom Message:</div>
+              <textarea class="ptac-custom" placeholder="Type custom broadcast message..."></textarea>
               <div style="display: flex; gap: 8px;">
-                <button
-                  @click=${(e) => {
-                    const textarea = e.target.parentElement.previousElementSibling;
-                    if (textarea.value.trim()) {
-                      methods.broadcastMessage(state, 'custom', textarea.value);
-                      textarea.value = '';
-                    }
-                  }}
-                  style="
-                    flex: 1;
-                    padding: 8px;
-                    background: ${activeTheme.purple};
-                    color: ${activeTheme.bg0};
-                    border: none;
-                    border-radius: 4px;
-                    font-weight: bold;
-                    font-size: 12px;
-                    cursor: pointer;
-                  "
-                >📢 Send Broadcast</button>
-                
-                <button
-                  @click=${(e) => {
-                    const textarea = e.target.parentElement.previousElementSibling;
-                    if (textarea.value.trim()) {
-                      methods.speak(state, textarea.value);
-                    }
-                  }}
-                  style="
-                    padding: 8px 12px;
-                    background: ${activeTheme.bg1};
-                    border: 1px solid ${activeTheme.border};
-                    color: ${activeTheme.fg};
-                    border-radius: 4px;
-                    font-size: 12px;
-                    cursor: pointer;
-                  "
-                >🎤 Speak Only</button>
+                <button class="ptac-btn" style="flex: 1; background: #8b5cf6;" data-click="customBroadcast">📢 Send Broadcast</button>
+                <button class="ptac-btn ptac-btn--ghost" data-click="speakCustom">🎤 Speak Only</button>
               </div>
-              
-              <!-- Broadcast History -->
-              ${state.broadcastHistory.length > 0 ? html`
-                <div style="margin-top: 16px;">
-                  <div style="font-size: 11px; color: ${activeTheme.fg_soft}; margin-bottom: 8px;">
-                    Recent Broadcasts (${state.broadcastHistory.length})
-                  </div>
-                  ${state.broadcastHistory.slice(0, 5).map(bc => html`
-                    <div style="
-                      background: ${activeTheme.bg0};
-                      border-left: 3px solid ${bc.type === 'urgent' ? activeTheme.red : bc.type === 'completed' ? activeTheme.green : activeTheme.blue};
-                      padding: 6px 10px;
-                      margin-bottom: 4px;
-                      border-radius: 0 4px 4px 0;
-                      font-size: 10px;
-                    ">
-                      <div style="color: ${activeTheme.fg};">${bc.message.substring(0, 60)}${bc.message.length > 60 ? '...' : ''}</div>
-                      <div style="color: ${activeTheme.fg_soft}; margin-top: 2px;">
-                        ${new Date(bc.timestamp).toLocaleTimeString()} • ${bc.type}
-                      </div>
-                    </div>
-                  `)}
-                </div>
-              ` : ''}
+              <div style="margin-top: 16px;">
+                <div class="ptac-meta ptac-hist-head" style="margin-bottom: 8px; display: none;"></div>
+                <div class="ptac-hist-list"></div>
+              </div>
             </div>
-          ` : ''}
-          
+          </div>
+
+          <div class="ptac-footer">
+            <span>ESA-PTAC-B v1.0</span>
+            <span class="ptac-transport">${state.connections.transport ? '🟢 Transport' : '🔴 No Transport'}</span>
+          </div>
         </div>
-        
-        <!-- Footer Status Bar -->
-        <div style="
-          background: ${activeTheme.bg1};
-          border-top: 1px solid ${activeTheme.border};
-          padding: 6px 12px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-size: 9px;
-          color: ${activeTheme.fg_soft};
-        ">
-          <span>ESA-PTAC-B v1.0</span>
-          <span>${state.connections.transport ? '🟢 Transport' : '🔴 No Transport'}</span>
+
+        <div class="bento-text">
+          <div class="bento-title">PTAC Service <em>Broadcast</em></div>
+          <p class="bento-desc">Seasons 9000 BTU PTAC · HD Supply #${state.unit.hdSupply.partNumber}. Parts, service schedule, diagnostic codes and Ava007 voice broadcasts for this unit — wired to the workorder and diagnostic cards.</p>
+          <button class="bk-btn primary" data-click="openHDSupply">HD Supply Catalog ↗</button>
         </div>
       </div>
-      
-      <!-- Toggle Button (when closed) -->
-      ${!state.isOpen ? html`
-        <button
-          @click=${() => methods.togglePanel(state, true)}
-          style="
-            position: fixed;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            background: ${activeTheme.purple};
-            color: ${activeTheme.bg0};
-            border: none;
-            border-radius: 8px 0 0 8px;
-            padding: 16px 8px;
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 999;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.3);
-            transition: all 0.2s;
-          "
-          onmouseenter=${(e) => e.style.paddingLeft = '12px'}
-          onmouseleave=${(e) => e.style.paddingLeft = '8px'}
-        >📡 PTAC-B</button>
-      ` : ''}
-    `
+    `;
   }
-}).component;
+});
 
-// Initialize on import
-if (typeof window !== 'undefined') {
-  // Will be initialized by integration.js
-}
+// ---------------------------------------------------------------------------
+// Post-mount wiring (Arrow 1.0.6-safe): the template renders ONCE — this
+// Arrow build's reactive updates are broken on every CDN — so this wrapper
+// binds delegated listeners and re-syncs the DOM from state after each
+// action. Same architecture as ESA.DiagnosticCard 3.0 / ESA.workorder 3.0.
+// ---------------------------------------------------------------------------
+const origPtacMount = ESAPtacB.mount.bind(ESAPtacB);
+methods = ESAPtacB.methods; // bind module-scope handle: methods.* call each other
+ESAPtacB.mount = function (container) {
+  const handle = origPtacMount(container);
+  if (!handle) return handle;
+  const cnt = handle.container || container;
+  const pState = ESAPtacB.state;
+  const pMethods = ESAPtacB.methods;
+
+  const esc = (s) => String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  function syncTabs() {
+    cnt.querySelectorAll('.ptac-tab').forEach((b) => b.classList.toggle('active', b.dataset.tab === pState.activeTab));
+    cnt.querySelectorAll('.ptac-panel').forEach((p) => {
+      if (p.dataset.panel === pState.activeTab) p.removeAttribute('hidden');
+      else p.setAttribute('hidden', '');
+    });
+  }
+
+  function syncLive() {
+    const on = !!pState.broadcastMode;
+    cnt.dataset.broadcast = on ? 'on' : 'off';
+    const live = cnt.querySelector('.ptac-live');
+    if (live) live.textContent = on ? '\u{1F534} LIVE' : '\u26AB OFF';
+    const icon = cnt.querySelector('.ptac-status-icon');
+    if (icon) icon.textContent = on ? '\u{1F4E1}' : '\u{1F4E4}';
+    const label = cnt.querySelector('.ptac-status-label');
+    if (label) label.textContent = on ? 'BROADCASTING ACTIVE' : 'BROADCASTING STANDBY';
+    const last = cnt.querySelector('.ptac-status-last');
+    if (last) {
+      const msg = pState.currentBroadcast && pState.currentBroadcast.message;
+      if (msg) {
+        last.style.display = '';
+        last.textContent = 'Last: ' + String(msg).substring(0, 50) + '...';
+      } else {
+        last.style.display = 'none';
+      }
+    }
+  }
+
+  function syncHistory() {
+    const head = cnt.querySelector('.ptac-hist-head');
+    const list = cnt.querySelector('.ptac-hist-list');
+    if (!head || !list) return;
+    const hist = pState.broadcastHistory || [];
+    if (!hist.length) {
+      head.style.display = 'none';
+      list.innerHTML = '';
+      return;
+    }
+    head.style.display = '';
+    head.textContent = 'Recent Broadcasts (' + hist.length + ')';
+    list.innerHTML = '';
+    hist.slice(0, 5).forEach((bc) => {
+      const row = document.createElement('div');
+      row.className = 'ptac-hist-row';
+      row.style.fontSize = '10px';
+      const bar = document.createElement('i');
+      bar.className = 'ptac-bar ' + (bc.type === 'urgent' ? 'ptac-bar-danger' : bc.type === 'completed' ? 'ptac-bar-ok' : 'ptac-bar-info');
+      const body = document.createElement('div');
+      const line1 = document.createElement('div');
+      line1.style.color = 'var(--bk-text)';
+      line1.textContent = String(bc.message || '').substring(0, 60) + (String(bc.message || '').length > 60 ? '...' : '');
+      const line2 = document.createElement('div');
+      line2.className = 'ptac-meta';
+      line2.style.marginTop = '2px';
+      line2.textContent = new Date(bc.timestamp).toLocaleTimeString() + ' \u2022 ' + bc.type;
+      body.appendChild(line1);
+      body.appendChild(line2);
+      row.appendChild(bar);
+      row.appendChild(body);
+      list.appendChild(row);
+    });
+  }
+
+  function syncAll() { syncTabs(); syncLive(); syncHistory(); }
+
+  cnt.addEventListener('click', (e) => {
+    const tab = e.target.closest('.ptac-tab');
+    if (tab) {
+      pMethods.switchTab(pState, tab.dataset.tab);
+      syncTabs();
+      return;
+    }
+
+    const btn = e.target.closest('[data-click]');
+    if (!btn) return;
+    const action = btn.dataset.click;
+    const hiddenV = btn.querySelector('i.ptac-hidden-v');
+    const val = hiddenV ? hiddenV.textContent.trim() : btn.dataset.arg;
+
+    switch (action) {
+      case 'liveToggle':
+        if (pState.broadcastMode) pMethods.stopBroadcast(pState);
+        else pMethods.startBroadcast(pState);
+        break;
+      case 'broadcast':
+        pMethods.broadcastMessage(pState, val || 'scheduled');
+        break;
+      case 'runCode':
+        pMethods.runDiagnostic(pState, val);
+        break;
+      case 'runInput':
+        pMethods.runDiagnostic(pState, pState.selectedDiagnosticCode);
+        break;
+      case 'addPart': {
+        const part = pState.unit.commonParts.find((p) => String(p.sku) === val);
+        if (part) pMethods.addPartToWorkorder(pState, part);
+        break;
+      }
+      case 'lookupPart':
+        pMethods.lookupPart(pState, val);
+        break;
+      case 'openDiagnostics':
+        window.dispatchEvent(new CustomEvent('esa:open-diagnostics', { detail: { source: 'ESA-Ptac-B' } }));
+        pMethods.switchTab(pState, 'overview');
+        break;
+      case 'customBroadcast': {
+        const ta = cnt.querySelector('.ptac-custom');
+        if (ta && ta.value.trim()) {
+          pMethods.broadcastMessage(pState, 'custom', ta.value);
+          ta.value = '';
+        }
+        break;
+      }
+      case 'speakCustom': {
+        const ta = cnt.querySelector('.ptac-custom');
+        if (ta && ta.value.trim()) pMethods.speak(pState, ta.value);
+        break;
+      }
+      default:
+        if (typeof pMethods[action] === 'function') pMethods[action](pState, val);
+    }
+    syncAll();
+  });
+
+  cnt.addEventListener('input', (e) => {
+    const el = e.target.closest('[data-ptac-input]');
+    if (el) pState[el.dataset.ptacInput] = e.target.value;
+  });
+
+  syncAll();
+  console.log('[ESA.Verify] Ptac-B post-mount delegation + render-sync wired');
+  return handle;
+};
+
+// ESAVerifyComponent returns the wrapper itself ({ mount, view, state, methods })
+// - there is no `.component` property; exporting the wrapper keeps the .mount()
+// contract that integration.js calls.
 
 export default ESAPtacB;
+

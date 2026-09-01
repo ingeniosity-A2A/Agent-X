@@ -1,83 +1,236 @@
-/* ESA service shell — cards + unified AI Chatbot Ingestion */
+/* ============================================================
+   ESA service shell — UI8 dock (V6 attachment) + viewport + chat
+   Dock visual: ava007-console-patch-v6 attachment, AS-IS —
+   floating glass rail, gradient orbs, utility stack, ESA label.
+   Tokens come from the attached ava-shell.css (.ava-shell).
+   ============================================================ */
 
 .esa-workspace {
   display: grid;
-  grid-template-columns: minmax(220px, 280px) 1fr;
+  grid-template-columns: 96px 1fr;
   grid-template-rows: 1fr auto;
   grid-template-areas:
     "nav stage"
     "nav chat";
-  height: calc(100vh - 56px);
+  height: calc(100vh - 52px);
   gap: 0;
 }
 
+/* ---- Left rail: hosts the floating UI8 dock ---- */
 #esa-service-nav,
 #esa-console {
   grid-area: nav;
-  background: #141414;
-  border-right: 1px solid rgba(200, 168, 130, 0.18);
-  overflow: auto;
-  padding: 12px 10px 16px;
+  background: transparent;
+  border-right: none;
+  overflow: visible;
+  padding: 0;
+  position: relative;
+  z-index: 60;
 }
 
-.esa-service-head {
+/* ---- The dock (uploaded v6 design, as-is) ---- */
+.u8-dock {
+  position: fixed;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 56px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(200, 168, 130, 0.22);
-  background: #1a1a1a;
-  color: #f2f2f2;
-  cursor: pointer;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-
-.esa-service-head[aria-expanded="true"] {
-  border-color: rgba(176, 125, 79, 0.55);
-}
-
-.esa-card-tree {
-  margin-top: 10px;
-  display: none;
   flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 9px 12px;
+  border-radius: 28px;
+  background: var(--exoskel-glass-tinted, rgba(20, 20, 25, 0.75));
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--exoskel-glass-border, rgba(255, 255, 255, 0.12));
+  box-shadow: var(--exoskel-glass-glow, 0 12px 32px rgba(0, 0, 0, 0.4));
+  z-index: 80;
 }
 
-.esa-card-tree.open {
-  display: flex;
-}
-
-.esa-card-tree button {
-  text-align: left;
+/* Orbs — gradient cores + conic ring on active/brand */
+.u8-orb {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
   border: none;
   background: transparent;
-  color: #c8c4bc;
-  padding: 10px 12px;
-  border-radius: 8px;
+  padding: 0;
   cursor: pointer;
-  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.u8-orb:hover { transform: scale(1.08); }
+.u8-orb:active { transform: scale(0.95); }
+
+.u8-orb::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  padding: 1.5px;
+  background: var(--bento-gradient-ring, conic-gradient(from 0deg, #3b82f6, #8b5cf6, #ec4899, #f97316, #3b82f6));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+.u8-orb.active::before,
+.u8-brand::before { opacity: 1; }
+
+.u8-orb-core {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+.u8-orb--mini { width: 22px; height: 22px; font-size: 9px; }
+
+/* Orb palettes — actual card identities on the v6 gradient system */
+.u8-orb--brand  { background: radial-gradient(circle at 50% 50%, #fff 0 3px, transparent 3.5px), linear-gradient(135deg, #3b82f6, #8b5cf6); }
+.u8-orb--mint   { background: linear-gradient(135deg, #22c55e, #7dd4a8); }
+.u8-orb--orange { background: linear-gradient(135deg, #f97316, #ffb347); }
+.u8-orb--blue   { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+.u8-orb--purple { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+.u8-orb--coral  { background: linear-gradient(135deg, #ff7a6b, #ec4899); }
+
+.u8-dock-sep {
+  width: 22px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
 }
 
-.esa-card-tree button:hover,
-.esa-card-tree button[aria-selected="true"] {
-  background: #222;
+/* Utility stack — real shell actions (menu / cycle / voice) */
+.u8-dock-utils {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+.u8-util {
+  width: 26px;
+  height: 26px;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 11px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.u8-util:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.u8-util.active {
+  background: var(--bento-surface-light, rgba(255, 255, 255, 0.08));
+  color: #fff;
+  box-shadow: var(--bento-shadow-dark-inset, inset 2px 2px 8px rgba(255, 255, 255, 0.04));
+}
+
+.u8-dock-label {
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+}
+
+/* ---- Flyout dropdown: ESA title → card list → viewport ---- */
+.u8-flyout {
+  position: fixed;
+  left: 84px;
+  top: 50%;
+  transform: translateY(-50%) translateX(-8px);
+  min-width: 248px;
+  padding: 10px;
+  border-radius: 20px;
+  background: var(--exoskel-glass-tinted, rgba(20, 20, 25, 0.75));
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--exoskel-glass-border, rgba(255, 255, 255, 0.12));
+  box-shadow: var(--exoskel-glass-glow, 0 12px 32px rgba(0, 0, 0, 0.4));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 90;
+}
+.u8-flyout.open {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+  pointer-events: auto;
+}
+
+.u8-flyout-head {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--bento-text-muted, rgba(255, 255, 255, 0.4));
+  padding: 8px 10px 6px;
+}
+
+.u8-flyout-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: var(--bento-text-secondary, rgba(255, 255, 255, 0.6));
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.u8-flyout-item:hover,
+.u8-flyout-item[aria-selected="true"] {
+  background: var(--bento-surface-light, rgba(255, 255, 255, 0.08));
   color: #fff;
 }
 
-.esa-card-tree button[aria-selected="true"] {
-  box-shadow: inset 3px 0 0 #b07d4f;
+.u8-flyout-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.u8-flyout-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #fff;
+}
+.u8-flyout-sub {
+  font-size: 10px;
+  color: var(--bento-text-muted, rgba(255, 255, 255, 0.4));
 }
 
+/* ---- Viewport stage ---- */
 .esa-render-area {
   grid-area: stage;
   overflow: auto;
-  padding: 16px;
-  background:
-    radial-gradient(rgba(140, 190, 150, 0.05) 1px, transparent 1px) 0 0 / 26px 26px,
-    #101010;
+  padding: 16px 24px 16px 8px;
+  background: transparent;
 }
 
 .esa-render-area > [data-esa-card] {
@@ -90,13 +243,47 @@
   display: block;
 }
 
-/* chat area owned by ai-chatbot-dock.css */
+/* ---- V6 typography bridge (attachment is the type authority):
+        cards follow the ava-shell stack — bold sans titles like the
+        uploaded Bento cards; no serif remnants of the old design ---- */
+.ava-shell .bento-card { font-family: inherit; }
+.ava-shell .bento-title {
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.ava-shell .bk-btn,
+.ava-shell .bk-input { font-family: inherit; }
+
+/* ---- Header chrome → V6 glass topbar ---- */
+.esa-header {
+  background: transparent !important;
+  border-bottom: 1px solid var(--bento-border, rgba(255, 255, 255, 0.06)) !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.esa-title { color: var(--bento-text-primary, #fff) !important; }
+.esa-title span:first-child {
+  background: var(--bento-gradient-cool, linear-gradient(135deg, #3b82f6, #8b5cf6));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.esa-status-badge {
+  background: var(--bento-surface-dark, rgba(255, 255, 255, 0.03)) !important;
+  border: 1px solid var(--bento-border, rgba(255, 255, 255, 0.06)) !important;
+  color: var(--bento-text-secondary, rgba(255, 255, 255, 0.6)) !important;
+}
+
+/* ---- chat area owned by ai-chatbot-dock.css ---- */
 #ai-chatbot,
 #esa-ai-chatbot,
 #esa-ingestion {
   grid-area: chat;
 }
 
+/* ---- Mobile: dock becomes a horizontal strip (uploaded mobile design),
+        kept below the header so the chat dock owns the bottom ---- */
 @media (max-width: 768px) {
   .esa-workspace {
     grid-template-columns: 1fr;
@@ -110,8 +297,37 @@
 
   #esa-service-nav,
   #esa-console {
-    border-right: none;
-    border-bottom: 1px solid rgba(200, 168, 130, 0.18);
-    max-height: 36vh;
+    position: sticky;
+    top: 0;
+    z-index: 80;
+    display: flex;
+    justify-content: center;
+    padding: 8px 0;
+  }
+
+  .u8-dock {
+    position: static;
+    transform: none;
+    flex-direction: row;
+    width: auto;
+    max-width: calc(100vw - 24px);
+    padding: 9px 14px;
+    border-radius: 28px;
+  }
+
+  .u8-dock-sep { width: 1px; height: 22px; }
+  .u8-dock-utils { flex-direction: row; }
+  .u8-dock-label { display: none; }
+
+  .u8-flyout {
+    left: 50%;
+    top: auto;
+    bottom: calc(100% + 10px);
+    transform: translateX(-50%) translateY(6px);
+  }
+  .u8-flyout.open { transform: translateX(-50%) translateY(0); }
+
+  .esa-render-area {
+    padding: 16px 12px;
   }
 }

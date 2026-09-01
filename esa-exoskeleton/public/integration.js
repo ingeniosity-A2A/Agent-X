@@ -86,7 +86,7 @@ async function initESAExoskeleton() {
   // ============================================
   // LOAD COMPONENTS
   // ============================================
-  let ESAIngestion, ESADiagnosticCard, ESAInvPartsCardB, ESAWorkorder, ESAMaintenanceChecklist, themeModule;
+  let ESAIngestion, ESADiagnosticCard, ESAInvPartsCardB, ESAWorkorder, ESAMaintenanceChecklist, ESAPtacB, themeModule;
 
   try {
     const [
@@ -95,14 +95,16 @@ async function initESAExoskeleton() {
       partsModule,
       workorderModule,
       checklistModule,
+      ptacModule,
       themeMod
     ] = await Promise.allSettled([
-      import('./components/ESA.Ingestion.js'),
-      import('./components/ESA.DiagnosticCard.js'),
-      import('./components/ESA.invpartscard-B.js'),
-      import('./components/ESA.workorder.js'),
-      import('./components/ESA.MaintenanceChecklist.js'),
-      import('./config/gruvbox-colors.js')
+      import('./components/ESA.Ingestion.js?v=407'),
+      import('./components/ESA.DiagnosticCard.js?v=407'),
+      import('./components/ESA.invpartscard-B.js?v=407'),
+      import('./components/ESA.workorder.js?v=407'),
+      import('./components/ESA.MaintenanceChecklist.js?v=407'),
+      import('./components/ESA.Ptac-B.js?v=407'),
+      import('./config/gruvbox-colors.js?v=407')
     ]);
 
     ESAIngestion = ingestionModule.status === 'fulfilled' ? ingestionModule.value.ESAIngestion : null;
@@ -110,6 +112,7 @@ async function initESAExoskeleton() {
     ESAInvPartsCardB = partsModule.status === 'fulfilled' ? partsModule.value.ESAInvPartsCardB : null;
     ESAWorkorder = workorderModule.status === 'fulfilled' ? workorderModule.value.ESAWorkorder : null;
     ESAMaintenanceChecklist = checklistModule.status === 'fulfilled' ? checklistModule.value.ESAMaintenanceChecklist : null;
+    ESAPtacB = ptacModule.status === 'fulfilled' ? (ptacModule.value.ESAPtacB || ptacModule.value.default) : null;
     themeModule = themeMod.status === 'fulfilled' ? themeMod.value : null;
 
     if (ingestionModule.status === 'rejected') window.ESA.errors.push({ component: 'Ingestion', error: ingestionModule.reason });
@@ -117,6 +120,7 @@ async function initESAExoskeleton() {
     if (partsModule.status === 'rejected') window.ESA.errors.push({ component: 'InvPartsCard', error: partsModule.reason });
     if (workorderModule.status === 'rejected') window.ESA.errors.push({ component: 'Workorder', error: workorderModule.reason });
     if (checklistModule.status === 'rejected') window.ESA.errors.push({ component: 'MaintenanceChecklist', error: checklistModule.reason });
+    if (ptacModule.status === 'rejected') window.ESA.errors.push({ component: 'PtacB', error: ptacModule.reason });
   } catch (err) {
     window.ESA.errors.push({ phase: 'import', error: err });
   }
@@ -230,11 +234,29 @@ async function initESAExoskeleton() {
     }
   }
 
+  // 6. PTAC-B — HD Supply service broadcasting card (B-side sliding panel)
+  if (ESAPtacB && typeof ESAPtacB.mount === 'function') {
+    try {
+      const ptacContainer = document.getElementById('esa-ptac');
+      if (ptacContainer) {
+        ptacContainer.innerHTML = '';
+        const mountResult = ESAPtacB.mount(ptacContainer);
+        if (mountResult) {
+          window.ESA.components.ptacB = mountResult;
+          window.ESA.mountedComponents.push(mountResult);
+          if (window.ESA.log) window.ESA.log('✓ PTAC-B service broadcast card mounted', 'success');
+        }
+      }
+    } catch (err) {
+      window.ESA.errors.push({ component: 'PtacB', phase: 'mount', error: err });
+    }
+  }
+
   // ============================================
   // 5b. VIEWPORT TOOLBAR + LIBRARY REFRESH
   // ============================================
   const renderArea = document.querySelector('.esa-render-area');
-  const CARD_IDS = ['esa-ingestion-chat-card', 'esa-diagnostics', 'esa-parts-card', 'esa-workorder', 'esa-maintenance-checklist'];
+  const CARD_IDS = ['esa-ingestion-chat-card', 'esa-diagnostics', 'esa-parts-card', 'esa-workorder', 'esa-maintenance-checklist', 'esa-ptac'];
   if (renderArea) {
     const bar = document.createElement('div');
     bar.className = 'esa-view-toolbar';
@@ -345,7 +367,8 @@ async function initESAExoskeleton() {
       gsap.from('#esa-parts-card', { duration: 0.5, opacity: 0, y: 20, delay: 0.15, ease: 'power2.out' });
       gsap.from('#esa-workorder', { duration: 0.5, opacity: 0, y: 20, delay: 0.2, ease: 'power2.out' });
       gsap.from('#esa-maintenance-checklist', { duration: 0.5, opacity: 0, y: 20, delay: 0.25, ease: 'power2.out' });
-      gsap.from('#esa-ingestion', { duration: 0.5, opacity: 0, y: 20, delay: 0.3, ease: 'power2.out' });
+      gsap.from('#esa-ptac', { duration: 0.5, opacity: 0, y: 20, delay: 0.3, ease: 'power2.out' });
+      gsap.from('#esa-ingestion', { duration: 0.5, opacity: 0, y: 20, delay: 0.35, ease: 'power2.out' });
     }
   } catch (err) {
     // Animations non-critical
@@ -373,7 +396,8 @@ async function initESAExoskeleton() {
         diagnosticCard: !!window.ESA.components.diagnosticCard,
         invPartsCard: !!window.ESA.components.invPartsCard,
         workorder: !!window.ESA.components.workorder,
-        maintenanceChecklist: !!window.ESA.components.maintenanceChecklist
+        maintenanceChecklist: !!window.ESA.components.maintenanceChecklist,
+        ptacB: !!window.ESA.components.ptacB
       }
     }
   }));
