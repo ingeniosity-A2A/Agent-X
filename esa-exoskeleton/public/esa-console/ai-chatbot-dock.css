@@ -1,8 +1,5 @@
-/* AI Chatbot Ingestion — speakers on each end, Bento beige/green/black
- *
- *  [ SPEAKER L ]  [ prompt + tools + send + lens ]  [ SPEAKER R ]
- *
- * Pattern aligned with AI Elements PromptInput + dual audio ends.
+/* AI Chatbot Ingestion — dual speakers OUTSIDE shell (each end)
+ * Aligns with AI Elements PromptInput pattern + product dual-audio ends
  * https://elements.ai-sdk.dev/examples/chatbot
  */
 
@@ -26,117 +23,199 @@
   position: relative;
 }
 
-/* Three-column: left speaker | bar | right speaker */
-.esa-dock {
+.ai-dock-row {
   display: flex;
   align-items: stretch;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
 }
 
-/* SPEAKERS — one on each end (always visible) */
-.esa-dock-side,
-.esa-speaker-end {
+.ai-speaker {
   flex: 0 0 auto;
-  width: 120px;
-  min-width: 88px;
-  display: flex !important;
+  width: 48px;
+  min-height: 96px;
+  border-radius: 14px;
+  border: 1px solid var(--esa-line, rgba(244, 244, 238, 0.14));
+  background: linear-gradient(160deg, #1a1a1a, #0a0a0a);
+  color: var(--esa-beige, #f4f4ee);
+  font-size: 20px;
+  cursor: pointer;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
 }
 
-.esa-dock-bar {
+.ai-speaker:hover,
+.ai-speaker.active {
+  border-color: var(--esa-green, #7ec8a0);
+  color: var(--esa-green, #7ec8a0);
+  box-shadow: 0 0 16px rgba(126, 200, 160, 0.2);
+}
+
+.ai-speaker[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 11px;
+  color: #0a0a0a;
+  background: #f4f4ee;
+  border-radius: 6px;
+  padding: 4px 8px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.ai-speaker[data-tip]:hover::after,
+.ai-speaker[data-tip]:focus-visible::after {
+  opacity: 1;
+}
+
+.ai-shell {
   flex: 1;
   max-width: 720px;
   min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "prompt lens"
+    "bottom lens";
+  gap: 8px 10px;
+}
+
+.ai-prompt-row {
+  grid-area: prompt;
   display: flex;
   align-items: center;
-  gap: 8px;
+  position: relative;
   background: rgba(18, 18, 18, 0.98);
   border: 1px solid var(--esa-line, rgba(244, 244, 238, 0.12));
   border-radius: 999px;
-  padding: 8px 10px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  padding: 6px 14px;
+}
+
+.ai-prompt-row input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--esa-beige, #f4f4ee);
+  font-size: 14px;
+  padding: 8px 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.ai-prompt-row input::placeholder {
+  color: rgba(244, 244, 238, 0.4);
+}
+
+.ai-bottom {
+  grid-area: bottom;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-icon-dock {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.ai-tool {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--esa-line, rgba(244, 244, 238, 0.12));
+  background: #1a1a1a;
+  color: #f4f4ee;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
 }
 
-.esa-dock-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  border: 1px solid #2e2e2e;
-  background: #1d1d1d;
-  color: var(--esa-beige, #f4f4ee);
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex: none;
-}
-
-.esa-dock-btn:hover {
-  background: #2a2a2a;
+.ai-tool:hover {
   border-color: var(--esa-green, #7ec8a0);
   color: var(--esa-green, #7ec8a0);
 }
 
-.esa-dock-input {
-  flex: 1;
-  min-width: 0;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: var(--esa-beige, #f4f4ee);
-  font-size: 13px;
-  padding: 10px 4px;
+.ai-tool[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 11px;
+  color: #0a0a0a;
+  background: #f4f4ee;
+  border-radius: 6px;
+  padding: 4px 8px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 50;
 }
 
-.esa-dock-input::placeholder {
-  color: rgba(244, 244, 238, 0.4);
+.ai-tool[data-tip]:hover::after {
+  opacity: 1;
 }
 
-.esa-dock-send,
-.esa-ai-send {
-  width: 38px;
-  height: 38px;
+.ai-send {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: none;
-  background: var(--esa-beige, #f4f4ee);
+  background: #f4f4ee;
   color: #0a0a0a;
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
   flex: none;
+  margin-left: auto;
 }
 
-.esa-dock-send:disabled,
-.esa-ai-send:disabled {
+.ai-send:disabled {
   opacity: 0.35;
   cursor: not-allowed;
 }
 
-.esa-dock-send:hover:not(:disabled),
-.esa-ai-send:hover:not(:disabled) {
+.ai-send:hover:not(:disabled) {
   background: var(--esa-green, #7ec8a0);
 }
 
-/* Big Lens — right of Send, before right speaker */
-.esa-ai-lens {
-  width: 48px !important;
-  height: 48px !important;
-  border-radius: 14px !important;
-  border: 1px solid rgba(126, 200, 160, 0.35) !important;
-  color: var(--esa-green, #7ec8a0) !important;
-  background: linear-gradient(160deg, #1a1a1a, #0a0a0a) !important;
-  font-size: 20px !important;
+.ai-lens {
+  grid-area: lens;
+  align-self: stretch;
+  width: 64px;
+  min-height: 96px;
+  border-radius: 16px;
+  border: 1px solid rgba(126, 200, 160, 0.35);
+  background: linear-gradient(160deg, #1a1a1a, #0a0a0a);
+  color: var(--esa-green, #7ec8a0);
+  font-size: 28px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.esa-ai-lens:hover {
-  box-shadow: 0 0 18px rgba(126, 200, 160, 0.25);
+.ai-lens:hover {
+  box-shadow: 0 0 24px rgba(126, 200, 160, 0.28);
+}
+
+.ai-lens:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .esa-dock-pop {
@@ -151,11 +230,29 @@
   z-index: 50;
 }
 
+.esa-dock-pop-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: none;
+  background: transparent;
+  color: #dcdcdc;
+  border-radius: 9px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 12px;
+}
+
+.esa-dock-pop-item:hover {
+  background: #262626;
+}
+
 .esa-dock-meta {
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
   flex-wrap: wrap;
+  gap: 12px;
   font-size: 8.5px;
   letter-spacing: 1px;
   color: #5f5f5f;
@@ -166,16 +263,14 @@
   display: none !important;
 }
 
-/* Mobile: keep both speakers, shrink width */
-@media (max-width: 900px) {
-  .esa-dock-side,
-  .esa-speaker-end {
-    display: flex !important;
-    width: 64px;
-    min-width: 56px;
+@media (max-width: 768px) {
+  .ai-speaker {
+    width: 40px;
+    min-height: 80px;
+    font-size: 16px;
   }
-
-  .esa-dock-bar {
-    max-width: 100%;
+  .ai-lens {
+    width: 52px;
+    font-size: 22px;
   }
 }
