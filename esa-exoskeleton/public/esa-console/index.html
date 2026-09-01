@@ -422,6 +422,10 @@
       min-height: 0;
       display: grid;
       grid-template-columns: repeat(auto-fit, 24rem);
+      /* Each row sizes to its tallest card — without this, async-mounted
+         card content (workorder 1044px, checklist 1908px) overflows its
+         collapsed track and paints over the neighbouring cards. */
+      grid-auto-rows: max-content;
       justify-content: center;
       gap: 20px;
       align-content: start;
