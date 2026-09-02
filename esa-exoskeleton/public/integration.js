@@ -234,17 +234,89 @@ async function initESAExoskeleton() {
     }
   }
 
-  // 6. PTAC-B — HD Supply service broadcasting card (B-side sliding panel)
+  // 6. PTAC-B — mounted as a true child of the PTAC inventory card.
+  // The B-side service deck is a slide-out surface, not a separate viewport card.
   if (ESAPtacB && typeof ESAPtacB.mount === 'function') {
     try {
-      const ptacContainer = document.getElementById('esa-ptac');
-      if (ptacContainer) {
-        ptacContainer.innerHTML = '';
-        const mountResult = ESAPtacB.mount(ptacContainer);
+      const partsCardContainer = document.getElementById('esa-parts-card');
+      const legacyPtacContainer = document.getElementById('esa-ptac');
+      const parentCard = partsCardContainer?.querySelector('.bento-card');
+
+      if (parentCard) {
+        // Keep the legacy mount node inert; Ptac-B belongs to the PTAC card now.
+        if (legacyPtacContainer) legacyPtacContainer.innerHTML = '';
+
+        parentCard.style.position = 'relative';
+        parentCard.style.overflow = 'visible';
+
+        const slideout = document.createElement('div');
+        slideout.id = 'esa-ptac-slideout';
+        slideout.setAttribute('aria-hidden', 'true');
+        slideout.style.cssText = [
+          'position:absolute',
+          'z-index:50',
+          'top:0',
+          'right:0',
+          'width:min(560px, calc(100vw - 32px))',
+          'max-height:calc(100% - 8px)',
+          'transition:transform 320ms cubic-bezier(.22,.61,.36,1), opacity 220ms ease',
+          'transform:translateX(100%)',
+          'opacity:0',
+          'pointer-events:none',
+          'will-change:transform,opacity'
+        ].join(';');
+        parentCard.appendChild(slideout);
+
+        const mountResult = ESAPtacB.mount(slideout);
         if (mountResult) {
           window.ESA.components.ptacB = mountResult;
           window.ESA.mountedComponents.push(mountResult);
-          if (window.ESA.log) window.ESA.log('✓ PTAC-B service broadcast card mounted', 'success');
+
+          const setSlideout = (open) => {
+            const isOpen = !!open;
+            slideout.style.transform = isOpen ? 'translateX(100%)' : 'translateX(100%)';
+            slideout.style.opacity = isOpen ? '0' : '0';
+            slideout.style.pointerEvents = 'none';
+            slideout.setAttribute('aria-hidden', String(!isOpen));
+
+            if (isOpen) {
+              requestAnimationFrame(() => {
+                slideout.style.transform = 'translateX(calc(100% + 12px))';
+                slideout.style.opacity = '1';
+                slideout.style.pointerEvents = 'auto';
+              });
+            }
+          };
+
+          // Parent PTAC card owns the open/close signal.
+          window.addEventListener('esa:broadcast-toggle', (event) => {
+            const open = !!event.detail?.open;
+            if (ESAPtacB.state) ESAPtacB.state.isOpen = open;
+            if (ESAPtacB.state) ESAPtacB.state.slidePosition = open ? 'open' : 'closed';
+            setSlideout(open);
+          });
+
+          // Expose a small parent-card control surface without changing the
+          // Ptac-B feature set.
+          window.ESA.components.ptacBSlideout = {
+            open: () => window.dispatchEvent(new CustomEvent('esa:broadcast-toggle', {
+              detail: { open: true, component: 'InvPartsCard-B' }
+            })),
+            close: () => window.dispatchEvent(new CustomEvent('esa:broadcast-toggle', {
+              detail: { open: false, component: 'InvPartsCard-B' }
+            }))
+          };
+
+          if (window.ESA.log) window.ESA.log('✓ PTAC-B mounted as PTAC card slide-out', 'success');
+        }
+      } else if (legacyPtacContainer) {
+        // Safe fallback if the parent card has not mounted its Bento root yet.
+        legacyPtacContainer.innerHTML = '';
+        const mountResult = ESAPtacB.mount(legacyPtacContainer);
+        if (mountResult) {
+          window.ESA.components.ptacB = mountResult;
+          window.ESA.mountedComponents.push(mountResult);
+          if (window.ESA.log) window.ESA.log('✓ PTAC-B service broadcast card mounted (fallback)', 'success');
         }
       }
     } catch (err) {
