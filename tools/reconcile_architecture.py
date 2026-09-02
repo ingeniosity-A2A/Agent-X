@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
-"""Mechanical boundary reconciliation for Agent-X.
+"""Local-only Agent-X boundary reconciliation.
 
-This script performs only approved compatibility migrations. It does not redesign
-features or UI. Agent-X remains capability/mesh execution; cognitive state is
-never represented here.
+No GitHub Actions or hosted automation is used. This script performs only the
+approved compatibility migration: legacy cognitive envelopes are converted to
+opaque intent/capability references while preserving existing behavior and UI.
 """
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+TARGETS = [
+    "src/quantum/task_memory.py",
+    "esa-exoskeleton/public/components/ESA.GSAPTransport.js",
+    "esa-exoskeleton/public/components/ESA.Ptac-B.js",
+    "esa-exoskeleton/docs/service-broadcast-cards.md",
+]
 
 
 def replace(path: str, replacements: list[tuple[str, str]]) -> bool:
@@ -27,8 +33,8 @@ def replace(path: str, replacements: list[tuple[str, str]]) -> bool:
 
 changed = False
 
-# Python memory adapter: preserve its public intent/confidence query API, but source
-# those values only from opaque routing/observation metadata.
+# Preserve the existing task-memory intent/confidence API, but source it only
+# from opaque substrate routing/observation metadata.
 changed |= replace(
     "src/quantum/task_memory.py",
     [
@@ -43,7 +49,7 @@ changed |= replace(
     ],
 )
 
-# JS transport components: convert legacy cognitive envelopes to opaque intent refs.
+# Convert transport-side legacy cognitive envelope lookups/emitters.
 for path in [
     "esa-exoskeleton/public/components/ESA.GSAPTransport.js",
     "esa-exoskeleton/public/components/ESA.Ptac-B.js",
@@ -66,7 +72,6 @@ for path in [
         ],
     )
 
-# Documentation examples must teach the canonical boundary, not the legacy one.
 changed |= replace(
     "esa-exoskeleton/docs/service-broadcast-cards.md",
     [
