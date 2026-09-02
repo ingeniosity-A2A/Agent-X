@@ -8,10 +8,10 @@ trigger:
   - lte-m-uplink
   - nb-iot-telemetry
   - iot-gateway-status
-role: connectivity-muscle
+role: connectivity-firmware
 layer: capability-firmware
 not: intellect
-owner: Agent-X / Exoskeleton connectivity surface
+owner: Cybernetic-Ava007 (firmware intelligence) / Agent-X (execution adapter)
 requires:
   - nRF Connect SDK (NCS) toolchain on build host
   - Onomondo SoftSIM credentials (operator-provisioned)
@@ -26,7 +26,7 @@ boundary: no-artifact-no-work
 
 # Onomondo + NCS — Connectivity Firmware
 
-**Muscles, not brain.** Ava emits Intent. This skill attaches the radio path.
+**Firmware, not brain replacement.** The authoritative skill intelligence belongs to Cybernetic-Ava007. Ava emits Intent; the Exoskeleton mounts and transports the firmware contract; Agent-X supplies the world-facing connectivity execution adapter.
 
 ## What it does
 
@@ -38,16 +38,17 @@ boundary: no-artifact-no-work
 ## What it does not do
 
 - Does not invent carrier authority without provisioned SoftSIM
-- Does not live inside AVA-007 intellect repo as implementation body
+- Does not move Ava007 intelligence into Agent-X
 - Does not replace Core-Membrain or GSAP temporal kernel
+- Does not become runtime orchestration or device-wide authority
 
 ## Layers
 
 | Path | Role |
 |------|------|
-| `SKILL.md` | This brain — triggers + constraints |
+| `SKILL.md` | Ava007 firmware intelligence: triggers + constraints |
 | `config/prj.conf` | NCS Kconfig tokens for Onomondo path |
-| `scripts/` | Build / mock / receipt actions (CLI) |
+| `scripts/` | Agent-X execution/build/mock/receipt actions (CLI) |
 | `references/` | Lazy manuals — load only when skill active |
 
 ## Human gates
