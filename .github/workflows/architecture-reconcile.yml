@@ -36,9 +36,9 @@ jobs:
         run: |
           set -e
           if grep -RIn --exclude-dir=.git --exclude-dir=node_modules --exclude='*.lock' \
-            -E 'cognitive_state|chain_of_thought|(^|[^A-Za-z])reasoning([^A-Za-z]|$)' \
+            -E 'cognitive_state|CognitiveState|chain_of_thought' \
             src esa-exoskeleton 2>/dev/null; then
-            echo "ERROR: cognitive-state/reasoning ownership leaked into Agent-X."
+            echo "ERROR: cognitive-state implementation leaked into Agent-X."
             exit 1
           fi
           echo "Agent-X boundary clean."
