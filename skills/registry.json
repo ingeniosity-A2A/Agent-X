@@ -1,29 +1,40 @@
 {
-  "registry_version": "0.1.0",
-  "invariant": "No skill → no capability. No verified skill → no authority.",
+  "registry_version": "0.2.0",
+  "invariant": "No skill -> no capability. No verified firmware -> no capability authority.",
+  "authority_model": {
+    "firmware": "Cybernetic-Ava007",
+    "substrate": "a2a-exoskeleton",
+    "execution": "Agent-X"
+  },
   "skills": [
     {
       "skill_id": "onomondo-ncs",
       "version": "0.1.0",
       "provides": ["cellular.softsim.cli"],
-      "entry": "skills/onomondo-ncs/SKILL.md",
-      "authority": "network",
+      "firmware_ref": "Cybernetic-Ava007:skills/onomondo-ncs/SKILL.md",
+      "adapter_path": "skills/onomondo-ncs",
+      "authority": "firmware",
+      "execution_surface": "Agent-X",
       "status": "present"
     },
     {
       "skill_id": "agent-browser",
       "version": "0.1.0",
       "provides": ["browser.agent"],
-      "entry": "skills/agent-browser/SKILL.md",
-      "authority": "local",
+      "firmware_ref": "Cybernetic-Ava007:skills/agent-browser/SKILL.md",
+      "adapter_path": "skills/agent-browser",
+      "authority": "firmware",
+      "execution_surface": "Agent-X",
       "status": "present"
     },
     {
       "skill_id": "headless-reflex-arc",
       "version": "0.1.0",
       "provides": ["shell.gated.local"],
-      "entry": "skills/headless-reflex-arc/SKILL.md",
-      "authority": "local",
+      "firmware_ref": null,
+      "adapter_path": "skills/headless-reflex-arc",
+      "authority": "execution",
+      "execution_surface": "Agent-X",
       "status": "scaffold"
     }
   ]
