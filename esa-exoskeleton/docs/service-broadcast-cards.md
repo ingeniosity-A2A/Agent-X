@@ -108,13 +108,13 @@ coil 180d, inspection 365d — each with `lastService`/`nextDue`).
    `BROADCAST_TEMPLATES` (`scheduled` / `urgent` / `completed`), fills
    placeholders (`{unit}`, `{code}`, `{interval}`, `{part}`), prepends the result
    to `broadcastHistory` (max 50), and sets `currentBroadcast`.
-3. **Transport** — the message is ingested into **GSAP Transport** as a
-   `broadcast:message` intent with a temporal tween atom:
+3. **Transport** — the message is ingested into **GSAP Transport** using an opaque
+   `intent_id` routing reference plus a temporal tween atom. No cognitive state is
+   carried by the execution surface:
 
    ```js
    window.ESA.transport.ingest({
-     intent: 'broadcast:message',
-     cognitive_state: { intent: 'service:broadcast' },
+     intent_id: 'service:broadcast',
      temporal_tween: { start: 0, end: 1, duration_ms: 500, easing: 'power2.out' },
      metadata: { ...broadcast, source: 'ESA-Ptac-B', transportType: 'tween-atom' }
    });
