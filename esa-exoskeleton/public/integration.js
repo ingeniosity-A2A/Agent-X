@@ -68,9 +68,9 @@ async function initESAExoskeleton() {
       import('./components/ESA.DiagnosticCard.js?v=408'),
       import('./components/ESA.invpartscard-B.js?v=408'),
       import('./components/ESA.workorder.js?v=408'),
-      import('./components/ESA.MaintenanceChecklist.js?v=408'),
+      import('./components/ESA.MaintenanceChecklist.js?v=414'),
       import('./components/ESA.Ptac-B.js?v=408'),
-      import('./components/ESA.Calendar.js?v=413'),
+      import('./components/ESA.Calendar.js?v=414'),
       import('./config/gruvbox-colors.js?v=408')
     ]);
     ESAIngestion = ingestionModule.status === 'fulfilled' ? ingestionModule.value.ESAIngestion : null;

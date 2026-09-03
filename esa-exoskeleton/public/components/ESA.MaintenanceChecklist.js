@@ -1,16 +1,21 @@
 /**
  * ESA.MaintenanceChecklist.js — BENTO EDITION
  * ============================================
- * DAILY MAINTENANCE WORKFLOW — official Bento card.
+ * DAILY MAINTENANCE WORKFLOW — official Bento card (the daily to-do list).
  *
  * One framework: Bento (docs/BENTO-OFFICIAL-UI.md).
  * Structure:  .bento-card > header (title + gel progress) + shift fields +
- *             SOP sections + Green Shield tracking log
+ *             SOP sections + Green Shield tracking log + worksheets→manager
  * Tokens:     --bk-* (bento-tokens.css) — Beige · Green · Black.
  * Polish:     punch-border + gel-progress-track (v6-exoskel-polish.css).
  *
  * Content follows the printed DAILY MAINTENANCE WORKFLOW — Standard
  * Operating Procedure & Shift Checklist (Done / Task / SOP rows).
+ *
+ * v5 — Green Shield Focus is HIGHLIGHTED (green glow panel) and shows the
+ *       REAL scheduled assignment for the selected date, shared with the
+ *       calendar + backend via config/green-shield.js. New wrap-up task:
+ *       "Worksheets Complete & Sent to Manager" with a send receipt strip.
  *
  * React (esm.sh CDN, no build step). State persists to localStorage.
  * Contract kept identical for integration.js: .mount() + esa:checklist events.
@@ -18,6 +23,7 @@
 
 import { html, useState, useEffect, useRef, useCallback } from './ESA.ReactMount.js';
 import { mountReact } from './ESA.ReactMount.js';
+import { gsForIsoDate } from '../config/green-shield.js?v=414';
 
 const STORAGE_KEY = 'esa-maintenance-checklist-v2';
 
@@ -54,7 +60,7 @@ const SECTIONS = [
     items: [
       { task: 'Clean Common Areas', sop: 'Sanitize high-touch surfaces, sweep, and mop entryways, lobbies, and shared public corridors.' },
       { task: 'Clean Guest Laundry', sop: 'Wipe down external surfaces of washers/dryers, clear lint traps completely, and sweep flooring.' },
-      { task: 'Green Shield Focus', sop: 'Execute the designated preventative Green Shield task scheduled for today (Daily/Weekly/Monthly/Annual sequence).' }
+      { task: 'Green Shield Focus', sop: 'Execute the designated preventative Green Shield task scheduled for today (Daily/Weekly/Monthly/Annual sequence).', gs: true }
     ]
   },
   {
@@ -74,12 +80,17 @@ const SECTIONS = [
     color: '#9c6ade',
     items: [
       { task: 'Final Trash Round', sop: 'Perform one last complete round of trash collection from high-traffic zones before shift end.' },
-      { task: 'Secure & Sign In Keys', sop: 'Return all keys directly to the secure lockbox and officially sign them back into the registry.' }
+      { task: 'Secure & Sign In Keys', sop: 'Return all keys directly to the secure lockbox and officially sign them back into the registry.' },
+      { task: 'Worksheets Complete & Sent to Manager', sop: 'Confirm every worksheet — shift checklist, OOS report, and Green Shield tracking log — is filled in, then submit the complete packet to the manager for review and sign-off.', worksheet: true }
     ]
   }
 ];
 
-const TOTAL = SECTIONS.reduce((sum, s) => sum + s.items.length, 0); // 18
+const TOTAL = SECTIONS.reduce((sum, s) => sum + s.items.length, 0); // 16
+
+const GS_ACCENT = '#7ec8a0';
+const wrapUpSection = SECTIONS.find((s) => s.id === 'wrap-up');
+const WORKSHEET_KEY = 'wrap-up:' + wrapUpSection.items.findIndex((i) => i.worksheet);
 
 function loadPersisted() {
   try {
@@ -104,7 +115,40 @@ function CheckBox({ checked, color, onToggle }) {
   `;
 }
 
-function ChecklistItem({ section, index, task, sop, checked, onToggle }) {
+function ChecklistItem({ section, index, task, sop, checked, onToggle, gsInfo }) {
+  if (gsInfo) {
+    return html`
+      <div style=${{ display: 'flex', gap: '10px', padding: '10px 11px', margin: '6px 0 8px', alignItems: 'flex-start', background: 'rgba(126,200,160,0.10)', border: '1px solid rgba(126,200,160,0.50)', boxShadow: '0 0 18px rgba(126,200,160,0.20)', borderRadius: '10px' }}>
+        <${CheckBox} checked=${checked} color=${GS_ACCENT} onToggle=${onToggle} />
+        <div style=${{ flex: 1, minWidth: 0 }}>
+          <div style=${{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '3px', flexWrap: 'wrap' }}>
+            <span style=${{ fontSize: '9px', fontWeight: 'bold', letterSpacing: '1.2px', color: GS_ACCENT, background: 'rgba(126,200,160,0.14)', border: '1px solid rgba(126,200,160,0.45)', borderRadius: '99px', padding: '2px 8px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+              <span className="bk-dot pulse"></span>GREEN SHIELD · TODAY'S FOCUS
+            </span>
+            <span style=${{ fontSize: '9px', color: 'var(--bk-text-3)', letterSpacing: '1px' }}>${gsInfo.requiredCount} REQUIRED CHECKS</span>
+          </div>
+          <div style=${{ fontSize: '13px', color: checked ? 'var(--bk-text-3)' : 'var(--bk-text)', textDecoration: checked ? 'line-through' : 'none', fontWeight: checked ? 'normal' : 600, lineHeight: '1.35', transition: 'all 0.15s' }}>${task}</div>
+          ${gsInfo.due ? html`
+            <div style=${{ fontSize: '11.5px', color: '#a8dcc0', marginTop: '4px', lineHeight: '1.5', fontWeight: 'bold' }}>${gsInfo.template}</div>
+            <div style=${{ margin: '4px 0 0' }}>
+              ${gsInfo.checks.map((c) => html`
+                <div key=${c.label} style=${{ fontSize: '10.5px', color: 'var(--bk-text-3)', lineHeight: '1.55' }}>
+                  <span style=${{ color: c.required ? GS_ACCENT : 'var(--bk-text-3)' }}>${c.required ? '●' : '○'}</span> ${c.label}
+                </div>
+              `)}
+            </div>
+            <div style=${{ fontSize: '10.5px', color: gsInfo.rooms.length ? '#f2c94c' : 'var(--bk-text-3)', marginTop: '6px', fontWeight: gsInfo.rooms.length ? 'bold' : 'normal' }}>
+              ${gsInfo.rooms.length ? 'Rooms out of service today: ' + gsInfo.rooms.join(' · ') : 'No rooms out of service today.'}
+            </div>
+          ` : html`
+            <div style=${{ fontSize: '11.5px', color: 'var(--bk-text-3)', marginTop: '4px', lineHeight: '1.5' }}>
+              No Green Shield inspection today — Sunday.
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+  }
   return html`
     <div style=${{ display: 'flex', gap: '10px', padding: '6px 0', alignItems: 'flex-start' }}>
       <${CheckBox} checked=${checked} color=${section.color} onToggle=${onToggle} />
@@ -130,7 +174,7 @@ function SkeletonRow() {
   `;
 }
 
-function SectionBlock({ section, checks, onToggle, skeleton }) {
+function SectionBlock({ section, checks, onToggle, skeleton, gsInfo }) {
   const done = section.items.filter((_, i) => checks[`${section.id}:${i}`]).length;
   const total = section.items.length;
   const pct = Math.round((done / total) * 100);
@@ -159,6 +203,7 @@ function SectionBlock({ section, checks, onToggle, skeleton }) {
                   sop=${item.sop}
                   checked=${!!checks[`${section.id}:${i}`]}
                   onToggle=${() => onToggle(`${section.id}:${i}`)}
+                  gsInfo=${item.gs ? gsInfo : null}
                 />
               `)}
         </div>
@@ -206,8 +251,12 @@ function ESA_MaintenanceChecklistView() {
     { area: '', actions: '' },
     { area: '', actions: '' }
   ]);
+  const [sent, setSent] = useState(persisted?.sent || null);
   const [loading, setLoading] = useState(true);
   const prevChecks = useRef(checks);
+
+  // Real Green Shield assignment for the selected date (shared parity module).
+  const gsInfo = date ? gsForIsoDate(date) : null;
 
   // Skeleton on first paint
   useEffect(() => {
@@ -221,9 +270,9 @@ function ESA_MaintenanceChecklistView() {
   // Persist
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ checks, date, shift, employee, manager, notes }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ checks, date, shift, employee, manager, notes, sent }));
     } catch (_) { /* storage full / unavailable */ }
-  }, [checks, date, shift, employee, manager, notes]);
+  }, [checks, date, shift, employee, manager, notes, sent]);
 
   // Hub events when a section (or the whole day) completes
   useEffect(() => {
@@ -260,8 +309,30 @@ function ESA_MaintenanceChecklistView() {
       { area: '', actions: '' },
       { area: '', actions: '' }
     ]);
+    setSent(null);
     setLoading(true);
     setTimeout(() => setLoading(false), 600);
+  };
+
+  // Worksheets → manager: idempotent complete-and-send with a persisted receipt.
+  const sendToManager = () => {
+    const at = new Date().toISOString();
+    setChecks((prev) => ({ ...prev, [WORKSHEET_KEY]: true }));
+    setSent({ at: at, manager: manager });
+    window.dispatchEvent(new CustomEvent('esa:checklist', {
+      detail: { worksheet: 'sent-to-manager', manager: manager, at: at, progress: doneCount + (checks[WORKSHEET_KEY] ? 0 : 1), total: TOTAL }
+    }));
+  };
+
+  const undoSend = () => {
+    setSent(null);
+    setChecks((prev) => ({ ...prev, [WORKSHEET_KEY]: false }));
+  };
+
+  const fmtSentTime = (iso) => {
+    try {
+      return new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    } catch (_) { return iso; }
   };
 
   const updateNote = (i, field, value) => {
@@ -320,7 +391,7 @@ function ESA_MaintenanceChecklistView() {
         </div>
 
         <!-- Sections -->
-        ${SECTIONS.map(s => html`<${SectionBlock} key=${s.id} section=${s} checks=${checks} onToggle=${toggle} skeleton=${loading} />`)}
+        ${SECTIONS.map(s => html`<${SectionBlock} key=${s.id} section=${s} checks=${checks} onToggle=${toggle} skeleton=${loading} gsInfo=${gsInfo} />`)}
 
         <!-- Shift Notes & Green Shield Tracking Log -->
         <div style=${{ marginTop: '22px' }}>
@@ -351,6 +422,32 @@ function ESA_MaintenanceChecklistView() {
             style=${{ marginTop: '10px', padding: '8px 16px', background: 'rgba(126,200,160,0.12)', color: 'var(--bk-accent)', border: '1px solid rgba(126,200,160,0.35)', borderRadius: '8px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold', letterSpacing: '1px', fontFamily: "'DM Sans', sans-serif" }}
           >+ ADD LOG ENTRY</button>
         </div>
+
+        <!-- Worksheets → manager: complete + send receipt strip -->
+        <div style=${{ marginTop: '16px', padding: '13px 14px', background: 'var(--bk-panel)', border: '1px solid rgba(126,200,160,0.35)', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <div style=${{ minWidth: '220px', flex: 1 }}>
+            <div style=${{ fontSize: '11px', fontWeight: 'bold', letterSpacing: '1.5px', color: GS_ACCENT }}>WORKSHEETS → MANAGER</div>
+            <div style=${{ fontSize: '11px', color: 'var(--bk-text-3)', marginTop: '3px', lineHeight: '1.5' }}>
+              ${sent
+                ? 'Packet submitted — receipt recorded below with the checklist totals.'
+                : 'Finish every worksheet, then mark the packet complete and sent for manager sign-off.'}
+            </div>
+          </div>
+          ${sent ? html`
+            <div style=${{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              <div style=${{ fontSize: '11px', fontWeight: 'bold', color: GS_ACCENT, background: 'rgba(126,200,160,0.12)', border: '1px solid rgba(126,200,160,0.45)', borderRadius: '8px', padding: '8px 12px' }}>
+                ✓ Complete — sent to manager ${sent.manager || '(no name)'} · ${fmtSentTime(sent.at)}
+              </div>
+              <button onClick=${undoSend} title="Undo send" className="bk-icon-btn" style=${{ width: '26px', height: '26px', borderRadius: '50%', fontSize: '12px' }}>↺</button>
+            </div>
+          ` : html`
+            <button
+              onClick=${sendToManager}
+              title=${checks[WORKSHEET_KEY] ? 'Record the send receipt' : 'Marks the worksheet task complete and records the send receipt'}
+              style=${{ padding: '9px 16px', background: GS_ACCENT, color: '#0a0a0a', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold', letterSpacing: '1px', fontFamily: "'DM Sans', sans-serif", boxShadow: '0 0 16px rgba(126,200,160,0.35)', whiteSpace: 'nowrap' }}
+            >MARK COMPLETE & SEND TO MANAGER</button>
+          `}
+        </div>
       </div>
     </div>
   `;
@@ -358,7 +455,7 @@ function ESA_MaintenanceChecklistView() {
 
 export const ESAMaintenanceChecklist = {
   name: 'MaintenanceChecklist',
-  version: '4.0.0',
+  version: '5.0.0',
   kind: 'react',
 
   /**

@@ -5,15 +5,13 @@
  * Stays as-is: same mount point (#esa-calendar), same dropdown entry,
  * same esa:calendar event. Updated with the important Green Shield dates.
  *
- * Green Shield rules are parity with the real backend
+ * Green Shield rules come from the shared parity module
+ * config/green-shield.js — one source of truth, also used by the
+ * MaintenanceChecklist to-do card. Contract = real backend
  * (platform/src/lib/green-shield.ts — /api/green-shield):
  *   - Inspection DUE every weekday except Sunday
- *   - Rotating daily template by day-of-month (d % 3):
- *       0 -> Daily facilities walk
- *       1 -> Guest room mechanical sample
- *       2 -> Kitchen / break & laundry
- *   - Rooms out of service (same ternary chain as the backend):
- *       d % 4 === 0 -> rooms 214 + 308 ; else d % 5 === 0 -> room 119
+ *   - Rotating daily template by day-of-month (d % 3)
+ *   - Rooms out of service: d % 4 === 0 -> 214 + 308 ; else d % 5 === 0 -> 119
  *
  * Arrow.js rules honored: no HTML comments inside html`` templates,
  * no ${} inside style attributes (static classes + post-mount DOM only).
@@ -22,6 +20,7 @@
 
 import { reactive, html } from 'https://esm.sh/@arrow-js/core';
 import { ESAVerifyComponent } from './ESA.VerifiedWrapper.js';
+import { gsForDate } from '../config/green-shield.js?v=414';
 
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -30,23 +29,8 @@ const MONTH_NAMES = [
 
 const DOW_NAMES = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
-// Rotating Green Shield daily templates — same order as the backend lib.
-const GS_TEMPLATES = [
-  'Daily facilities walk',
-  'Guest room mechanical sample',
-  'Kitchen / break & laundry'
-];
-
-// Green Shield schedule for one day — parity with buildDay/dWeekdayDue.
-function gsFor(year, month, d) {
-  const dow = new Date(year, month, d).getDay();
-  return {
-    dow: dow,
-    due: dow !== 0,
-    template: GS_TEMPLATES[d % 3],
-    rooms: d % 4 === 0 ? ['214', '308'] : (d % 5 === 0 ? ['119'] : [])
-  };
-}
+// Green Shield schedule — shared parity module (config/green-shield.js).
+const gsFor = (year, month, d) => gsForDate(new Date(year, month, d));
 
 // Module-scope methods binding (wrapper exposes .methods).
 let methods = null;
