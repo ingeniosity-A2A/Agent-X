@@ -1,0 +1,300 @@
+/* ============================================================
+   AVA007 CYBERNETIC CONSOLE — base surface styles
+   Provides the class/var contract patch v8 components expect
+   (.bento-card / .bento-tabs / .ava-* / --bento-*), mapped to the
+   official ESA Bento palette (esa-black · esa-beige · esa-green,
+   info-blue #5b8def) per esa-exoskeleton/public/bento-tokens.css.
+   ============================================================ */
+
+.ava-console {
+  --bento-page: #060606;
+  --bento-surface-dark: #0a0a0a;
+  --bento-surface-card: #121212;
+  --bento-surface-light: #1a1a1a;
+  --bento-border: rgba(244, 244, 238, 0.12);
+  --bento-text-primary: #f4f4ee;
+  --bento-text-secondary: rgba(244, 244, 238, 0.8);
+  --bento-text-muted: rgba(244, 244, 238, 0.52);
+  --bento-accent-mint: #7ec8a0;
+  --bento-accent-blue: #5b8def;
+  --bento-warn: #e0a13e;
+  --bento-danger: #e5484d;
+  --bento-gradient-cool: linear-gradient(90deg, #7ec8a0, #5b8def);
+
+  min-height: 100dvh;
+  background:
+    radial-gradient(1200px 500px at 80% -10%, rgba(126, 200, 160, 0.06), transparent 60%),
+    var(--bento-page);
+  color: var(--bento-text-primary);
+  padding: 20px 20px 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-family: "Noto Sans", system-ui, -apple-system, sans-serif;
+}
+
+.ava-console .mono,
+.mono {
+  font-family: "Noto Sans Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* ---- header ---- */
+.ava-console-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.ava-console-header h1 {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+.ava-console-header p {
+  font-size: 11.5px;
+  color: var(--bento-text-muted);
+  margin: 4px 0 0;
+}
+
+/* ---- bento card contract ---- */
+.bento-card {
+  background: var(--bento-surface-card);
+  border: 1px solid var(--bento-border);
+  border-radius: 20px;
+}
+.bento-card--elevated {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+.bento-card--inset {
+  background: var(--bento-surface-dark);
+  border: 1px solid rgba(244, 244, 238, 0.07);
+}
+
+.bento-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.bento-tab {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--bento-border);
+  background: transparent;
+  color: var(--bento-text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.bento-tab:hover {
+  color: var(--bento-text-primary);
+  border-color: rgba(244, 244, 238, 0.3);
+}
+.bento-tab.active {
+  background: var(--bento-accent-mint);
+  color: #0a0a0a;
+  border-color: transparent;
+  font-weight: 600;
+}
+
+/* ---- buttons / badges ---- */
+.ava-icon-btn {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid var(--bento-border);
+  background: transparent;
+  color: var(--bento-text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.ava-icon-btn:hover {
+  color: var(--bento-text-primary);
+  border-color: rgba(244, 244, 238, 0.3);
+}
+.ava-icon-btn.primary {
+  background: var(--bento-accent-mint);
+  color: #0a0a0a;
+  border-color: transparent;
+}
+.ava-icon-btn.listening {
+  border-color: var(--bento-accent-mint);
+  color: var(--bento-accent-mint);
+  box-shadow: 0 0 0 3px rgba(126, 200, 160, 0.15);
+}
+
+.ava-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--bento-border);
+  font-size: 11px;
+  color: var(--bento-text-secondary);
+  background: rgba(244, 244, 238, 0.04);
+  white-space: nowrap;
+}
+.ava-badge.on {
+  color: var(--bento-accent-mint);
+  border-color: rgba(126, 200, 160, 0.4);
+}
+
+.ava-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--bento-accent-mint);
+  box-shadow: 0 0 6px rgba(126, 200, 160, 0.8);
+  flex-shrink: 0;
+}
+.ava-dot.warn {
+  background: var(--bento-warn);
+  box-shadow: 0 0 6px rgba(224, 161, 62, 0.8);
+}
+.ava-dot.off {
+  background: #5c5c56;
+  box-shadow: none;
+}
+
+.ava-context-chip {
+  font-size: 10.5px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--bento-border);
+  color: var(--bento-accent-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+/* ---- bottom bar ---- */
+.ava-bottombar {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 14px;
+  width: min(720px, calc(100vw - 24px));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bento-surface-card);
+  border: 1px solid var(--bento-border);
+  border-radius: 999px;
+  padding: 10px 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  z-index: 40;
+}
+.ava-bottombar input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--bento-text-primary);
+  font-size: 13px;
+}
+.ava-bottombar input::placeholder {
+  color: var(--bento-text-muted);
+}
+
+/* ---- waveform (both ends of the AI bar) ---- */
+.ava-waveform {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.ava-waveform-bar {
+  width: 2px;
+  border-radius: 2px;
+  background: var(--bento-accent-mint);
+  height: 22%;
+}
+.ava-waveform.active .ava-waveform-bar {
+  animation: ava-wave-bounce 0.9s ease-in-out infinite;
+}
+.ava-waveform.idle .ava-waveform-bar {
+  animation: none;
+  height: 18%;
+  opacity: 0.45;
+}
+@keyframes ava-wave-bounce {
+  0%,
+  100% {
+    height: 22%;
+  }
+  50% {
+    height: 100%;
+  }
+}
+
+/* ---- scrollbars ---- */
+.ava-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.ava-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ava-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(244, 244, 238, 0.14);
+  border-radius: 999px;
+}
+
+/* ---- card builder ---- */
+.ava-builder-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--bento-border);
+  background: var(--bento-surface-dark);
+  cursor: grab;
+}
+.ava-builder-item:active {
+  cursor: grabbing;
+}
+.ava-builder-item.drop-target {
+  border-color: var(--bento-accent-mint);
+  box-shadow: 0 0 0 2px rgba(126, 200, 160, 0.2);
+}
+.ava-builder-item.is-hidden {
+  opacity: 0.45;
+}
+.ava-builder-grip {
+  color: var(--bento-text-muted);
+  font-size: 13px;
+  user-select: none;
+}
+
+/* ---- SplitText render pipeline ---- */
+.diff-line-parent {
+  will-change: transform, opacity;
+}
+.ava-pipe-chunk {
+  font-size: 11px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--bento-surface-dark);
+  border: 1px solid rgba(244, 244, 238, 0.07);
+  color: var(--bento-text-secondary);
+  margin-bottom: 10px;
+}
+
+/* ---- reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .ava-waveform-bar {
+    animation: none !important;
+    height: 40% !important;
+  }
+}
