@@ -177,3 +177,116 @@
     padding: 16px 12px;
   }
 }
+
+/* ESA.Calendar v2 — full service calendar panel (NOT a bento card) with Green Shield dates */
+.esa-cal-panel {
+  width: 100%;
+  max-width: 660px;
+  margin: 0 auto;
+  background: var(--bk-panel);
+  border: 1px solid var(--bk-border);
+  border-radius: 1rem;
+  padding: 0.75rem 0.95rem 0.65rem;
+  box-shadow: var(--bk-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.esa-cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+.esa-cal-nav { display: flex; gap: 0.4rem; }
+.esa-cal-dow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.35rem;
+  justify-items: center;
+  padding: 0 0.25rem;
+}
+.esa-cal-grid { justify-items: center; }
+.esa-cal-grid .bk-cal-cell {
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  position: relative;
+}
+.esa-cal-grid .bk-cal-cell.bk-cal-dim { cursor: default; }
+.esa-cal-grid .bk-cal-cell.esa-cal-sun { color: var(--bk-text-3); }
+.esa-cal-grid .bk-cal-cell.esa-cal-selected {
+  outline: 1px solid var(--bk-line);
+  outline-offset: 1px;
+}
+.esa-cal-grid .bk-cal-cell.esa-cal-gs::after {
+  content: "";
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--bk-accent);
+}
+.esa-cal-grid .bk-cal-cell.esa-cal-oos::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--bk-warn);
+}
+.esa-cal-grid .bk-cal-cell.bk-cal-today.esa-cal-gs::after { background: var(--bk-on-accent); }
+.esa-cal-detail {
+  background: var(--bk-panel-2);
+  border: 1px solid var(--bk-border-soft);
+  border-radius: 0.6rem;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.65rem;
+  line-height: 1.4;
+  color: var(--bk-text-2);
+}
+.esa-cal-detail strong { color: var(--bk-text); font-weight: 700; }
+.esa-cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  align-items: center;
+}
+.esa-cal-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  color: var(--bk-text-3);
+}
+.esa-cal-legend .lg { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.esa-cal-legend .lg-due { background: var(--bk-accent); }
+.esa-cal-legend .lg-oos { background: var(--bk-warn); }
+.esa-cal-legend .lg-off { background: transparent; border: 1px solid var(--bk-text-3); }
+.esa-cal-grid { min-height: 0; }
+.esa-cal-grid .bk-cal-cell { width: 1.6rem; height: 1.6rem; font-size: 0.62rem; border-radius: 0.35rem; }
+.esa-cal-grid .bk-cal-cell.esa-cal-gs::after { bottom: 2px; width: 4px; height: 4px; }
+.esa-cal-grid .bk-cal-cell.esa-cal-oos::before { top: 2px; right: 3px; width: 4px; height: 4px; }
+
+/* Calendar container — the Green Shield calendar is NOT a card: strip the
+   wildcard [id^="esa-"] card chrome for this container only (shell show/hide
+   logic still uses the #esa-calendar id). */
+#esa-calendar {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  min-height: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  overflow: visible;
+}
+#esa-calendar::before { display: none; }

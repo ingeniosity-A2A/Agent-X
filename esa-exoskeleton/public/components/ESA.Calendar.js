@@ -1,11 +1,19 @@
 /**
- * ESA.Calendar.js — BENTO EDITION
+ * ESA.Calendar.js — SERVICE CALENDAR · GREEN SHIELD EDITION
  * ============================================
- * SERVICE CALENDAR — official Bento card (ESA tab dropdown).
+ * The ESA tab dropdown's calendar — its own full panel, NOT a bento card.
+ * Stays as-is: same mount point (#esa-calendar), same dropdown entry,
+ * same esa:calendar event. Updated with the important Green Shield dates.
  *
- * One framework: Bento (docs/BENTO-OFFICIAL-UI.md).
- * Structure:  .bento-card > .bento-demo (month grid) + .bento-text
- * Tokens:     --bk-* (bento-tokens.css) — Beige · Green · Black.
+ * Green Shield rules are parity with the real backend
+ * (platform/src/lib/green-shield.ts — /api/green-shield):
+ *   - Inspection DUE every weekday except Sunday
+ *   - Rotating daily template by day-of-month (d % 3):
+ *       0 -> Daily facilities walk
+ *       1 -> Guest room mechanical sample
+ *       2 -> Kitchen / break & laundry
+ *   - Rooms out of service (same ternary chain as the backend):
+ *       d % 4 === 0 -> rooms 214 + 308 ; else d % 5 === 0 -> room 119
  *
  * Arrow.js rules honored: no HTML comments inside html`` templates,
  * no ${} inside style attributes (static classes + post-mount DOM only).
@@ -22,18 +30,36 @@ const MONTH_NAMES = [
 
 const DOW_NAMES = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
+// Rotating Green Shield daily templates — same order as the backend lib.
+const GS_TEMPLATES = [
+  'Daily facilities walk',
+  'Guest room mechanical sample',
+  'Kitchen / break & laundry'
+];
+
+// Green Shield schedule for one day — parity with buildDay/dWeekdayDue.
+function gsFor(year, month, d) {
+  const dow = new Date(year, month, d).getDay();
+  return {
+    dow: dow,
+    due: dow !== 0,
+    template: GS_TEMPLATES[d % 3],
+    rooms: d % 4 === 0 ? ['214', '308'] : (d % 5 === 0 ? ['119'] : [])
+  };
+}
+
 // Module-scope methods binding (wrapper exposes .methods).
 let methods = null;
 
 export const ESACalendar = ESAVerifyComponent({
   name: 'Calendar',
-  version: '1.0.0',
+  version: '2.0.0',
   verified: true,
 
   state: {
     year: new Date().getFullYear(),
     month: new Date().getMonth(),
-    todayIso: new Date().toDateString()
+    selected: new Date().getDate()
   },
 
   methods: {
@@ -58,28 +84,87 @@ export const ESACalendar = ESAVerifyComponent({
         cells.push({ d: d, inMonth: true, today: isToday });
       }
       let next = 1;
-      while (cells.length % 7 !== 0 || cells.length < 42) {
+      const rows = Math.ceil(cells.length / 7);
+      while (cells.length < rows * 7) {
         cells.push({ d: next, inMonth: false, today: false });
         next++;
-        if (cells.length >= 42) break;
       }
       return cells;
     },
 
     renderGrid: (state, container) => {
-      const grid = container.querySelector('#esa-cal-grid');
+      const grid = container.querySelector('#cal-grid');
       if (!grid) return;
       grid.innerHTML = '';
       methods.cells(state).forEach((c) => {
         const cell = document.createElement('span');
-        cell.className = 'bk-cal-cell' +
+        let cls = 'bk-cal-cell' +
           (c.inMonth ? '' : ' bk-cal-dim') +
           (c.today ? ' bk-cal-today' : '');
+        if (c.inMonth) {
+          const gs = gsFor(state.year, state.month, c.d);
+          if (gs.dow === 0) cls += ' esa-cal-sun';
+          if (gs.due) cls += ' esa-cal-gs';
+          if (gs.rooms.length) cls += ' esa-cal-oos';
+          if (state.selected === c.d) cls += ' esa-cal-selected';
+          cell.dataset.day = String(c.d);
+          cell.title = 'Green Shield ' + (gs.due ? 'due' : 'no inspection (Sunday)') +
+            (gs.rooms.length ? ' · rooms out: ' + gs.rooms.join(', ') : '');
+          cell.addEventListener('click', () => {
+            methods.selectDay(state, c.d, container);
+          });
+        }
+        cell.className = cls;
         cell.textContent = c.d;
         grid.appendChild(cell);
       });
-      const label = container.querySelector('#esa-cal-label');
+      const label = container.querySelector('#cal-label');
       if (label) label.textContent = methods.monthLabel(state);
+    },
+
+    renderDetail: (state, container) => {
+      const el = container.querySelector('#cal-detail');
+      if (!el) return;
+      el.innerHTML = '';
+
+      const now = new Date();
+      const viewIsCurrent = state.year === now.getFullYear() && state.month === now.getMonth();
+      const sel = state.selected != null ? state.selected : (viewIsCurrent ? now.getDate() : null);
+
+      if (sel == null) {
+        const hint = document.createElement('div');
+        hint.textContent = 'Select a day for its Green Shield detail.';
+        el.appendChild(hint);
+        return;
+      }
+
+      const gs = gsFor(state.year, state.month, sel);
+      const dateStr = new Date(state.year, state.month, sel)
+        .toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+        .toUpperCase();
+
+      const head = document.createElement('div');
+      const strong = document.createElement('strong');
+      strong.textContent = dateStr;
+      head.appendChild(strong);
+      head.appendChild(document.createTextNode(' — ' + (gs.due ? 'GREEN SHIELD DUE' : 'NO INSPECTION — SUNDAY')));
+      el.appendChild(head);
+
+      const tpl = document.createElement('div');
+      tpl.textContent = 'Daily template: ' + gs.template;
+      el.appendChild(tpl);
+
+      const rooms = document.createElement('div');
+      rooms.textContent = gs.rooms.length
+        ? 'Rooms out of service: ' + gs.rooms.join(', ')
+        : 'No rooms out of service.';
+      el.appendChild(rooms);
+    },
+
+    selectDay: (state, d, container) => {
+      state.selected = d;
+      methods.renderGrid(state, container);
+      methods.renderDetail(state, container);
     },
 
     shiftMonth: (state, delta) => {
@@ -95,43 +180,41 @@ export const ESACalendar = ESAVerifyComponent({
     }
   },
 
-  // Bento template — static style attributes only, no HTML comments.
+  // Full calendar panel — not a bento card. Static style attributes only,
+  // no HTML comments; dynamic content is post-mount DOM.
   template: (props, state, methods) => html`
-    <div class="bento-card punch-border" style="width:100%;max-width:600px;margin:0 auto;">
-      <div class="bento-demo" style="padding:1.25rem;display:flex;flex-direction:column;gap:0.85rem;">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;">
-          <span class="bk-pill"><span class="bk-dot pulse"></span>SERVICE CALENDAR</span>
-          <span id="esa-cal-label" class="bk-meta">SEPTEMBER 2026</span>
-        </div>
-
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">
-          <button id="esa-cal-prev" class="bk-icon-btn" style="width:2rem;height:2rem;" aria-label="Previous month">
+    <div class="esa-cal-panel">
+      <div class="esa-cal-head">
+        <span class="bk-pill"><span class="bk-dot pulse"></span>ESA · GREEN SHIELD CALENDAR</span>
+        <span id="cal-label" class="bk-meta">SEPTEMBER 2026</span>
+        <div class="esa-cal-nav">
+          <button id="cal-prev" class="bk-icon-btn" style="width:2rem;height:2rem;" aria-label="Previous month">
             <svg viewBox="0 0 24 24" style="width:0.9rem;height:0.9rem;" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </button>
-          <div style="display:flex;gap:0.4rem;width:100%;justify-content:space-between;padding:0 0.25rem;">
-            ${DOW_NAMES.map((d) => html`
-              <span class="bk-meta" style="width:2rem;text-align:center;">${d}</span>
-            `)}
-          </div>
-          <button id="esa-cal-next" class="bk-icon-btn" style="width:2rem;height:2rem;" aria-label="Next month">
+          <button id="cal-next" class="bk-icon-btn" style="width:2rem;height:2rem;" aria-label="Next month">
             <svg viewBox="0 0 24 24" style="width:0.9rem;height:0.9rem;" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </button>
         </div>
-
-        <div id="esa-cal-grid" class="bk-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;justify-items:center;"></div>
       </div>
 
-      <div class="bento-text">
-        <h3 class="bento-title">Service <em>calendar</em></h3>
-        <p class="bento-desc">Real month grids with today marked — the ESA tab dropdown drops down to the cards and this calendar. Flip months to plan service windows around the workorder schedule.</p>
-        <div class="bk-row" style="margin-top:0.75rem;">
-          <span class="bk-meta">TODAY</span>
-          <span class="bk-pill"><span class="bk-dot"></span>${new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>
-        </div>
+      <div class="esa-cal-dow">
+        ${DOW_NAMES.map((d) => html`
+          <span class="bk-meta">${d}</span>
+        `)}
+      </div>
+
+      <div id="cal-grid" class="esa-cal-grid bk-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.25rem;"></div>
+
+      <div id="cal-detail" class="esa-cal-detail"></div>
+
+      <div class="esa-cal-legend">
+        <span><i class="lg lg-due"></i>GREEN SHIELD DUE</span>
+        <span><i class="lg lg-oos"></i>ROOMS OUT OF SERVICE</span>
+        <span><i class="lg lg-off"></i>NO INSPECTION (SUN)</span>
       </div>
     </div>
     `
@@ -145,21 +228,24 @@ ESACalendar.mount = function (container) {
   const result = origCalMount.call(this, container);
 
   setTimeout(() => {
-    const prevBtn = container.querySelector('#esa-cal-prev');
-    const nextBtn = container.querySelector('#esa-cal-next');
+    const prevBtn = container.querySelector('#cal-prev');
+    const nextBtn = container.querySelector('#cal-next');
     if (prevBtn) {
       prevBtn.addEventListener('click', () => {
         methods.shiftMonth(this.state, -1);
         methods.renderGrid(this.state, container);
+        methods.renderDetail(this.state, container);
       });
     }
     if (nextBtn) {
       nextBtn.addEventListener('click', () => {
         methods.shiftMonth(this.state, 1);
         methods.renderGrid(this.state, container);
+        methods.renderDetail(this.state, container);
       });
     }
     methods.renderGrid(this.state, container);
+    methods.renderDetail(this.state, container);
   }, 100);
 
   return result;

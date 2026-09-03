@@ -70,7 +70,7 @@ async function initESAExoskeleton() {
       import('./components/ESA.workorder.js?v=408'),
       import('./components/ESA.MaintenanceChecklist.js?v=408'),
       import('./components/ESA.Ptac-B.js?v=408'),
-      import('./components/ESA.Calendar.js?v=408'),
+      import('./components/ESA.Calendar.js?v=413'),
       import('./config/gruvbox-colors.js?v=408')
     ]);
     ESAIngestion = ingestionModule.status === 'fulfilled' ? ingestionModule.value.ESAIngestion : null;
@@ -244,7 +244,7 @@ async function initESAExoskeleton() {
     } catch (err) { window.ESA.errors.push({ component: 'PtacB', phase: 'mount', error: err }); }
   }
 
-  // 7. CALENDAR — the ESA tab dropdown's calendar card
+  // 7. CALENDAR — the ESA tab dropdown's calendar panel (not a card), Green Shield dates
   if (ESACalendar && typeof ESACalendar.mount === 'function') {
     try {
       const calendarContainer = document.getElementById('esa-calendar');
