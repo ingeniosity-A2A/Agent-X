@@ -6,9 +6,10 @@ import { useState } from "react";
  * Universal feature stack shown in the Browser panel's AI tab.
  *
  * Each feature dispatches a real intent POST to `/api/ai/intent` carrying the
- * active surface. There is no pretending: if the intent queue is not wired in
- * this deployment (the reserved route answers 501), the response is rendered
- * verbatim so the operator sees the true state.
+ * active surface and feature id. The route grounds the model in the live
+ * agent-browser a11y snapshot of the open page; when the SDK is unreachable
+ * its local engine answers from real snapshot parsing and labels itself
+ * "local engine" — the reply is rendered verbatim either way.
  */
 
 interface Feature {
@@ -28,7 +29,7 @@ export function UniversalFeatureStack({ showPrompt = false }: { showPrompt?: boo
   const [result, setResult] = useState("");
   const [draft, setDraft] = useState("");
 
-  async function dispatch(text: string) {
+  async function dispatch(text: string, feature?: string) {
     if (!text.trim() || pending) return;
     setPending(text);
     setResult("");
@@ -36,12 +37,12 @@ export function UniversalFeatureStack({ showPrompt = false }: { showPrompt?: boo
       const res = await fetch("/api/ai/intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: text.trim(), current_surface: "browser" }),
+        body: JSON.stringify({ text: text.trim(), current_surface: "browser", feature }),
       });
-      const data = (await res.json().catch(() => ({}))) as { hint?: string };
-      setResult(data.hint || (res.ok ? "Queued." : `Intent queue responded ${res.status}.`));
+      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; reply?: string; hint?: string };
+      setResult(data.reply ?? data.hint ?? (res.ok ? "Empty reply." : `Intent dispatch responded ${res.status}.`));
     } catch {
-      setResult("Could not reach /api/ai/intent — intent queue not wired in this deployment.");
+      setResult("Could not reach /api/ai/intent.");
     } finally {
       setPending(null);
     }
@@ -55,7 +56,7 @@ export function UniversalFeatureStack({ showPrompt = false }: { showPrompt?: boo
             key={f.id}
             className="ava-badge"
             style={{ cursor: "pointer", opacity: pending === f.label ? 0.5 : 1 }}
-            onClick={() => dispatch(f.label)}
+            onClick={() => dispatch(f.label, f.id)}
           >
             {pending === f.label ? "dispatching…" : f.label}
           </button>
@@ -88,7 +89,10 @@ export function UniversalFeatureStack({ showPrompt = false }: { showPrompt?: boo
       )}
 
       {result && (
-        <div className="mono" style={{ fontSize: 10.5, color: "var(--bento-text-muted)" }}>
+        <div
+          className="mono ava-scrollbar"
+          style={{ fontSize: 10.5, color: "var(--bento-text-muted)", whiteSpace: "pre-wrap", maxHeight: 160, overflowY: "auto" }}
+        >
           {result}
         </div>
       )}

@@ -8,7 +8,7 @@ import "../ava-console.css";
 /**
  * AVA007 Cybernetic Console — route mounting the patch v8 surface:
  * BrowserPanel (with the Edit Mode slide-over) + BottomAIBar ("sound on both
- * ends", TTS side honestly idle until a backend is wired).
+ * ends": real Web Speech input, real /api/ai/tts voice-out, reply bubble).
  */
 export default function AvaConsolePage() {
   return (
