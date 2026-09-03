@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BENTO BUILDER — ESA Exoskeleton</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bb-card: #121212;
+    --bb-panel: #1a1a1a;
+    --bb-deep: #0a0a0a;
+    --bb-border: rgba(244,244,238,0.12);
+    --bb-border-soft: rgba(244,244,238,0.07);
+    --bb-text: #f4f4ee;
+    --bb-text-3: rgba(244,244,238,0.52);
+    --bb-accent: #7ec8a0;
+    --bb-danger: #e5484d;
+  }
+  html, body { height: 100%; }
+  body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: var(--bb-deep);
+    background-image: radial-gradient(rgba(140,190,150,0.05) 1px, transparent 1px);
+    background-size: 22px 22px;
+    color: var(--bb-text);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  button { font-family: inherit; cursor: pointer; }
+
+  /* ── Header ── */
+  header {
+    height: 54px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--bb-border);
+    background: var(--bb-deep);
+  }
+  .bb-mark {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem;
+    letter-spacing: 0.02rem;
+  }
+  .bb-mark em { font-style: italic; color: var(--bb-accent); }
+  .bb-mark .bb-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.14rem;
+    color: var(--bb-text-3);
+    margin-left: 10px;
+    text-transform: uppercase;
+  }
+  .bb-head-actions { display: flex; gap: 8px; align-items: center; }
+  .bb-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 0.72rem; font-weight: 600;
+    border: 1px solid var(--bb-border);
+    background: var(--bb-panel);
+    color: var(--bb-text);
+    transition: background .2s, transform .15s;
+  }
+  .bb-btn:hover { background: #232323; }
+  .bb-btn:active { transform: scale(0.97); }
+  .bb-btn.primary {
+    border: none;
+    background: linear-gradient(135deg, var(--bb-accent), #5aaf84);
+    color: #0a0a0a;
+    box-shadow: 0 4px 16px rgba(126,200,160,0.3);
+  }
+  .bb-btn.danger { color: var(--bb-danger); border-color: rgba(229,72,77,0.35); }
+  .bb-btn.mini { padding: 5px 10px; font-size: 0.65rem; }
+
+  /* ── Main split ── */
+  main { flex: 1; display: grid; grid-template-columns: 348px 1fr; min-height: 0; }
+
+  aside {
+    border-right: 1px solid var(--bb-border);
+    background: var(--bb-deep);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .bb-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--bb-border);
+    flex-shrink: 0;
+  }
+  .bb-tab {
+    flex: 1;
+    background: none; border: none;
+    padding: 11px 4px;
+    color: var(--bb-text-3);
+    font-size: 0.62rem; font-weight: 700;
+    letter-spacing: 0.12rem;
+    text-transform: uppercase;
+    border-bottom: 2px solid transparent;
+  }
+  .bb-tab.active { color: var(--bb-accent); border-bottom-color: var(--bb-accent); }
+  .bb-panelbody { flex: 1; overflow-y: auto; padding: 14px; min-height: 0; }
+  .bb-section { display: none; }
+  .bb-section.active { display: block; }
+  .bb-note {
+    font-size: 0.68rem; line-height: 1.5;
+    color: var(--bb-text-3);
+    background: var(--bb-panel);
+    border: 1px solid var(--bb-border-soft);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+  }
+  .bb-note b { color: var(--bb-text); font-weight: 600; }
+  .bb-group-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem; letter-spacing: 0.16rem;
+    text-transform: uppercase;
+    color: var(--bb-text-3);
+    margin: 18px 2px 8px;
+  }
+  .bb-group-title:first-child { margin-top: 0; }
+
+  /* Color rows */
+  .bb-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px;
+    padding: 6px 8px;
+    border: 1px solid var(--bb-border-soft);
+    background: var(--bb-card);
+    border-radius: 9px;
+    margin-bottom: 6px;
+  }
+  .bb-row label { font-size: 0.72rem; color: var(--bb-text); flex: 1; min-width: 0; }
+  .bb-row .bb-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem; color: var(--bb-text-3);
+    width: 58px; text-align: right;
+    flex-shrink: 0;
+  }
+  input[type="color"] {
+    width: 34px; height: 24px;
+    border: 1px solid var(--bb-border);
+    border-radius: 6px;
+    background: none; padding: 1px;
+    cursor: pointer; flex-shrink: 0;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 92px; height: 3px;
+    background: var(--bb-border);
+    border-radius: 2px;
+    outline: none; flex-shrink: 0;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--bb-accent);
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(126,200,160,0.5);
+  }
+
+  /* Presets */
+  .bb-presets { display: flex; gap: 6px; margin-bottom: 6px; }
+  .bb-preset {
+    flex: 1;
+    border: 1px solid var(--bb-border);
+    background: var(--bb-card);
+    border-radius: 9px;
+    padding: 8px 6px;
+    color: var(--bb-text);
+    font-size: 0.6rem; font-weight: 600;
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+  }
+  .bb-preset .sw { display: flex; gap: 2px; }
+  .bb-preset .sw i { width: 10px; height: 10px; border-radius: 50%; display: block; }
+  .bb-preset:hover { border-color: var(--bb-accent); }
+
+  /* Card rows (content tab) */
+  .bb-cardrow {
+    border: 1px solid var(--bb-border-soft);
+    background: var(--bb-card);
+    border-radius: 10px;
+    padding: 9px 10px;
+    margin-bottom: 7px;
+  }
+  .bb-cardrow .nm { font-size: 0.74rem; font-weight: 600; }
+  .bb-cardrow .id { font-family: 'JetBrains Mono', monospace; font-size: 0.55rem; color: var(--bb-text-3); margin-top: 2px; }
+  .bb-cardrow .acts { display: flex; gap: 6px; margin-top: 8px; }
+  .bb-cardrow .st { font-size: 0.6rem; color: var(--bb-accent); margin-top: 6px; }
+
+  /* Export */
+  textarea.bb-code {
+    width: 100%;
+    height: 150px;
+    resize: vertical;
+    background: var(--bb-card);
+    border: 1px solid var(--bb-border);
+    border-radius: 10px;
+    color: var(--bb-text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    line-height: 1.5;
+    padding: 10px;
+    outline: none;
+    white-space: pre;
+  }
+  .bb-exp-actions { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 16px; }
+
+  /* ── Stage ── */
+  #stage {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+    padding: 14px;
+  }
+  #frameWrap {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--bb-border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+    transition: width .25s ease;
+    background: #0a0a0f;
+  }
+  #preview { flex: 1; width: 100%; border: none; background: #0a0a0f; }
+  #devbar {
+    flex-shrink: 0;
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 10px;
+    background: var(--bb-panel);
+    border-bottom: 1px solid var(--bb-border-soft);
+  }
+  #devbar .bb-chipbtn {
+    border: 1px solid var(--bb-border);
+    background: var(--bb-card);
+    color: var(--bb-text-3);
+    border-radius: 999px;
+    font-size: 0.6rem; font-weight: 600;
+    padding: 4px 10px;
+  }
+  #devbar .bb-chipbtn.active { color: #0a0a0a; background: var(--bb-accent); border-color: var(--bb-accent); }
+  #devbar .bb-devlabel {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem; color: var(--bb-text-3);
+    margin-left: auto;
+  }
+
+  /* ── Status bar ── */
+  footer {
+    height: 34px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 14px;
+    border-top: 1px solid var(--bb-border);
+    background: var(--bb-deep);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--bb-text-3);
+  }
+  footer .ok { color: var(--bb-accent); }
+  footer a { color: var(--bb-text-3); text-decoration: none; }
+  footer a:hover { color: var(--bb-accent); }
+
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; }
+    aside { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bb-mark">Bento <em>Builder</em><span class="bb-tag">ESA Exoskeleton · Card Studio</span></div>
+  <div class="bb-head-actions">
+    <button class="bb-btn danger mini" id="btnReset">Reset all</button>
+    <button class="bb-btn mini" id="btnCopyTop">Copy CSS</button>
+    <button class="bb-btn primary mini" id="btnDlCss">Download overrides.css</button>
+  </div>
+</header>
+
+<main>
+  <aside>
+    <div class="bb-tabs">
+      <button class="bb-tab active" data-tab="theme">Theme</button>
+      <button class="bb-tab" data-tab="content">Content</button>
+      <button class="bb-tab" data-tab="layout">Layout</button>
+      <button class="bb-tab" data-tab="export">Export</button>
+    </div>
+    <div class="bb-panelbody">
+
+      <!-- THEME -->
+      <section class="bb-section active" data-sec="theme">
+        <div class="bb-note"><b>Live edits.</b> Every control restyles the real cards in the preview instantly. Export bakes your values into CSS you can commit.</div>
+
+        <div class="bb-group-title">Accent presets</div>
+        <div class="bb-presets" id="presets"></div>
+
+        <div class="bb-group-title">Surfaces</div>
+        <div id="grpSurfaces"></div>
+
+        <div class="bb-group-title">Accents &amp; status</div>
+        <div id="grpAccents"></div>
+
+        <div class="bb-group-title">Text &amp; lines</div>
+        <div id="grpText"></div>
+
+        <div class="bb-group-title">Shape &amp; depth</div>
+        <div id="grpShape"></div>
+      </section>
+
+      <!-- CONTENT -->
+      <section class="bb-section" data-sec="content">
+        <div class="bb-note"><b>Inline editing.</b> Press <b>Start editing</b>, then click any card title or description in the preview and type. Edits are captured live (card titles keep their italic accent styling).</div>
+        <div style="display:flex; gap:6px; margin-bottom:14px;">
+          <button class="bb-btn primary mini" id="btnEditOn">Start editing</button>
+          <button class="bb-btn mini" id="btnEditOff">Stop editing</button>
+        </div>
+        <div class="bb-group-title">Cards</div>
+        <div id="cardList"></div>
+      </section>
+
+      <!-- LAYOUT -->
+      <section class="bb-section" data-sec="layout">
+        <div class="bb-note"><b>Scale &amp; spacing.</b> Text scale zooms everything rem-based inside the cards; gutter changes the viewport padding around the active card.</div>
+        <div id="grpLayout"></div>
+      </section>
+
+      <!-- EXPORT -->
+      <section class="bb-section" data-sec="export">
+        <div class="bb-note"><b>Ship it.</b> Copy the CSS below and send it to me in chat — I'll bake it into <b>bento-tokens.css</b> and push. Content edits export as JSON and get wired the same way.</div>
+        <div class="bb-group-title">bento-overrides.css</div>
+        <textarea class="bb-code" id="cssOut" readonly spellcheck="false"></textarea>
+        <div class="bb-exp-actions">
+          <button class="bb-btn mini" id="btnCopyCss">Copy CSS</button>
+          <button class="bb-btn mini" id="btnDlCss2">Download .css</button>
+        </div>
+        <div class="bb-group-title">bento-content.json</div>
+        <textarea class="bb-code" id="jsonOut" readonly spellcheck="false"></textarea>
+        <div class="bb-exp-actions">
+          <button class="bb-btn mini" id="btnCopyJson">Copy JSON</button>
+          <button class="bb-btn mini" id="btnDlJson">Download .json</button>
+          <button class="bb-btn mini" id="btnCopyLink">Copy share link</button>
+        </div>
+      </section>
+
+    </div>
+  </aside>
+
+  <div id="stage">
+    <div id="frameWrap">
+      <div id="devbar">
+        <button class="bb-chipbtn active" data-w="full">Full</button>
+        <button class="bb-chipbtn" data-w="1180">1180</button>
+        <button class="bb-chipbtn" data-w="834">834</button>
+        <button class="bb-chipbtn" data-w="390">390</button>
+        <span class="bb-devlabel" id="devLabel">preview · index.html</span>
+      </div>
+      <iframe id="preview" title="Bento preview"></iframe>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span id="statusLeft">booting…</span>
+  <span><a href="index.html" target="_blank" rel="noopener">open shell ↗</a></span>
+</footer>
+
+<script>
+/* ============================================================
+   BENTO BUILDER — live editor for the ESA Bento cards.
+   Same-origin iframe of index.html; injects CSS overrides,
+   captures inline content edits, exports commit-ready files.
+   ============================================================ */
+(function () {
+  'use strict';
+
+  window.addEventListener('error', function (e) {
+    var el = document.getElementById('statusLeft');
+    if (el) { el.textContent = 'builder error: ' + e.message + ' (line ' + e.lineno + ')'; el.style.color = '#e5484d'; }
+  });
+
+  var $ = function (s) { return document.querySelector(s); };
+  var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+
+  /* ---------- Factory defaults (mirror bento-tokens.css) ---------- */
+  var FACTORY = {
+    card: '#121212', panel: '#1a1a1a', panel2: '#0a0a0a', chip: '#1a1a1a',
+    accent: '#7ec8a0', accent2: '#5aaf84', accent3: '#a9dfc3', onAccent: '#0a0a0a',
+    text: '#f4f4ee', danger: '#e5484d', warn: '#e0a13e', info: '#5b8def',
+    border:  { hex: '#f4f4ee', a: 12 },
+    borderSoft: { hex: '#f4f4ee', a: 7 },
+    line:    { hex: '#f4f4ee', a: 22 },
+    text2:   { hex: '#f4f4ee', a: 80 },
+    text3:   { hex: '#f4f4ee', a: 52 },
+    shadow: 45, radius: 20,
+    scale: 100, gutter: 24
+  };
+
+  var PRESETS = {
+    'Factory':  { accent: '#7ec8a0', accent2: '#5aaf84', accent3: '#a9dfc3' },
+    'Ocean':    { accent: '#6ea8fe', accent2: '#4d8ae8', accent3: '#a8c8ff' },
+    'Amber':    { accent: '#e8b45a', accent2: '#d19a3d', accent3: '#f4d48a' },
+    'Violet':   { accent: '#b48cf2', accent2: '#9a6fe0', accent3: '#d4c0fa' }
+  };
+
+  var CARDS = [
+    { id: 'esa-diagnostics',          name: 'Diagnostic Service' },
+    { id: 'esa-parts-card',           name: 'Parts — InvParts-B' },
+    { id: 'esa-workorder',            name: 'Workorder Details' },
+    { id: 'esa-maintenance-checklist',name: 'Daily Maintenance' },
+    { id: 'esa-ptac',                 name: 'PTAC Broadcast' }
+  ];
+
+  var COLOR_DEFS = [
+    { k: 'card',    label: 'Card surface', grp: 'grpSurfaces' },
+    { k: 'panel',   label: 'Panel surface', grp: 'grpSurfaces' },
+    { k: 'panel2',  label: 'Deep panel', grp: 'grpSurfaces' },
+    { k: 'chip',    label: 'Chip / button', grp: 'grpSurfaces' },
+    { k: 'accent',  label: 'Accent (green)', grp: 'grpAccents' },
+    { k: 'accent2', label: 'Accent deep', grp: 'grpAccents' },
+    { k: 'accent3', label: 'Accent soft', grp: 'grpAccents' },
+    { k: 'onAccent',label: 'On-accent ink', grp: 'grpAccents' },
+    { k: 'danger',  label: 'Danger', grp: 'grpAccents' },
+    { k: 'warn',    label: 'Warn', grp: 'grpAccents' },
+    { k: 'info',    label: 'Info', grp: 'grpAccents' },
+    { k: 'text',    label: 'Text (beige)', grp: 'grpText' }
+  ];
+
+  var ALPHA_DEFS = [
+    { k: 'border',     label: 'Card border', token: '--bk-border',      grp: 'grpText' },
+    { k: 'borderSoft', label: 'Border soft', token: '--bk-border-soft', grp: 'grpText' },
+    { k: 'line',       label: 'Hairline',    token: '--bk-line',        grp: 'grpText' },
+    { k: 'text2',      label: 'Text 2',      token: '--bk-text-2',      grp: 'grpText' },
+    { k: 'text3',      label: 'Text muted',  token: '--bk-text-3',      grp: 'grpText' }
+  ];
+
+  var SLIDER_DEFS = [
+    { k: 'shadow', label: 'Shadow depth', min: 0, max: 80, unit: '%', grp: 'grpShape', fmt: function (v) { return v + '%'; } },
+    { k: 'radius', label: 'Card radius',  min: 0, max: 36, unit: 'px', grp: 'grpShape', fmt: function (v) { return v + 'px'; } }
+  ];
+
+  var LAYOUT_DEFS = [
+    { k: 'scale',  label: 'Text scale',   min: 80, max: 130, unit: '%', fmt: function (v) { return v + '%'; } },
+    { k: 'gutter', label: 'Viewport gutter', min: 0, max: 48, unit: 'px', fmt: function (v) { return v + 'px'; } }
+  ];
+
+  var TOKEN_MAP = {
+    card: '--bk-card', panel: '--bk-panel', panel2: '--bk-panel-2', chip: '--bk-chip',
+    accent: '--bk-accent', accent2: '--bk-accent-2', accent3: '--bk-accent-3',
+    onAccent: '--bk-on-accent', text: '--bk-text',
+    danger: '--bk-danger', warn: '--bk-warn', info: '--bk-info'
+  };
+
+  /* ---------- State ---------- */
+  var LS_KEY = 'esa-bento-builder-v1';
+  var state = loadState();
+  var editing = false;
+  var dirtyCount = 0;
+  var lastSaved = null;
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function factoryState() { var s = clone(FACTORY); s.content = {}; return s; }
+
+  function loadState() {
+    // 1. URL hash (share link) wins
+    var m = /(?:^|[#&])s=([^&]+)/.exec(location.hash || '');
+    if (m) {
+      try { return normalize(JSON.parse(decodeURIComponent(escape(atob(m[1]))))); } catch (e) {}
+    }
+    try {
+      var raw = localStorage.getItem(LS_KEY);
+      if (raw) return normalize(JSON.parse(raw));
+    } catch (e) {}
+    return factoryState();
+  }
+  function normalize(s) {
+    var out = factoryState();
+    Object.keys(out).forEach(function (k) {
+      if (s[k] === undefined) return;
+      if (typeof out[k] === 'object' && s[k] && typeof s[k] === 'object') {
+        if (s[k].hex) out[k].hex = s[k].hex;
+        if (s[k].a !== undefined) out[k].a = Math.max(0, Math.min(100, Number(s[k].a) || 0));
+      } else if (typeof out[k] === 'number') {
+        out[k] = Number(s[k]);
+        if (isNaN(out[k])) out[k] = FACTORY[k];
+      } else if (typeof s[k] === 'string' && /^#[0-9a-fA-F]{6}$/.test(s[k])) {
+        out[k] = s[k];
+      }
+    });
+    if (s.content && typeof s.content === 'object') out.content = s.content; else out.content = {};
+    return out;
+  }
+  function saveState() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
+    lastSaved = new Date();
+    try {
+      history.replaceState(null, '', '#s=' + btoa(unescape(encodeURIComponent(JSON.stringify(state)))));
+    } catch (e) {}
+    updateStatus();
+  }
+
+  /* ---------- CSS generation ---------- */
+  function rgba(pair) {
+    var hex = pair.hex.replace('#', '');
+    var r = parseInt(hex.substr(0, 2), 16), g = parseInt(hex.substr(2, 2), 16), b = parseInt(hex.substr(4, 2), 16);
+    return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + (pair.a / 100).toFixed(2) + ')';
+  }
+  function hexEq(k) { return state[k] === FACTORY[k]; }
+  function pairEq(k) { return state[k].hex === FACTORY[k].hex && state[k].a === FACTORY[k].a; }
+
+  function buildCSS() {
+    var L = [];
+    L.push('/* ============================================================');
+    L.push('   Bento overrides — generated by Bento Builder (builder.html)');
+    L.push('   Paste into bento-tokens.css or hand to the agent to commit.');
+    L.push('   Generated: ' + new Date().toISOString());
+    L.push('   ============================================================ */');
+    var rootLines = [];
+    COLOR_DEFS.forEach(function (d) { if (!hexEq(d.k)) rootLines.push('  ' + TOKEN_MAP[d.k] + ': ' + state[d.k] + ' !important;'); });
+    ALPHA_DEFS.forEach(function (d) { if (!pairEq(d.k)) rootLines.push('  ' + d.token + ': ' + rgba(state[d.k]) + ' !important;'); });
+    if (state.shadow !== FACTORY.shadow) {
+      if (state.shadow === 0) rootLines.push('  --bk-shadow: none !important;');
+      else rootLines.push('  --bk-shadow: 0 12px 40px rgba(0, 0, 0, ' + (state.shadow / 100).toFixed(2) + ') !important;');
+    }
+    if (rootLines.length) {
+      L.push('');
+      L.push(':root {');
+      L.push(rootLines.join('\n'));
+      L.push('}');
+    }
+    if (state.radius !== FACTORY.radius) {
+      L.push('');
+      L.push('.bento-card { border-radius: ' + state.radius + 'px !important; }');
+    }
+    if (state.scale !== FACTORY.scale) {
+      L.push('');
+      L.push('/* rem-based card type scale */');
+      L.push('html { font-size: ' + state.scale + '% !important; }');
+    }
+    if (state.gutter !== FACTORY.gutter) {
+      L.push('');
+      L.push('.esa-render-area { padding: 16px ' + state.gutter + 'px !important; }');
+    }
+    if (!rootLines.length && state.radius === FACTORY.radius && state.scale === FACTORY.scale && state.gutter === FACTORY.gutter) {
+      L.push('');
+      L.push('/* No changes from factory defaults yet. */');
+    }
+    return L.join('\n');
+  }
+  function buildJSON() {
+    var hasContent = Object.keys(state.content || {}).length > 0;
+    return JSON.stringify({
+      _readme: 'Content overrides captured in Bento Builder. Fields map to .bento-title (t*) / .bento-desc (d*) per card, in DOM order.',
+      generated: new Date().toISOString(),
+      cards: hasContent ? state.content : {}
+    }, null, 2);
+  }
+
+  /* ---------- Preview iframe ---------- */
+  var iframe = $('#preview');
+
+  function loadPreview() {
+    iframe.src = 'index.html?b=' + Date.now();
+    waitForCards(function () {
+      injectOverrides();
+      applyContent();
+      if (editing) startEditing();
+      $('#statusLeft').textContent = '';
+      updateStatus('preview mounted');
+    });
+  }
+  function waitForCards(cb) {
+    var tries = 0;
+    var t = setInterval(function () {
+      tries++;
+      var doc;
+      try { doc = iframe.contentDocument; } catch (e) { doc = null; }
+      if (doc && doc.querySelector('.bento-card')) { clearInterval(t); cb(); }
+      else if (tries > 80) { clearInterval(t); updateStatus('preview failed to mount', true); }
+    }, 250);
+  }
+  function injectOverrides() {
+    var doc = iframe.contentDocument;
+    if (!doc || !doc.head) return;
+    var st = doc.getElementById('bk-builder-overrides');
+    if (!st) {
+      st = doc.createElement('style');
+      st.id = 'bk-builder-overrides';
+      st.textContent = '';
+      doc.head.appendChild(st);
+      watchHead(doc, st);
+    }
+    st.textContent = buildCSS() + '\n\n[data-bk-edit] { outline: 1px dashed rgba(126,200,160,0.55); outline-offset: 3px; border-radius: 4px; cursor: text; min-height: 1em; }\n[data-bk-edit]:focus { outline: 1px solid rgba(126,200,160,0.95); background: rgba(126,200,160,0.06); }';
+    // Cards inject their own stylesheets AFTER boot — keep the override last.
+    if (doc.head.lastElementChild !== st) doc.head.appendChild(st);
+  }
+  function watchHead(doc, st) {
+    // Re-pin the override sheet whenever new styles land in the head.
+    try {
+      var mo = new MutationObserver(function () {
+        if (doc.head && doc.head.lastElementChild !== st) doc.head.appendChild(st);
+      });
+      mo.observe(doc.documentElement, { childList: true, subtree: true });
+    } catch (e) {}
+    setInterval(function () {
+      try { if (doc.head && doc.head.lastElementChild !== st) doc.head.appendChild(st); } catch (e) {}
+    }, 700);
+  }
+
+  /* ---------- Content editing ---------- */
+  function startEditing() {
+    var doc = iframe.contentDocument;
+    if (!doc) return;
+    editing = true;
+    CARDS.forEach(function (c) {
+      var card = doc.getElementById(c.id);
+      if (!card) return;
+      var fields = card.querySelectorAll('.bento-title, .bento-desc');
+      Array.prototype.forEach.call(fields, function (el, i) {
+        var key = (el.classList.contains('bento-title') ? 't' : 'd') + i;
+        el.setAttribute('data-bk-edit', c.id + '|' + key);
+        el.setAttribute('contenteditable', 'true');
+        el.setAttribute('spellcheck', 'false');
+        if (!el.__bkBound) {
+          el.__bkBound = true;
+          el.addEventListener('input', function () {
+            var kk = (el.getAttribute('data-bk-edit') || '').split('|');
+            if (kk.length !== 2) return;
+            state.content[kk[0]] = state.content[kk[0]] || {};
+            if (state.content[kk[0]][kk[1]] === el.innerHTML) return;
+            state.content[kk[0]][kk[1]] = el.innerHTML;
+            dirtyCount++;
+            saveState();
+            refreshExports();
+            renderCardList();
+          });
+        }
+      });
+    });
+    injectOverrides();
+    updateStatus('inline editing ON — click a title or description in the preview');
+    setEditButtons();
+  }
+  function stopEditing() {
+    editing = false;
+    try {
+      var doc = iframe.contentDocument;
+      doc.querySelectorAll('[data-bk-edit]').forEach(function (el) {
+        el.removeAttribute('data-bk-edit');
+        el.removeAttribute('contenteditable');
+      });
+    } catch (e) {}
+    updateStatus('inline editing off');
+    setEditButtons();
+  }
+  function setEditButtons() {
+    $('#btnEditOn').style.opacity = editing ? '0.45' : '1';
+    $('#btnEditOff').style.opacity = editing ? '1' : '0.45';
+  }
+  function applyContent() {
+    var doc = iframe.contentDocument;
+    if (!doc) return;
+    Object.keys(state.content || {}).forEach(function (id) {
+      var card = doc.getElementById(id);
+      if (!card) return;
+      var fields = card.querySelectorAll('.bento-title, .bento-desc');
+      Array.prototype.forEach.call(fields, function (el, i) {
+        var key = (el.classList.contains('bento-title') ? 't' : 'd') + i;
+        var v = state.content[id] && state.content[id][key];
+        if (typeof v === 'string') el.innerHTML = v;
+      });
+    });
+  }
+
+  /* ---------- UI construction ---------- */
+  function colorRow(d) {
+    var row = document.createElement('div');
+    row.className = 'bb-row';
+    var lab = document.createElement('label');
+    lab.textContent = d.label;
+    var mono = document.createElement('span');
+    mono.className = 'bb-mono';
+    mono.textContent = state[d.k];
+    var inp = document.createElement('input');
+    inp.type = 'color';
+    inp.value = state[d.k];
+    inp.addEventListener('input', function () {
+      state[d.k] = inp.value;
+      mono.textContent = inp.value;
+      pushAll();
+    });
+    row.appendChild(lab); row.appendChild(mono); row.appendChild(inp);
+    return row;
+  }
+  function alphaRow(d) {
+    var row = document.createElement('div');
+    row.className = 'bb-row';
+    var lab = document.createElement('label');
+    lab.textContent = d.label;
+    var rng = document.createElement('input');
+    rng.type = 'range'; rng.min = '0'; rng.max = '100'; rng.value = state[d.k].a;
+    var sw = document.createElement('input');
+    sw.type = 'color'; sw.value = state[d.k].hex;
+    var mono = document.createElement('span');
+    mono.className = 'bb-mono';
+    mono.textContent = state[d.k].a + '%';
+    rng.addEventListener('input', function () {
+      state[d.k].a = Number(rng.value);
+      mono.textContent = rng.value + '%';
+      pushAll();
+    });
+    sw.addEventListener('input', function () {
+      state[d.k].hex = sw.value;
+      pushAll();
+    });
+    row.appendChild(lab); row.appendChild(mono); row.appendChild(rng); row.appendChild(sw);
+    return row;
+  }
+  function sliderRow(d, isLayout) {
+    var row = document.createElement('div');
+    row.className = 'bb-row';
+    var lab = document.createElement('label');
+    lab.textContent = d.label;
+    var mono = document.createElement('span');
+    mono.className = 'bb-mono';
+    mono.textContent = d.fmt(state[d.k]);
+    var rng = document.createElement('input');
+    rng.type = 'range'; rng.min = String(d.min); rng.max = String(d.max); rng.value = state[d.k];
+    rng.addEventListener('input', function () {
+      state[d.k] = Number(rng.value);
+      mono.textContent = d.fmt(state[d.k]);
+      pushAll();
+    });
+    row.appendChild(lab); row.appendChild(mono); row.appendChild(rng);
+    return row;
+  }
+  function buildControls() {
+    COLOR_DEFS.forEach(function (d) { document.getElementById(d.grp).appendChild(colorRow(d)); });
+    ALPHA_DEFS.forEach(function (d) { document.getElementById(d.grp).appendChild(alphaRow(d)); });
+    SLIDER_DEFS.forEach(function (d) { document.getElementById(d.grp).appendChild(sliderRow(d, false)); });
+    LAYOUT_DEFS.forEach(function (d) { document.getElementById('grpLayout').appendChild(sliderRow(d, true)); });
+
+    var pres = $('#presets');
+    Object.keys(PRESETS).forEach(function (name) {
+      var b = document.createElement('button');
+      b.className = 'bb-preset';
+      var sw = document.createElement('span');
+      sw.className = 'sw';
+      PRESETS[name] && ['accent', 'accent2', 'accent3'].forEach(function (k) {
+        var i = document.createElement('i');
+        i.style.background = PRESETS[name][k];
+        sw.appendChild(i);
+      });
+      b.appendChild(sw);
+      b.appendChild(document.createTextNode(name));
+      b.addEventListener('click', function () {
+        Object.keys(PRESETS[name]).forEach(function (k) { state[k] = PRESETS[name][k]; });
+        rebuildControls();
+        pushAll();
+      });
+      pres.appendChild(b);
+    });
+
+    renderCardList();
+  }
+  function rebuildControls() {
+    ['grpSurfaces', 'grpAccents', 'grpText', 'grpShape', 'grpLayout'].forEach(function (id) {
+      document.getElementById(id).innerHTML = '';
+    });
+    COLOR_DEFS.forEach(function (d) { document.getElementById(d.grp).appendChild(colorRow(d)); });
+    ALPHA_DEFS.forEach(function (d) { document.getElementById(d.grp).appendChild(alphaRow(d)); });
+    SLIDER_DEFS.forEach(function (d) { document.getElementById(d.grp).appendChild(sliderRow(d, false)); });
+    LAYOUT_DEFS.forEach(function (d) { document.getElementById('grpLayout').appendChild(sliderRow(d, true)); });
+  }
+  function renderCardList() {
+    var host = $('#cardList');
+    host.innerHTML = '';
+    CARDS.forEach(function (c) {
+      var n = state.content[c.id] ? Object.keys(state.content[c.id]).length : 0;
+      var row = document.createElement('div');
+      row.className = 'bb-cardrow';
+      row.innerHTML =
+        '<div class="nm">' + c.name + '</div>' +
+        '<div class="id">' + c.id + '</div>' +
+        (n ? '<div class="st">' + n + ' field' + (n > 1 ? 's' : '') + ' edited</div>' : '') +
+        '<div class="acts"></div>';
+      var acts = row.querySelector('.acts');
+      var show = document.createElement('button');
+      show.className = 'bb-btn mini';
+      show.textContent = 'Show';
+      show.addEventListener('click', function () {
+        try {
+          var w = iframe.contentWindow;
+          if (w.ESAShell && typeof w.ESAShell.showCard === 'function') w.ESAShell.showCard(c.id);
+        } catch (e) {}
+      });
+      acts.appendChild(show);
+      if (n) {
+        var clr = document.createElement('button');
+        clr.className = 'bb-btn danger mini';
+        clr.textContent = 'Clear edits';
+        clr.addEventListener('click', function () {
+          delete state.content[c.id];
+          saveState();
+          refreshExports();
+          renderCardList();
+          loadPreview();
+        });
+        acts.appendChild(clr);
+      }
+      host.appendChild(row);
+    });
+  }
+
+  /* ---------- Push + export ---------- */
+  function pushAll() {
+    dirtyCount++;
+    injectOverrides();
+    saveState();
+    refreshExports();
+  }
+  function refreshExports() {
+    $('#cssOut').value = buildCSS();
+    $('#jsonOut').value = buildJSON();
+  }
+  function download(name, text, type) {
+    var blob = new Blob([text], { type: type || 'text/plain' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 400);
+  }
+  function copyText(text, btn) {
+    var done = function () {
+      if (!btn) return;
+      var old = btn.textContent;
+      btn.textContent = 'Copied ✓';
+      setTimeout(function () { btn.textContent = old; }, 1200);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallback(); });
+    } else fallback();
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) {}
+      ta.remove();
+    }
+  }
+
+  /* ---------- Status ---------- */
+  function updateStatus(msg, isErr) {
+    var el = $('#statusLeft');
+    var bits = [];
+    if (msg) bits.push(msg);
+    if (dirtyCount) bits.push(dirtyCount + ' change' + (dirtyCount > 1 ? 's' : ''));
+    if (lastSaved) bits.push('saved ' + lastSaved.toLocaleTimeString());
+    el.textContent = bits.join(' · ') || 'ready';
+    el.style.color = isErr ? 'var(--bb-danger)' : '';
+  }
+
+  /* ---------- Wire chrome ---------- */
+  $$('.bb-tab').forEach(function (t) {
+    t.addEventListener('click', function () {
+      $$('.bb-tab').forEach(function (x) { x.classList.remove('active'); });
+      $$('.bb-section').forEach(function (x) { x.classList.remove('active'); });
+      t.classList.add('active');
+      document.querySelector('[data-sec="' + t.dataset.tab + '"]').classList.add('active');
+    });
+  });
+  $$('#devbar .bb-chipbtn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      $$('#devbar .bb-chipbtn').forEach(function (x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      var w = b.dataset.w;
+      $('#frameWrap').style.width = (w === 'full') ? '100%' : (w + 'px');
+      $('#devLabel').textContent = 'preview · index.html · ' + (w === 'full' ? 'fluid' : w + 'px');
+    });
+  });
+  $('#btnEditOn').addEventListener('click', startEditing);
+  $('#btnEditOff').addEventListener('click', stopEditing);
+  $('#btnReset').addEventListener('click', function () {
+    if (!confirm('Reset ALL builder edits (theme, layout, content)?')) return;
+    try { localStorage.removeItem(LS_KEY); } catch (e) {}
+    history.replaceState(null, '', location.pathname);
+    state = factoryState();
+    dirtyCount = 0;
+    editing = false;
+    rebuildControls();
+    renderCardList();
+    refreshExports();
+    loadPreview();
+    setEditButtons();
+  });
+  $('#btnCopyCss').addEventListener('click', function () { copyText($('#cssOut').value, this); });
+  $('#btnCopyTop').addEventListener('click', function () { copyText($('#cssOut').value, this); });
+  $('#btnCopyJson').addEventListener('click', function () { copyText($('#jsonOut').value, this); });
+  $('#btnDlCss').addEventListener('click', function () { download('bento-overrides.css', $('#cssOut').value); });
+  $('#btnDlCss2').addEventListener('click', function () { download('bento-overrides.css', $('#cssOut').value); });
+  $('#btnDlJson').addEventListener('click', function () { download('bento-content.json', $('#jsonOut').value, 'application/json'); });
+  $('#btnCopyLink').addEventListener('click', function () {
+    saveState();
+    copyText(location.href, this);
+  });
+
+  /* ---------- Boot ---------- */
+  buildControls();
+  refreshExports();
+  setEditButtons();
+  loadPreview();
+})();
+</script>
+</body>
+</html>
