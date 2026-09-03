@@ -43,6 +43,10 @@ The existence of an adapter in Agent-X never makes that adapter the authority fo
 
 Experimental capability code remains isolated and returns normalized observations. Promotion to a stable capability requires the repository's governance/promotion process. Experimental state must not be injected into Ava007 cognitive context.
 
+## UI authority
+
+Visual and shell authority for console surfaces lives with the Agent Browser surface and uploaded shell attachments, which are applied verbatim. `esa-exoskeleton/` is a mount/verify/transport host: it carries the tenants' service cards (ESA: five rendering cards, calendar, catalog DB, inventory) and must not originate shell or UI redesigns. Tenant brands stay inside tenant cards; framework chrome stays framework-branded. Full manifest: `esa-exoskeleton/docs/UI-AUTHORITY.md`.
+
 ## Boundary cleanup
 
 Legacy `cognitive_state` fields in transport/capability code are not an alternative A2A protocol. Replace their use with opaque `intent_id`, `capability`, skill/version references, and observation metadata. Preserve behavior and UI while removing cognitive ownership from the execution surface.
