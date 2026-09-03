@@ -61,16 +61,17 @@ async function initESAExoskeleton() {
     if (window.ESA.logBuffer.length > 300) window.ESA.logBuffer.shift();
   };
 
-  let ESAIngestion, ESADiagnosticCard, ESAInvPartsCardB, ESAWorkorder, ESAMaintenanceChecklist, ESAPtacB, themeModule;
+  let ESAIngestion, ESADiagnosticCard, ESAInvPartsCardB, ESAWorkorder, ESAMaintenanceChecklist, ESAPtacB, ESACalendar, themeModule;
   try {
-    const [ingestionModule, diagnosticModule, partsModule, workorderModule, checklistModule, ptacModule, themeMod] = await Promise.allSettled([
-      import('./components/ESA.Ingestion.js?v=407'),
-      import('./components/ESA.DiagnosticCard.js?v=407'),
-      import('./components/ESA.invpartscard-B.js?v=407'),
-      import('./components/ESA.workorder.js?v=407'),
-      import('./components/ESA.MaintenanceChecklist.js?v=407'),
-      import('./components/ESA.Ptac-B.js?v=407'),
-      import('./config/gruvbox-colors.js?v=407')
+    const [ingestionModule, diagnosticModule, partsModule, workorderModule, checklistModule, ptacModule, calendarModule, themeMod] = await Promise.allSettled([
+      import('./components/ESA.Ingestion.js?v=408'),
+      import('./components/ESA.DiagnosticCard.js?v=408'),
+      import('./components/ESA.invpartscard-B.js?v=408'),
+      import('./components/ESA.workorder.js?v=408'),
+      import('./components/ESA.MaintenanceChecklist.js?v=408'),
+      import('./components/ESA.Ptac-B.js?v=408'),
+      import('./components/ESA.Calendar.js?v=408'),
+      import('./config/gruvbox-colors.js?v=408')
     ]);
     ESAIngestion = ingestionModule.status === 'fulfilled' ? ingestionModule.value.ESAIngestion : null;
     ESADiagnosticCard = diagnosticModule.status === 'fulfilled' ? diagnosticModule.value.ESADiagnosticCard : null;
@@ -78,6 +79,7 @@ async function initESAExoskeleton() {
     ESAWorkorder = workorderModule.status === 'fulfilled' ? workorderModule.value.ESAWorkorder : null;
     ESAMaintenanceChecklist = checklistModule.status === 'fulfilled' ? checklistModule.value.ESAMaintenanceChecklist : null;
     ESAPtacB = ptacModule.status === 'fulfilled' ? (ptacModule.value.ESAPtacB || ptacModule.value.default) : null;
+    ESACalendar = calendarModule.status === 'fulfilled' ? (calendarModule.value.ESACalendar || calendarModule.value.default) : null;
     themeModule = themeMod.status === 'fulfilled' ? themeMod.value : null;
     if (ingestionModule.status === 'rejected') window.ESA.errors.push({ component: 'Ingestion', error: ingestionModule.reason });
     if (diagnosticModule.status === 'rejected') window.ESA.errors.push({ component: 'DiagnosticCard', error: diagnosticModule.reason });
@@ -85,6 +87,7 @@ async function initESAExoskeleton() {
     if (workorderModule.status === 'rejected') window.ESA.errors.push({ component: 'Workorder', error: workorderModule.reason });
     if (checklistModule.status === 'rejected') window.ESA.errors.push({ component: 'MaintenanceChecklist', error: checklistModule.reason });
     if (ptacModule.status === 'rejected') window.ESA.errors.push({ component: 'PtacB', error: ptacModule.reason });
+    if (calendarModule.status === 'rejected') window.ESA.errors.push({ component: 'Calendar', error: calendarModule.reason });
   } catch (err) {
     window.ESA.errors.push({ phase: 'import', error: err });
   }
@@ -241,8 +244,24 @@ async function initESAExoskeleton() {
     } catch (err) { window.ESA.errors.push({ component: 'PtacB', phase: 'mount', error: err }); }
   }
 
+  // 7. CALENDAR — the ESA tab dropdown's calendar card
+  if (ESACalendar && typeof ESACalendar.mount === 'function') {
+    try {
+      const calendarContainer = document.getElementById('esa-calendar');
+      if (calendarContainer) {
+        calendarContainer.innerHTML = '';
+        const mountResult = ESACalendar.mount(calendarContainer);
+        if (mountResult) {
+          window.ESA.components.calendar = mountResult;
+          window.ESA.mountedComponents.push(mountResult);
+          if (window.ESA.log) window.ESA.log('✓ Service calendar mounted', 'success');
+        }
+      }
+    } catch (err) { window.ESA.errors.push({ component: 'Calendar', phase: 'mount', error: err }); }
+  }
+
   const renderArea = document.querySelector('.esa-render-area');
-  const CARD_IDS = ['esa-ingestion-chat-card', 'esa-diagnostics', 'esa-parts-card', 'esa-workorder', 'esa-maintenance-checklist', 'esa-ptac'];
+  const CARD_IDS = ['esa-ingestion-chat-card', 'esa-diagnostics', 'esa-parts-card', 'esa-workorder', 'esa-maintenance-checklist', 'esa-ptac', 'esa-calendar'];
   if (renderArea) {
     const bar = document.createElement('div');
     bar.className = 'esa-view-toolbar';
@@ -327,7 +346,8 @@ async function initESAExoskeleton() {
         invPartsCard: !!window.ESA.components.invPartsCard,
         workorder: !!window.ESA.components.workorder,
         maintenanceChecklist: !!window.ESA.components.maintenanceChecklist,
-        ptacB: !!window.ESA.components.ptacB
+        ptacB: !!window.ESA.components.ptacB,
+        calendar: !!window.ESA.components.calendar
       }
     }
   }));
