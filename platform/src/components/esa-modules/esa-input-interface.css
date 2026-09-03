@@ -1,0 +1,325 @@
+@keyframes greenPulse {
+  0%,100% { box-shadow:0 0 18px -4px rgba(34,197,94,0.45),0 0 40px -12px rgba(34,197,94,0.18); }
+  50%      { box-shadow:0 0 30px -4px rgba(34,197,94,0.72),0 0 60px -10px rgba(34,197,94,0.38); }
+}
+.ava-grid-bg {
+  --line: rgba(34,197,94,0.06);
+  --cell: 80px;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, var(--line) 1px, transparent 1px var(--cell)) 0 calc(var(--cell) * -0.5) / var(--cell) var(--cell),
+    linear-gradient(var(--line) 1px, transparent 1px var(--cell)) 0 calc(var(--cell) * -0.5) / var(--cell) var(--cell);
+  -webkit-mask: linear-gradient(-15deg, transparent 30%, white);
+  mask: linear-gradient(-15deg, transparent 30%, white);
+}
+.ava-input-controls {
+  position: relative;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 0.75rem 1rem 0.6rem;
+  color: hsl(0 0% 92%);
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  box-shadow: inset 0 0.5px rgba(255,255,255,0.25);
+}
+.ava-input-controls:focus-within {
+  background: rgba(34,197,94,0.03);
+  border-color: rgba(34,197,94,0.3);
+  box-shadow: inset 0 0.5px rgba(255,255,255,0.5), 0 0 40px -10px rgba(34,197,94,0.12);
+  --glow-alpha: 0;
+}
+.ava-input-controls::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 18px;
+  background: radial-gradient(
+    140px 140px at calc(var(--glow-x, 50) * 1px) calc(var(--glow-y, 50) * 1px),
+    rgba(34,197,94,0.55), transparent 70%
+  );
+  z-index: 0;
+  border: 2px solid transparent;
+  -webkit-mask:
+    linear-gradient(transparent, transparent),
+    linear-gradient(white, white);
+  -webkit-mask-clip: padding-box, border-box;
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(transparent, transparent),
+    linear-gradient(white, white);
+  mask-clip: padding-box, border-box;
+  mask-composite: intersect;
+  opacity: var(--glow-alpha, 1);
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+.ava-textarea {
+  field-sizing: content;
+  background: linear-gradient(hsl(0 0% 100%), hsl(0 0% 65%));
+  background-attachment: fixed;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  caret-color: #22c55e;
+  border: 0;
+  resize: none;
+  width: 100%;
+  outline: none;
+  line-height: 1.5lh;
+  min-height: 3lh;
+  max-height: 12lh;
+  overflow-y: auto;
+  font-size: 17px;
+  font-family: 'Inter', system-ui, sans-serif;
+  transition: all 0.2s;
+  position: relative;
+  z-index: 1;
+}
+.ava-textarea::placeholder {
+  color: transparent;
+}
+.ava-textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ava-textarea::-webkit-scrollbar-thumb {
+  background: rgba(34,197,94,0.25);
+  border-radius: 999px;
+}
+.ava-textarea::-webkit-scrollbar {
+  width: 3px;
+  background: transparent;
+}
+/* ── Agent X badge — top right of input box ── */
+.ava-ai-badge {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: ui-monospace, monospace;
+  color: rgba(34,197,94,0.8);
+  letter-spacing: 0.04em;
+  user-select: none;
+}
+.ava-ai-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 6px #22c55e;
+}
+
+/* ── Action bar: 5 icon btns + send + email pdf ── */
+.ava-actions {
+  display: grid;
+  grid-template-columns: repeat(5, auto) 1fr auto;
+  gap: 0.25rem;
+  align-items: center;
+  margin-top: 0.6rem;
+  position: relative;
+  z-index: 1;
+}
+.ava-action-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: rgba(255,255,255,0.3);
+  aspect-ratio: 1;
+  width: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s, color 0.2s;
+}
+.ava-action-btn:hover,
+.ava-action-btn:focus-visible {
+  background: rgba(34,197,94,0.1);
+  color: #22c55e;
+}
+.ava-action-btn--active {
+  color: #22c55e;
+  background: rgba(34,197,94,0.08);
+}
+.ava-action-btn svg {
+  width: 50%;
+  height: 50%;
+}
+/* ── Email PDF button ── */
+.ava-email-btn {
+  justify-self: end;
+  width: fit-content;
+  padding: 0 1.25rem;
+  height: 40px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #22c55e, #166534);
+  border: 1px solid rgba(34,197,94,0.3);
+  box-shadow: 0 0 18px rgba(34,197,94,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: grid;
+  place-items: center;
+}
+.ava-email-btn:hover {
+  box-shadow: 0 0 28px rgba(34,197,94,0.5), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+/* ── Ingeniosity Lens button (gold accent, always visible) ── */
+.ava-lens-btn {
+  position: relative;
+  color: rgba(234,179,8,0.5);
+}
+.ava-lens-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  border: 1px solid rgba(234,179,8,0.15);
+  pointer-events: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.ava-lens-btn:hover::before,
+.ava-lens-btn--active::before {
+  border-color: rgba(234,179,8,0.5);
+  box-shadow: 0 0 12px rgba(234,179,8,0.25), inset 0 0 8px rgba(234,179,8,0.06);
+}
+.ava-lens-btn:hover,
+.ava-lens-btn:focus-visible {
+  background: rgba(234,179,8,0.1);
+  color: #eab308;
+}
+/* ── Small text send button ── */
+.ava-text-send-btn {
+  appearance: none;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: transparent;
+  color: rgba(255,255,255,0.2);
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s;
+}
+.ava-text-send-btn--active {
+  background: rgba(34,197,94,0.12);
+  border-color: rgba(34,197,94,0.35);
+  color: #22c55e;
+}
+.ava-text-send-btn--active:hover {
+  background: rgba(34,197,94,0.2);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GLASS CARD SYSTEM (Shell Lounge Chair)
+   ═══════════════════════════════════════════════════════════════ */
+.main-glass-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.055);
+  backdrop-filter: blur(24px) saturate(145%);
+  -webkit-backdrop-filter: blur(24px) saturate(145%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+.main-glass-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(34, 197, 94, 0.6) 0%,
+    transparent 20%,
+    transparent 75%,
+    rgba(34, 197, 94, 0.5) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+}
+.glass-subcard {
+  position: relative;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1rem;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.25s ease;
+}
+.glass-subcard:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+.glass-control-bar {
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.25rem;
+  transition: all 0.25s ease;
+}
+.glass-checkout-dock {
+  background: rgba(255, 255, 255, 0.045);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 1.5rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+.glass-btn-pay {
+  background: linear-gradient(135deg, #00c853 0%, #009624 100%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow:
+    0 10px 25px rgba(0, 200, 83, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.glass-btn-pay:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 14px 30px rgba(0, 200, 83, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.stepper-rail {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.stepper-bar {
+  height: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+.stepper-bar.active {
+  width: 1.25rem;
+  background: #00e676;
+  box-shadow: 0 0 10px rgba(0, 230, 118, 0.8);
+}

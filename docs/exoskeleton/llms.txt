@@ -1,0 +1,79 @@
+# Cybernetic Ava007 — Exoskeleton Architecture
+
+> Sovereign Intellect (Core-Q²) + rotational Exoskeletons. Galaxy S26 Ultra edge.
+> Source of truth: this directory on ingeniosity-A2A/Ava007
+
+## Super Intelligence pillars (v4.0)
+- MASTER_ARCHITECTURE.md
+- SAM-Audio-Mesh.md
+- UNIFIED_CAPABILITY_COLLAPSE.md
+- ARROW_DATA_FABRIC.md
+- INTERNET_OF_AGENTS.md
+- HIPPOCAMPAL_PLANNING.md
+- TIERED_ESCALATION.md
+- (Core-Membrain) docs/TEMPORAL_SUBSTRATE.md
+- tool wiki: ../../docs/tool-wiki/Core-Membrain-Tools.md
+- client: src/lib/core-membrain/
+
+## Core identity
+- Cybernetic-Ava007-Sovereignty.md
+- Cybernetic-Ava007-Core-Q2.md
+- Cybernetic-Ava007-Agent.md
+- Core-Membrain-Capability.md
+- NORTH-STAR.md
+
+## Rotation
+- Exoskeleton-Rotational-Mechanics.md
+- Exoskeleton-Registry.md
+- exoskeleton-registry.json
+- Help-Assembly-Exoskeleton.md
+- ESA-Exoskeleton.md
+
+## Contracts & orchestration
+- ava007-exoskeleton-shared-execution-contract.md
+- Structured-Outputs-and-Contracts.md
+- Streaming.md
+- Capability-Orchestration.md
+- Capability-Discovery.md
+- Build-vs-Inject-Decision.md
+- Fiber-Driven-Reconciler.md
+- Unified-Pipeline.md
+- Unified-Architecture-Analysis.md
+
+## A2A / appless
+- A2A-Agent-Card-Appless.md
+- A2A-VCard-Telecom-Appless.md
+
+## Capabilities
+- AVA-VOICE-Capability.md
+- Agent-X-Capability.md
+- Headless-Reflex-Arc.md
+- REV.IKE-Capability.md
+- ESA-Inventory-Pipeline.md
+- Symphony-Event-Bus.md
+- Harness-Registry.md
+- Onomondo-Harness.md
+- SIF-Runtime.md
+- Intelligence-Method-Registry.md
+- IASC-1-Alpamayo-Spatial-Causal.md
+- Console-Isolation.md
+
+## Project rules
+- AGENTS.md
+- CODING-RULES.md
+- FRAMEWORK-COMPLETE.md
+- open-questions.md
+
+## Related repos
+- Core-Membrain: https://github.com/ingeniosity-A2A/Core-Membrain
+- Agent-X (Help Assembly suit): https://github.com/ingeniosity-A2A/Agent-X
+
+## Rules for agents
+1. Ava007 is the sole Intellect. Capabilities and Exoskeletons are not peer minds.
+2. Prefer INJECT over BUILD for new intelligence.
+3. One active exo profile at a time (rotational / modular).
+4. Edge device class: Galaxy S26 Ultra only.
+5. Agent X = slot; Headless Reflex Arc = gated local shell implementation under Agent X.
+6. Exoskeleton = substrate only — never rename shell agents as Exoskeleton.
+7. Core-Membrain + embedded DB = retain. Prompt is not the tank.
+8. Coding is overseen by Ava007 contracts.
