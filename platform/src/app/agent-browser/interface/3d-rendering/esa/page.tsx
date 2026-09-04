@@ -12,10 +12,10 @@ import type { TodayJob } from "@/components/a2ui/TodaysJobs";
 type CardTab = "parts" | "service" | "green";
 
 /**
- * ESA Exoskeleton Console — Select Card (not "select console").
+ * ESA rendering surface — Select Card (never "select console").
  * Cards: Daily To-Dos · Parts + Inventory · Service Request · Green Shield
  */
-export default function ESAExoskeletonConsole() {
+export default function ESAExoskeletonSurface() {
   const [card, setCard] = useState<CardTab>("parts");
   const [todosOpen, setTodosOpen] = useState(false);
   const [jobs, setJobs] = useState<TodayJob[]>([]);
@@ -137,7 +137,7 @@ export default function ESAExoskeletonConsole() {
             Mobile Parts Card
           </button>
           <Link
-            href="/consoles/help-assembly"
+            href="/agent-browser/interface/3d-rendering/helpassembly"
             className="block rounded-lg border border-[#2a2a3a] px-2 py-1.5 text-center text-[10px] text-[#aaa]"
           >
             Help Assembly

@@ -1,50 +1,69 @@
 /**
- * Console surface registry for the AVA007 Cybernetic Console.
+ * Agent Browser surface registry.
  *
  * `SectionId` is the contract `BottomAIBar` uses as `current_surface` when it
  * dispatches intents, so Ava's intent resolution knows what the operator is
- * looking at. Each section maps to a real console route (or a planned one,
- * labeled honestly below).
+ * looking at. Every section maps to a real route under the Agent Browser
+ * Interface hierarchy — no "consoles" naming, nothing planned-but-unrouted.
+ *
+ *   /agent-browser/interface/terminal                    → Agent Browser + Elements Terminal
+ *   /agent-browser/interface/bento-ui-editor             → Bento UI Editor
+ *   /agent-browser/interface/3d-rendering                → 3D-Rendering pipeline
+ *   /agent-browser/interface/3d-rendering/esa            → 3D-Rendering / ESA
+ *   /agent-browser/interface/3d-rendering/helpassembly   → 3D-Rendering / HelpAssembly
  */
-export type SectionId = "browser" | "terminal" | "cards" | "pipeline" | "esa";
+export type SectionId =
+  | "browser"
+  | "terminal"
+  | "bento"
+  | "rendering"
+  | "esa"
+  | "helpassembly";
 
 export interface SectionMeta {
   id: SectionId;
   label: string;
   description: string;
-  route: string | null; // null = not wired to a route yet (stated, not faked)
+  route: string;
 }
 
 export const SECTIONS: Record<SectionId, SectionMeta> = {
   browser: {
     id: "browser",
-    label: "Browser",
+    label: "Agent Browser",
     description: "agent-browser viewport, snapshot refs and page actions",
-    route: "/consoles/ava-console",
+    route: "/agent-browser/interface/terminal",
   },
   terminal: {
     id: "terminal",
     label: "Terminal",
-    description: "browser CLI exec surface (bash exec backend not wired yet)",
-    route: null,
+    description:
+      "AI Elements terminal — real allowlisted exec + agent-browser actions",
+    route: "/agent-browser/interface/terminal",
   },
-  cards: {
-    id: "cards",
-    label: "Cards",
-    description: "drag-reorder console card builder (Edit Mode → Card Editor)",
-    route: null,
+  bento: {
+    id: "bento",
+    label: "Bento UI Editor",
+    description: "drag-reorder bento card builder surface",
+    route: "/agent-browser/interface/bento-ui-editor",
   },
-  pipeline: {
-    id: "pipeline",
-    label: "Render Pipeline",
-    description: "recursive splitter → GSAP SplitText diff render",
-    route: "/consoles/render-pipeline",
+  rendering: {
+    id: "rendering",
+    label: "3D-Rendering",
+    description: "recursive splitter → GSAP SplitText render pipeline",
+    route: "/agent-browser/interface/3d-rendering",
   },
   esa: {
     id: "esa",
     label: "ESA",
-    description: "ESA maintenance operator surface",
-    route: "/consoles/esa-maintenance",
+    description: "ESA rendering surface (Select Card)",
+    route: "/agent-browser/interface/3d-rendering/esa",
+  },
+  helpassembly: {
+    id: "helpassembly",
+    label: "HelpAssembly",
+    description: "Help Assembly rendering surface",
+    route: "/agent-browser/interface/3d-rendering/helpassembly",
   },
 };
 

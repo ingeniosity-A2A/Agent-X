@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import TerminalPanel from "../terminals/TerminalPanel";
-import CardBuilder from "../builder/CardBuilder";
+import BentoCardBuilder from "../builder/BentoCardBuilder";
 import { chunkCode, type Chunk } from "@/lib/recursive-splitter";
 import { animateCodeDiff } from "@/lib/codeDiffAnimator";
 
@@ -76,7 +76,7 @@ export function EditModePanel({ open, onClose }: { open: boolean; onClose: () =>
         {mode === "ide" && <IdeMode />}
         {mode === "cards" && (
           <div style={{ transform: "scale(0.94)", transformOrigin: "top left" }}>
-            <CardBuilder />
+            <BentoCardBuilder />
           </div>
         )}
       </div>
@@ -126,7 +126,7 @@ function IdeMode() {
           setRoot(data.root);
           setFiles(data.files);
           const preferred =
-            data.files.find((f) => f.endsWith("src/app/consoles/ava-console/page.tsx")) ?? data.files[0];
+            data.files.find((f) => f.endsWith("src/app/agent-browser/interface/terminal/page.tsx")) ?? data.files[0];
           if (preferred) setSelected(preferred);
         } else {
           setTreeError(data?.hint ?? data?.error ?? `repo tree responded ${res.status}`);

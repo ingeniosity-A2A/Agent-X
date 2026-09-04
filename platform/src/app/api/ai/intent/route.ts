@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { runAgentBrowser, argsFor, DEFAULT_SESSION } from "@/lib/agentBrowser";
 
 /**
- * POST /api/ai/intent — real intent dispatch for the console AI surfaces
+ * POST /api/ai/intent — real intent dispatch for the Agent Browser interface surfaces
  * (BottomAIBar + UniversalFeatureStack both POST here).
  *
  * Primary engine: the z-ai-web-dev-sdk chat completions (server-side only).

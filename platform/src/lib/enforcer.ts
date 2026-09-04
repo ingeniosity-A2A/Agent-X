@@ -283,7 +283,7 @@ export class ExoskeletonEnforcer {
         ? this.speculativeHydrationPlan(deployment)
         : null,
       notes: [
-        "Dashboard routes are retired. Operator surface is /consoles/esa-maintenance (Select Card).",
+        "Dashboard routes are retired. Operator surface is /agent-browser/interface/3d-rendering/esa (Select Card).",
         "Intellect never calls enforcer directly; substrate collapses capability.",
         "Agent-X is exo surface + sandbox — not a peer Intellect.",
       ],

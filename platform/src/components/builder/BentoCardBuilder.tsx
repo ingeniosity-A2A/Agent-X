@@ -3,13 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Console CardBuilder — drag-reorder the console's card stack with
- * localStorage persistence (the persistence contract EditModePanel's Card
- * Editor mode relies on: "same drag-reorder, same localStorage persistence").
+ * Bento UI Editor card builder — drag-reorder the Agent Browser's card stack
+ * with localStorage persistence (the persistence contract EditModePanel's
+ * Card Editor mode relies on: "same drag-reorder, same localStorage
+ * persistence"). Mounted full-surface at
+ * /agent-browser/interface/bento-ui-editor and inside Edit Mode → Card Editor.
+ *
+ * Relocated from builder/CardBuilder.tsx when the Interface hierarchy landed
+ * (the "consoles"-era CardBuilder path is retired in the same commit).
  *
  * Original implementation, no new dependencies: HTML5 drag events only.
- * The registry lists the console's real surfaces; order + visibility persist
- * under `ava007-console.cardbuilder.v1`.
+ * The registry lists the Agent Browser's real surfaces; order + visibility
+ * persist under `ava007-console.cardbuilder.v1` (data key, unchanged).
  */
 
 interface BuilderCard {
@@ -19,10 +24,10 @@ interface BuilderCard {
 }
 
 const DEFAULT_CARDS: BuilderCard[] = [
-  { id: "browser", label: "Browser Panel", hint: "agent-browser viewport + snapshot refs (/consoles/ava-console)" },
-  { id: "terminal", label: "Terminal", hint: "browser CLI exec surface (Edit Mode → Terminal)" },
-  { id: "pipeline", label: "Render Pipeline", hint: "recursive splitter → SplitText render (/consoles/render-pipeline)" },
-  { id: "esa", label: "ESA Maintenance", hint: "/consoles/esa-maintenance operator surface" },
+  { id: "browser", label: "Browser Panel", hint: "agent-browser viewport + snapshot refs (/agent-browser/interface/terminal)" },
+  { id: "terminal", label: "Terminal", hint: "AI Elements terminal exec surface (Edit Mode → Terminal)" },
+  { id: "pipeline", label: "3D-Rendering", hint: "recursive splitter → SplitText render (/agent-browser/interface/3d-rendering)" },
+  { id: "esa", label: "ESA", hint: "/agent-browser/interface/3d-rendering/esa — Select Card" },
   { id: "diagnostics", label: "Diagnostics", hint: "session + capability status badges" },
 ];
 
@@ -51,7 +56,7 @@ function saveState(state: PersistedState) {
   }
 }
 
-export default function CardBuilder() {
+export default function BentoCardBuilder() {
   const [cards, setCards] = useState<BuilderCard[]>(DEFAULT_CARDS);
   const [hidden, setHidden] = useState<Set<string>>(new Set());
   const [saved, setSaved] = useState(false);

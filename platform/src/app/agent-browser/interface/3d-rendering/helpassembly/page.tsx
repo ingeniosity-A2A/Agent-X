@@ -7,10 +7,10 @@ import type { TodayJob } from "@/components/a2ui/TodaysJobs";
 import type { A2UINode } from "@/components/a2ui/types";
 
 /**
- * Agent-X / Consoles / help-assembly
- * Help Assembly services console (not Ava007 Dashboard).
+ * Agent Browser / Interface / 3D-Rendering / HelpAssembly
+ * Help Assembly rendering surface (not Ava007 Dashboard).
  */
-export default function HelpAssemblyConsole() {
+export default function HelpAssemblySurface() {
   const [jobs, setJobs] = useState<TodayJob[]>([]);
   const [counts, setCounts] = useState({
     inProgress: 0,
@@ -46,16 +46,16 @@ export default function HelpAssemblyConsole() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2">
           <div>
             <p className="text-[10px] uppercase tracking-[0.2em] text-[#7c3aed]">
-              Agent-X · Consoles
+              Agent-X · Interface · 3D-Rendering
             </p>
             <h1 className="text-lg font-semibold">Help Assembly</h1>
             <p className="text-xs text-[#666]">
-              Services console · bookings, capture, A2UI cards
+              Services surface · bookings, capture, A2UI cards
             </p>
           </div>
           <nav className="flex gap-2 text-xs">
             <Link
-              href="/consoles/esa-maintenance"
+              href="/agent-browser/interface/3d-rendering/esa"
               className="rounded-lg border border-[#2a2a3a] px-3 py-1.5 hover:border-[#00d4ff]"
             >
               ESA Maintenance

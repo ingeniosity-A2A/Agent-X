@@ -4,10 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { chunkCode, CODE_SEPARATORS, type Chunk } from "@/lib/recursive-splitter";
 import { animateCodeDiff } from "@/lib/codeDiffAnimator";
 import { SECTIONS } from "@/components/shell/AvaShell";
-import "../ava-console.css";
+import "../terminal/terminal.css";
 
 /**
- * Render Pipeline console — the frontend layer of the recursive-splitting
+ * 3D-Rendering — the render pipeline, frontend layer of the recursive-splitting
  * architecture, running for real and end-to-end:
  *
  *   source text → chunkCode() (code-aware recursive splitter)
@@ -55,7 +55,7 @@ export const SEPARATORS = ["\\nclass ", "\\nfunction ", "\\nexport ", "\\n\\n", 
 
 const schedulerNote =
   "Backend half (DuckDB symbol index, scheduler routing) is the edge repo's " +
-  "half of the hard boundary — this console never stores the data itself.";
+  "half of the hard boundary — this surface never stores the data itself.";
 
 await scheduler.ready();
 export function route(edit) {
@@ -100,12 +100,12 @@ export default function RenderPipelinePage() {
         <div>
           <h1>Render Pipeline — recursive splitter → SplitText</h1>
           <p>
-            {SECTIONS.pipeline.description} · DuckDB/scheduler half lives in the edge repo (boundary: AGENTS.md)
+            {SECTIONS.rendering.description} · DuckDB/scheduler half lives in the edge repo (boundary: AGENTS.md)
           </p>
         </div>
         <span className="ava-badge">
           <span className="ava-dot" />
-          {SECTIONS.pipeline.label}
+          {SECTIONS.rendering.label}
         </span>
       </header>
 
