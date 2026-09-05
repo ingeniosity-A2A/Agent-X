@@ -38,6 +38,7 @@ export default function ESAExoskeletonSurface() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing refetch pattern (reload todos on card/toggle change); runtime deliberately untouched
     loadTodos();
   }, [loadTodos, card, todosOpen]);
 

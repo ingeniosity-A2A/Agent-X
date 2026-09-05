@@ -62,6 +62,8 @@ export default function BentoCardBuilder() {
   const [saved, setSaved] = useState(false);
   const dragIndex = useRef<number | null>(null);
   const [overIndex, setOverIndex] = useState<number | null>(null);
+  /* render-safe mirror of dragIndex — refs must not be read during render */
+  const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const persisted = loadState();
@@ -69,9 +71,11 @@ export default function BentoCardBuilder() {
     const byId = new Map(DEFAULT_CARDS.map((c) => [c.id, c]));
     const ordered = persisted.order.map((id) => byId.get(id)).filter(Boolean) as BuilderCard[];
     const rest = DEFAULT_CARDS.filter((c) => !persisted.order.includes(c.id));
+    /* deferred localStorage hydration — kept out of the lazy initializer so
+       SSR'd surfaces never mismatch on first paint */
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCards([...ordered, ...rest]);
     setHidden(new Set(persisted.hidden));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function persist(nextOrder: BuilderCard[], nextHidden: Set<string>) {
@@ -126,6 +130,7 @@ export default function BentoCardBuilder() {
             draggable
             onDragStart={() => {
               dragIndex.current = i;
+              setDraggingIndex(i);
             }}
             onDragOver={(e) => {
               e.preventDefault();
@@ -135,9 +140,10 @@ export default function BentoCardBuilder() {
             onDrop={() => handleDrop(i)}
             onDragEnd={() => {
               dragIndex.current = null;
+              setDraggingIndex(null);
               setOverIndex(null);
             }}
-            className={`ava-builder-item ${overIndex === i && dragIndex.current !== i ? "drop-target" : ""} ${hidden.has(c.id) ? "is-hidden" : ""}`}
+            className={`ava-builder-item ${overIndex === i && draggingIndex !== i ? "drop-target" : ""} ${hidden.has(c.id) ? "is-hidden" : ""}`}
           >
             <span className="ava-builder-grip" aria-hidden="true">
               ⠿

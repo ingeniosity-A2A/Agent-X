@@ -18,6 +18,16 @@ export default function HomePage() {
         </p>
         <div className="mt-8 space-y-3">
           <Link
+            href="/agent-browser/interface/ui-kit"
+            className="block rounded-xl border border-[#ff4d5e]/40 bg-[#12121a] px-5 py-4 hover:border-[#8b5cf6]"
+          >
+            <p className="font-medium">Ava007 UI Kit</p>
+            <p className="text-xs text-[#777]">
+              unified Bento + prompt-widget skill · chat workspace demo ·{" "}
+              /agent-browser/interface/ui-kit
+            </p>
+          </Link>
+          <Link
             href="/agent-browser/interface/3d-rendering/esa"
             className="block rounded-xl border border-[#7c3aed]/40 bg-[#12121a] px-5 py-4 hover:border-[#7c3aed]"
           >

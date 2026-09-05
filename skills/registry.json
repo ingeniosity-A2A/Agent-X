@@ -36,6 +36,16 @@
       "authority": "execution",
       "execution_surface": "Agent-X",
       "status": "scaffold"
+    },
+    {
+      "skill_id": "ava007-ui-kit",
+      "version": "0.1.0",
+      "provides": ["ui.kit.ava007"],
+      "firmware_ref": "Cybernetic-Ava007:skills/ava007-ui-kit/SKILL.md",
+      "adapter_path": "skills/ava007-ui-kit",
+      "authority": "firmware",
+      "execution_surface": "Agent-X",
+      "status": "present"
     }
   ]
 }

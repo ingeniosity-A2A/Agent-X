@@ -1,0 +1,260 @@
+/* ============================================================
+   AVA007 UI KIT — Prompt Widget theme (Tailwind CSS v4, CSS-first)
+   ------------------------------------------------------------
+   Unified Bento + Ava007 master skill tokens:
+   · clean hardware curvature 23px–24px (Nocra spec, rebranded)
+   · Aurora gradient stroke: red → purple → blue
+   · dark background scale + adaptive dual-shadow
+   · custom shimmer / fade keyframes
+   Imported by any surface that renders the Ava007 UI Kit
+   (e.g. app/interface/ui-kit). `@theme` registers design tokens
+   with Tailwind v4; the raw custom properties below keep the
+   component classes working even without utility generation.
+   ============================================================ */
+
+@theme {
+  /* Ava007 Aurora brand gradient (red → purple → blue) */
+  --color-ava007-aurora-red: #ff4d5e;
+  --color-ava007-aurora-purple: #8b5cf6;
+  --color-ava007-aurora-blue: #3b82f6;
+
+  /* Dark background scale */
+  --color-ava007-ink-950: #07070c;
+  --color-ava007-ink-900: #0b0b12;
+  --color-ava007-ink-850: #101019;
+  --color-ava007-ink-800: #16161f;
+  --color-ava007-ink-700: #1e1e2a;
+  --color-ava007-ink-600: #2a2a38;
+
+  /* Hardware curvature (Nocra spec: radius 23px–24px) */
+  --radius-ava007: 23px;
+  --radius-ava007-lg: 24px;
+
+  /* Animations */
+  --animate-ava007-shimmer: ava007-shimmer 2.4s linear infinite;
+  --animate-ava007-fade-up: ava007-fade-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-ava007-pulse-dot: ava007-pulse-dot 1.6s ease-in-out infinite;
+}
+
+@keyframes ava007-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes ava007-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ava007-pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.8); }
+}
+
+/* ------------------------------------------------------------
+   Raw tokens — light is default, .dark overrides (scoped to the
+   kit root so the kit never leaks into host surfaces)
+   ------------------------------------------------------------ */
+.ava007-kit {
+  --ava007-bg: #f4f4f8;
+  --ava007-panel: #ffffff;
+  --ava007-panel-2: #fafafc;
+  --ava007-line: rgba(15, 15, 25, 0.09);
+  --ava007-text: #101018;
+  --ava007-text-2: #5a5a6e;
+  --ava007-text-3: #8a8a9e;
+  --ava007-solid-btn: #0b0b12;      /* Generate: solid black in light mode */
+  --ava007-solid-btn-text: #ffffff;
+  --ava007-chip: rgba(15, 15, 25, 0.05);
+
+  /* Adaptive dual-shadow: soft ambient + tight contact, no gray flatness */
+  --ava007-shadow-outer: 0 18px 48px rgba(60, 40, 120, 0.14), 0 2px 8px rgba(20, 20, 40, 0.08);
+  --ava007-shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  --ava007-shadow-flyout: 0 12px 36px rgba(20, 20, 45, 0.16), 0 2px 6px rgba(20, 20, 45, 0.1);
+
+  /* Aurora gradient stroke */
+  --ava007-aurora: linear-gradient(120deg, #ff4d5e 0%, #8b5cf6 48%, #3b82f6 100%);
+  --ava007-aurora-soft: linear-gradient(120deg, rgba(255, 77, 94, 0.16), rgba(139, 92, 246, 0.16), rgba(59, 130, 246, 0.16));
+
+  --ava007-radius: 23px;
+  --ava007-radius-lg: 24px;
+}
+
+.ava007-kit.dark {
+  --ava007-bg: #07070c;
+  --ava007-panel: #101019;
+  --ava007-panel-2: #16161f;
+  --ava007-line: rgba(255, 255, 255, 0.08);
+  --ava007-text: #f2f2f7;
+  --ava007-text-2: rgba(255, 255, 255, 0.62);
+  --ava007-text-3: rgba(255, 255, 255, 0.4);
+  --ava007-solid-btn: #ffffff;      /* Generate: solid white in dark mode */
+  --ava007-solid-btn-text: #0b0b12;
+  --ava007-chip: rgba(255, 255, 255, 0.06);
+
+  --ava007-shadow-outer: 0 20px 52px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+  --ava007-shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --ava007-shadow-flyout: 0 14px 40px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* ------------------------------------------------------------
+   Aurora ring — the outer gradient stroke (red → purple → blue)
+   ------------------------------------------------------------ */
+.ava007-aurora-ring {
+  position: relative;
+  border-radius: var(--ava007-radius-lg);
+  background: var(--ava007-aurora);
+  padding: 1.5px;
+  box-shadow: var(--ava007-shadow-outer);
+}
+
+.ava007-aurora-ring::after {
+  /* soft aurora bloom behind the stroke */
+  content: "";
+  position: absolute;
+  inset: -14px;
+  border-radius: 32px;
+  background: var(--ava007-aurora-soft);
+  filter: blur(22px);
+  opacity: 0.55;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.ava007-aurora-inner {
+  border-radius: calc(var(--ava007-radius-lg) - 1.5px);
+  background: var(--ava007-panel);
+  box-shadow: var(--ava007-shadow-inner);
+}
+
+/* ------------------------------------------------------------
+   Widget anatomy
+   ------------------------------------------------------------ */
+.ava007-widget {
+  border-radius: var(--ava007-radius-lg);
+  color: var(--ava007-text);
+}
+
+.ava007-widget textarea {
+  background: transparent;
+  color: var(--ava007-text);
+  outline: none;
+  resize: none;
+  width: 100%;
+}
+
+.ava007-widget textarea::placeholder {
+  color: var(--ava007-text-3);
+}
+
+.ava007-action-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid var(--ava007-line);
+  background: var(--ava007-chip);
+  color: var(--ava007-text-2);
+  transition: transform 0.18s ease, border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+}
+
+.ava007-action-badge:hover {
+  color: var(--ava007-text);
+  border-color: rgba(139, 92, 246, 0.55);
+  background: var(--ava007-aurora-soft);
+  transform: translateY(-1px);
+}
+
+.ava007-btn-solid {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 9999px;
+  background: var(--ava007-solid-btn);
+  color: var(--ava007-solid-btn-text);
+  font-weight: 600;
+  transition: transform 0.16s ease, opacity 0.16s ease;
+}
+
+.ava007-btn-solid:hover { transform: translateY(-1px); }
+.ava007-btn-solid:active { transform: translateY(0) scale(0.98); }
+.ava007-btn-solid:disabled { opacity: 0.55; transform: none; }
+
+.ava007-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 9999px;
+  border: 1px solid var(--ava007-line);
+  color: var(--ava007-text-2);
+  background: transparent;
+  transition: border-color 0.16s ease, color 0.16s ease, background 0.16s ease;
+}
+
+.ava007-btn-ghost:hover {
+  color: var(--ava007-text);
+  border-color: rgba(139, 92, 246, 0.55);
+  background: var(--ava007-aurora-soft);
+}
+
+/* Model flyout */
+.ava007-flyout {
+  border-radius: 18px;
+  border: 1px solid var(--ava007-line);
+  background: var(--ava007-panel-2);
+  box-shadow: var(--ava007-shadow-flyout);
+  overflow: hidden;
+  animation: ava007-fade-up 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ava007-flyout-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  color: var(--ava007-text);
+  transition: background 0.14s ease;
+}
+
+.ava007-flyout-item:hover { background: var(--ava007-chip); }
+.ava007-flyout-item[data-active="true"] { background: var(--ava007-aurora-soft); }
+
+/* Image chips */
+.ava007-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 9999px;
+  border: 1px solid var(--ava007-line);
+  background: var(--ava007-chip);
+  color: var(--ava007-text-2);
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+.ava007-chip button { color: var(--ava007-text-3); }
+.ava007-chip button:hover { color: var(--ava007-text); }
+
+/* Generating shimmer skeleton */
+.ava007-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--ava007-chip) 25%,
+    var(--ava007-aurora-soft) 50%,
+    var(--ava007-chip) 75%
+  );
+  background-size: 200% 100%;
+  animation: var(--animate-ava007-shimmer);
+  border-radius: 8px;
+}
+
+.ava007-fade-up { animation: var(--animate-ava007-fade-up); }
+.ava007-pulse-dot { animation: var(--animate-ava007-pulse-dot); }
+
+/* Scrollbars inside the kit */
+.ava007-kit * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ava007-line) transparent;
+}
