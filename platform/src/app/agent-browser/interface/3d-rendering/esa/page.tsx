@@ -8,8 +8,9 @@ import { GreenShieldPanel } from "@/components/esa/GreenShieldPanel";
 import { SendEmailButtons } from "@/components/esa/SendEmailButtons";
 import { TodaysJobs } from "@/components/a2ui";
 import type { TodayJob } from "@/components/a2ui/TodaysJobs";
+import AssetStackPanel from "@/components/render-stack/AssetStackPanel";
 
-type CardTab = "parts" | "service" | "green";
+type CardTab = "parts" | "service" | "green" | "stack";
 
 /**
  * ESA rendering surface — Select Card (never "select console").
@@ -123,6 +124,12 @@ export default function ESAExoskeletonSurface() {
             "Calendar · daily checklist",
             "bg-emerald-500/20 text-emerald-200 ring-1 ring-emerald-500/40"
           )}
+          {cardBtn(
+            "stack",
+            "Asset Stack (RocksDB)",
+            "Render layers · restack",
+            "bg-amber-500/15 text-amber-200 ring-1 ring-amber-500/40"
+          )}
         </nav>
 
         <div className="space-y-2 border-t border-[#1e1e2e] p-2">
@@ -151,7 +158,7 @@ export default function ESAExoskeletonSurface() {
 
       <main className="min-w-0 flex-1 overflow-y-auto p-4">
         <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-[#555]">
-          ESA Exoskeleton · {card === "parts" ? "Parts + Inventory Card" : card === "service" ? "Service Request Card" : "Green Shield Card"}
+          ESA Exoskeleton · {card === "parts" ? "Parts + Inventory Card" : card === "service" ? "Service Request Card" : card === "stack" ? "Asset Stack — RocksDB housing" : "Green Shield Card"}
         </p>
         {card === "parts" && (
           <div className="mx-auto max-w-2xl">
@@ -166,6 +173,11 @@ export default function ESAExoskeletonSurface() {
         {card === "green" && (
           <div className="mx-auto max-w-5xl">
             <GreenShieldPanel />
+          </div>
+        )}
+        {card === "stack" && (
+          <div className="mx-auto max-w-4xl">
+            <AssetStackPanel service="esa" job="esa-service" frame="f0001" />
           </div>
         )}
       </main>

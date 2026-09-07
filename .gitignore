@@ -23,3 +23,8 @@ platform/dev.log
 
 # Next.js generated files
 next-env.d.ts
+
+# RocksDB housing internals — regenerable via `python3 scripts/seed_rocksdb.py`
+# (the databases ESA / Help Assembly house; code + seeds are tracked, internals are not)
+modules/esa/data/rocksdb/
+modules/helpassembly/data/rocksdb/

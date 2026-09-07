@@ -5,6 +5,7 @@ import Link from "next/link";
 import { TodaysJobs, CaptureCTA, A2UIRenderer } from "@/components/a2ui";
 import type { TodayJob } from "@/components/a2ui/TodaysJobs";
 import type { A2UINode } from "@/components/a2ui/types";
+import AssetStackPanel from "@/components/render-stack/AssetStackPanel";
 
 /**
  * Agent Browser / Interface / 3D-Rendering / HelpAssembly
@@ -97,6 +98,7 @@ export default function HelpAssemblySurface() {
             </p>
             <A2UIRenderer node={demo} />
           </div>
+          <AssetStackPanel service="helpassembly" job="helpassembly-service" frame="f0001" />
         </main>
       </div>
     </div>
