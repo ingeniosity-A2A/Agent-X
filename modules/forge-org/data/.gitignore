@@ -1,0 +1,4 @@
+rocksdb/
+vault.duckdb
+vault.duckdb.wal
+raw/*/original.bin

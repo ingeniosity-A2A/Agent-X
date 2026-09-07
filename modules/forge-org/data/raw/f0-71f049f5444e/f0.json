@@ -1,0 +1,10 @@
+{
+  "f0_id": "f0-71f049f5444e",
+  "sha256": "71f049f5444e4aeb4d7567e9628de40c8879f9fcffe635210b1a0e3814b42493",
+  "size_bytes": 10584,
+  "name": "FORGED-FILE-STANDARD.md",
+  "source": "canonical-spec",
+  "received_at": "2026-09-07T08:28:11.947+00:00",
+  "deduped": false,
+  "spec": "forged-file-standard/1.0.0"
+}

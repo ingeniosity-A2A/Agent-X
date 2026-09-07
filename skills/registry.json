@@ -45,6 +45,20 @@
       "status": "scaffold"
     },
     {
+      "skill_id": "forge-org",
+      "version": "1.0.0",
+      "provides": ["vault.forged-file-standard", "vault.f0-f3", "vault.rocksdb.skills", "vault.duckdb.intelligence", "vault.hf.vendor.boundary"],
+      "firmware_ref": null,
+      "adapter_path": "skills/forge-org",
+      "authority": "execution",
+      "execution_surface": "Agent Browser (operating environment) + Agent-X platform API",
+      "spec": "skills/forge-org/FORGED-FILE-STANDARD.md (canonical)",
+      "housing": "modules/forge-org/data",
+      "engine": "scripts/forged_vault.py",
+      "tier": 1,
+      "status": "present"
+    },
+    {
       "skill_id": "ava007-ui-kit",
       "version": "0.1.0",
       "provides": ["ui.kit.ava007"],

@@ -1,0 +1,1731 @@
+{
+  "spec": "forged-file-standard/1.0.0",
+  "forged_id": "ff-71f049f5-v1",
+  "version": 1,
+  "f0_id": "f0-71f049f5444e",
+  "sha256": "71f049f5444e4aeb4d7567e9628de40c8879f9fcffe635210b1a0e3814b42493",
+  "name": "FORGED-FILE-STANDARD.md",
+  "size_bytes": 10584,
+  "forged_at": "2026-09-07T08:28:17.102+00:00",
+  "normalize": {
+    "crlf": 0,
+    "bom": false,
+    "trailing_ws": 0,
+    "blank_collapse": 0,
+    "nfc_changed": 0
+  },
+  "harness": {
+    "checks": {
+      "deterministic_rechunk": true,
+      "hashes_stable": 89,
+      "ascii_ratio": 0.9496,
+      "unbalanced_braces": 0
+    },
+    "verdict": "pass",
+    "measured_us": 15844
+  },
+  "chunk_count": 89,
+  "chunks": [
+    {
+      "seq": 0,
+      "hash": "cfec9247",
+      "bytes": 28,
+      "chars": 28,
+      "startLine": 1,
+      "endLine": 3,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 4,
+        "avg_sentence_words": 4.0
+      }
+    },
+    {
+      "seq": 1,
+      "hash": "438034a6",
+      "bytes": 301,
+      "chars": 301,
+      "startLine": 3,
+      "endLine": 8,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 38,
+        "avg_sentence_words": 12.7
+      }
+    },
+    {
+      "seq": 2,
+      "hash": "3f0ff49a",
+      "bytes": 54,
+      "chars": 53,
+      "startLine": 8,
+      "endLine": 10,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 4,
+        "avg_sentence_words": 4.0
+      }
+    },
+    {
+      "seq": 3,
+      "hash": "f68dc5b0",
+      "bytes": 5,
+      "chars": 5,
+      "startLine": 10,
+      "endLine": 12,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 4,
+      "hash": "56cd866d",
+      "bytes": 30,
+      "chars": 30,
+      "startLine": 12,
+      "endLine": 14,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 2,
+        "avg_sentence_words": 2.0
+      }
+    },
+    {
+      "seq": 5,
+      "hash": "325c04a2",
+      "bytes": 8,
+      "chars": 8,
+      "startLine": 14,
+      "endLine": 15,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 1,
+        "avg_sentence_words": 1.0
+      }
+    },
+    {
+      "seq": 6,
+      "hash": "81d6d904",
+      "bytes": 13,
+      "chars": 13,
+      "startLine": 15,
+      "endLine": 16,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 2,
+        "avg_sentence_words": 2.0
+      }
+    },
+    {
+      "seq": 7,
+      "hash": "c39ed79a",
+      "bytes": 24,
+      "chars": 22,
+      "startLine": 16,
+      "endLine": 17,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 8,
+      "hash": "03c4b910",
+      "bytes": 24,
+      "chars": 22,
+      "startLine": 17,
+      "endLine": 18,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 9,
+      "hash": "aeabedd5",
+      "bytes": 42,
+      "chars": 42,
+      "startLine": 18,
+      "endLine": 19,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 4,
+        "avg_sentence_words": 4.0
+      }
+    },
+    {
+      "seq": 10,
+      "hash": "c39ed79a",
+      "bytes": 24,
+      "chars": 22,
+      "startLine": 19,
+      "endLine": 20,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 11,
+      "hash": "03c4b910",
+      "bytes": 24,
+      "chars": 22,
+      "startLine": 20,
+      "endLine": 21,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 12,
+      "hash": "2a84d7d3",
+      "bytes": 62,
+      "chars": 30,
+      "startLine": 21,
+      "endLine": 22,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 13,
+      "hash": "e5cd8c93",
+      "bytes": 72,
+      "chars": 66,
+      "startLine": 22,
+      "endLine": 23,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 7,
+        "avg_sentence_words": 7.0
+      }
+    },
+    {
+      "seq": 14,
+      "hash": "e43af58d",
+      "bytes": 62,
+      "chars": 58,
+      "startLine": 23,
+      "endLine": 24,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 7,
+        "avg_sentence_words": 7.0
+      }
+    },
+    {
+      "seq": 15,
+      "hash": "32e763a7",
+      "bytes": 62,
+      "chars": 30,
+      "startLine": 24,
+      "endLine": 25,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 16,
+      "hash": "03c4b910",
+      "bytes": 24,
+      "chars": 22,
+      "startLine": 25,
+      "endLine": 26,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 17,
+      "hash": "2a84d7d3",
+      "bytes": 62,
+      "chars": 30,
+      "startLine": 26,
+      "endLine": 27,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 18,
+      "hash": "0e6401fe",
+      "bytes": 71,
+      "chars": 67,
+      "startLine": 27,
+      "endLine": 28,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 5,
+        "avg_sentence_words": 5.0
+      }
+    },
+    {
+      "seq": 19,
+      "hash": "b848a327",
+      "bytes": 34,
+      "chars": 30,
+      "startLine": 28,
+      "endLine": 29,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 1,
+        "avg_sentence_words": 1.0
+      }
+    },
+    {
+      "seq": 20,
+      "hash": "32e763a7",
+      "bytes": 62,
+      "chars": 30,
+      "startLine": 29,
+      "endLine": 30,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 21,
+      "hash": "03c4b910",
+      "bytes": 24,
+      "chars": 22,
+      "startLine": 30,
+      "endLine": 31,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 22,
+      "hash": "2a84d7d3",
+      "bytes": 62,
+      "chars": 30,
+      "startLine": 31,
+      "endLine": 32,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 23,
+      "hash": "2d2a2eb9",
+      "bytes": 75,
+      "chars": 71,
+      "startLine": 32,
+      "endLine": 33,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 6,
+        "avg_sentence_words": 6.0
+      }
+    },
+    {
+      "seq": 24,
+      "hash": "c6273e45",
+      "bytes": 73,
+      "chars": 69,
+      "startLine": 33,
+      "endLine": 34,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 8,
+        "avg_sentence_words": 8.0
+      }
+    },
+    {
+      "seq": 25,
+      "hash": "b1cf5ab4",
+      "bytes": 55,
+      "chars": 51,
+      "startLine": 34,
+      "endLine": 35,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 4,
+        "avg_sentence_words": 4.0
+      }
+    },
+    {
+      "seq": 26,
+      "hash": "32e763a7",
+      "bytes": 62,
+      "chars": 30,
+      "startLine": 35,
+      "endLine": 36,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 27,
+      "hash": "03c4b910",
+      "bytes": 24,
+      "chars": 22,
+      "startLine": 36,
+      "endLine": 37,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 28,
+      "hash": "2a84d7d3",
+      "bytes": 62,
+      "chars": 30,
+      "startLine": 37,
+      "endLine": 38,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 29,
+      "hash": "ecf04bd4",
+      "bytes": 74,
+      "chars": 68,
+      "startLine": 38,
+      "endLine": 39,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 1,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 7,
+        "avg_sentence_words": 7.0
+      }
+    },
+    {
+      "seq": 30,
+      "hash": "c02f1915",
+      "bytes": 75,
+      "chars": 69,
+      "startLine": 39,
+      "endLine": 40,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": -1,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 6,
+        "avg_sentence_words": 6.0
+      }
+    },
+    {
+      "seq": 31,
+      "hash": "32e763a7",
+      "bytes": 62,
+      "chars": 30,
+      "startLine": 40,
+      "endLine": 41,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 32,
+      "hash": "03c4b910",
+      "bytes": 24,
+      "chars": 22,
+      "startLine": 41,
+      "endLine": 42,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 33,
+      "hash": "2a84d7d3",
+      "bytes": 62,
+      "chars": 30,
+      "startLine": 42,
+      "endLine": 43,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 34,
+      "hash": "5b8d0cfe",
+      "bytes": 76,
+      "chars": 72,
+      "startLine": 43,
+      "endLine": 44,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 5,
+        "avg_sentence_words": 5.0
+      }
+    },
+    {
+      "seq": 35,
+      "hash": "e5e4c039",
+      "bytes": 56,
+      "chars": 52,
+      "startLine": 44,
+      "endLine": 45,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 3,
+        "avg_sentence_words": 3.0
+      }
+    },
+    {
+      "seq": 36,
+      "hash": "32e763a7",
+      "bytes": 62,
+      "chars": 30,
+      "startLine": 45,
+      "endLine": 46,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 37,
+      "hash": "03c4b910",
+      "bytes": 24,
+      "chars": 22,
+      "startLine": 46,
+      "endLine": 47,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 38,
+      "hash": "2a84d7d3",
+      "bytes": 62,
+      "chars": 30,
+      "startLine": 47,
+      "endLine": 48,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 39,
+      "hash": "8d98ead5",
+      "bytes": 77,
+      "chars": 73,
+      "startLine": 48,
+      "endLine": 49,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 6,
+        "avg_sentence_words": 6.0
+      }
+    },
+    {
+      "seq": 40,
+      "hash": "34a6e2b1",
+      "bytes": 34,
+      "chars": 30,
+      "startLine": 49,
+      "endLine": 50,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 1,
+        "avg_sentence_words": 1.0
+      }
+    },
+    {
+      "seq": 41,
+      "hash": "32e763a7",
+      "bytes": 62,
+      "chars": 30,
+      "startLine": 50,
+      "endLine": 51,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 42,
+      "hash": "64a7cb2f",
+      "bytes": 62,
+      "chars": 30,
+      "startLine": 51,
+      "endLine": 52,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 43,
+      "hash": "87ce0f2f",
+      "bytes": 34,
+      "chars": 30,
+      "startLine": 52,
+      "endLine": 53,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 44,
+      "hash": "88f78def",
+      "bytes": 99,
+      "chars": 39,
+      "startLine": 53,
+      "endLine": 54,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 45,
+      "hash": "29d129d0",
+      "bytes": 47,
+      "chars": 39,
+      "startLine": 54,
+      "endLine": 55,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 2,
+        "avg_sentence_words": 2.0
+      }
+    },
+    {
+      "seq": 46,
+      "hash": "6abeccd8",
+      "bytes": 47,
+      "chars": 39,
+      "startLine": 55,
+      "endLine": 56,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 2,
+        "avg_sentence_words": 2.0
+      }
+    },
+    {
+      "seq": 47,
+      "hash": "ee024b27",
+      "bytes": 99,
+      "chars": 39,
+      "startLine": 56,
+      "endLine": 57,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 48,
+      "hash": "b1b82f5c",
+      "bytes": 65,
+      "chars": 31,
+      "startLine": 57,
+      "endLine": 58,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 49,
+      "hash": "ff27b078",
+      "bytes": 25,
+      "chars": 23,
+      "startLine": 58,
+      "endLine": 59,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 50,
+      "hash": "2a84d7d3",
+      "bytes": 62,
+      "chars": 30,
+      "startLine": 59,
+      "endLine": 60,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 51,
+      "hash": "4ed06da7",
+      "bytes": 59,
+      "chars": 55,
+      "startLine": 60,
+      "endLine": 61,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 4,
+        "avg_sentence_words": 4.0
+      }
+    },
+    {
+      "seq": 52,
+      "hash": "bc13de74",
+      "bytes": 34,
+      "chars": 30,
+      "startLine": 61,
+      "endLine": 62,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 1,
+        "avg_sentence_words": 1.0
+      }
+    },
+    {
+      "seq": 53,
+      "hash": "648d9633",
+      "bytes": 62,
+      "chars": 30,
+      "startLine": 62,
+      "endLine": 63,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 54,
+      "hash": "8d8f5fe7",
+      "bytes": 1,
+      "chars": 1,
+      "startLine": 63,
+      "endLine": 64,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 0,
+        "avg_sentence_words": 0.0
+      }
+    },
+    {
+      "seq": 55,
+      "hash": "6c9bbf77",
+      "bytes": 79,
+      "chars": 69,
+      "startLine": 64,
+      "endLine": 67,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 8,
+        "avg_sentence_words": 8.0
+      }
+    },
+    {
+      "seq": 56,
+      "hash": "749c2c56",
+      "bytes": 31,
+      "chars": 31,
+      "startLine": 67,
+      "endLine": 69,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 4,
+        "avg_sentence_words": 4.0
+      }
+    },
+    {
+      "seq": 57,
+      "hash": "256b0277",
+      "bytes": 574,
+      "chars": 565,
+      "startLine": 69,
+      "endLine": 76,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 63,
+        "avg_sentence_words": 63.0
+      }
+    },
+    {
+      "seq": 58,
+      "hash": "43a7b2d6",
+      "bytes": 227,
+      "chars": 227,
+      "startLine": 76,
+      "endLine": 80,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 36,
+        "avg_sentence_words": 18.0
+      }
+    },
+    {
+      "seq": 59,
+      "hash": "bd046640",
+      "bytes": 29,
+      "chars": 29,
+      "startLine": 80,
+      "endLine": 82,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 2,
+        "avg_sentence_words": 2.0
+      }
+    },
+    {
+      "seq": 60,
+      "hash": "d2a55298",
+      "bytes": 464,
+      "chars": 462,
+      "startLine": 82,
+      "endLine": 89,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 52,
+        "avg_sentence_words": 52.0
+      }
+    },
+    {
+      "seq": 61,
+      "hash": "1a624724",
+      "bytes": 184,
+      "chars": 182,
+      "startLine": 89,
+      "endLine": 93,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 27,
+        "avg_sentence_words": 27.0
+      }
+    },
+    {
+      "seq": 62,
+      "hash": "4991b493",
+      "bytes": 193,
+      "chars": 185,
+      "startLine": 93,
+      "endLine": 101,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 24,
+        "avg_sentence_words": 4.8
+      }
+    },
+    {
+      "seq": 63,
+      "hash": "f162ab74",
+      "bytes": 39,
+      "chars": 39,
+      "startLine": 101,
+      "endLine": 103,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 8,
+        "avg_sentence_words": 8.0
+      }
+    },
+    {
+      "seq": 64,
+      "hash": "3055ceb3",
+      "bytes": 43,
+      "chars": 43,
+      "startLine": 103,
+      "endLine": 105,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 5,
+        "avg_sentence_words": 5.0
+      }
+    },
+    {
+      "seq": 65,
+      "hash": "92b03594",
+      "bytes": 137,
+      "chars": 135,
+      "startLine": 105,
+      "endLine": 108,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 19,
+        "avg_sentence_words": 19.0
+      }
+    },
+    {
+      "seq": 66,
+      "hash": "d3b5a5d0",
+      "bytes": 489,
+      "chars": 489,
+      "startLine": 108,
+      "endLine": 122,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 41,
+        "avg_sentence_words": 41.0
+      }
+    },
+    {
+      "seq": 67,
+      "hash": "4193efb6",
+      "bytes": 42,
+      "chars": 42,
+      "startLine": 122,
+      "endLine": 124,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 4,
+        "avg_sentence_words": 4.0
+      }
+    },
+    {
+      "seq": 68,
+      "hash": "40f052ef",
+      "bytes": 45,
+      "chars": 45,
+      "startLine": 124,
+      "endLine": 126,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 6,
+        "avg_sentence_words": 6.0
+      }
+    },
+    {
+      "seq": 69,
+      "hash": "14253b70",
+      "bytes": 466,
+      "chars": 464,
+      "startLine": 126,
+      "endLine": 137,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 59,
+        "avg_sentence_words": 59.0
+      }
+    },
+    {
+      "seq": 70,
+      "hash": "b5346acf",
+      "bytes": 126,
+      "chars": 126,
+      "startLine": 137,
+      "endLine": 140,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 19,
+        "avg_sentence_words": 6.3
+      }
+    },
+    {
+      "seq": 71,
+      "hash": "f16cc135",
+      "bytes": 58,
+      "chars": 56,
+      "startLine": 140,
+      "endLine": 142,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 6,
+        "avg_sentence_words": 6.0
+      }
+    },
+    {
+      "seq": 72,
+      "hash": "8382c4aa",
+      "bytes": 150,
+      "chars": 150,
+      "startLine": 142,
+      "endLine": 145,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 21,
+        "avg_sentence_words": 21.0
+      }
+    },
+    {
+      "seq": 73,
+      "hash": "421f90b8",
+      "bytes": 610,
+      "chars": 552,
+      "startLine": 145,
+      "endLine": 162,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 55,
+        "avg_sentence_words": 55.0
+      }
+    },
+    {
+      "seq": 74,
+      "hash": "7b00b880",
+      "bytes": 475,
+      "chars": 471,
+      "startLine": 162,
+      "endLine": 169,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 55,
+        "avg_sentence_words": 11.0
+      }
+    },
+    {
+      "seq": 75,
+      "hash": "0150c6c4",
+      "bytes": 30,
+      "chars": 30,
+      "startLine": 169,
+      "endLine": 171,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 3,
+        "avg_sentence_words": 3.0
+      }
+    },
+    {
+      "seq": 76,
+      "hash": "5b76ce42",
+      "bytes": 23,
+      "chars": 23,
+      "startLine": 171,
+      "endLine": 173,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 3,
+        "avg_sentence_words": 3.0
+      }
+    },
+    {
+      "seq": 77,
+      "hash": "464388a6",
+      "bytes": 183,
+      "chars": 183,
+      "startLine": 173,
+      "endLine": 179,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 16,
+        "avg_sentence_words": 16.0
+      }
+    },
+    {
+      "seq": 78,
+      "hash": "b946f660",
+      "bytes": 54,
+      "chars": 54,
+      "startLine": 179,
+      "endLine": 181,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 6,
+        "avg_sentence_words": 6.0
+      }
+    },
+    {
+      "seq": 79,
+      "hash": "69d2a9d5",
+      "bytes": 319,
+      "chars": 309,
+      "startLine": 181,
+      "endLine": 189,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 35,
+        "avg_sentence_words": 35.0
+      }
+    },
+    {
+      "seq": 80,
+      "hash": "120863fc",
+      "bytes": 27,
+      "chars": 27,
+      "startLine": 189,
+      "endLine": 191,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 2,
+        "avg_sentence_words": 2.0
+      }
+    },
+    {
+      "seq": 81,
+      "hash": "51a80aaa",
+      "bytes": 486,
+      "chars": 486,
+      "startLine": 191,
+      "endLine": 198,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 58,
+        "avg_sentence_words": 19.3
+      }
+    },
+    {
+      "seq": 82,
+      "hash": "1a85c384",
+      "bytes": 21,
+      "chars": 21,
+      "startLine": 198,
+      "endLine": 200,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 2,
+        "avg_sentence_words": 2.0
+      }
+    },
+    {
+      "seq": 83,
+      "hash": "b2827e81",
+      "bytes": 472,
+      "chars": 436,
+      "startLine": 200,
+      "endLine": 210,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 52,
+        "avg_sentence_words": 52.0
+      }
+    },
+    {
+      "seq": 84,
+      "hash": "42491dee",
+      "bytes": 22,
+      "chars": 22,
+      "startLine": 210,
+      "endLine": 212,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 3,
+        "avg_sentence_words": 3.0
+      }
+    },
+    {
+      "seq": 85,
+      "hash": "225633c1",
+      "bytes": 505,
+      "chars": 505,
+      "startLine": 212,
+      "endLine": 224,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 49,
+        "avg_sentence_words": 49.0
+      }
+    },
+    {
+      "seq": 86,
+      "hash": "aaf988e2",
+      "bytes": 39,
+      "chars": 39,
+      "startLine": 224,
+      "endLine": 226,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 3,
+        "avg_sentence_words": 3.0
+      }
+    },
+    {
+      "seq": 87,
+      "hash": "75fed721",
+      "bytes": 695,
+      "chars": 615,
+      "startLine": 226,
+      "endLine": 241,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 58,
+        "avg_sentence_words": 58.0
+      }
+    },
+    {
+      "seq": 88,
+      "hash": "352b13a0",
+      "bytes": 276,
+      "chars": 274,
+      "startLine": 241,
+      "endLine": 245,
+      "parent": null,
+      "signals": {
+        "balance": {
+          "curly": 0,
+          "paren": 0,
+          "square": 0
+        },
+        "code_keyword_hits": 0,
+        "words": 39,
+        "avg_sentence_words": 19.5
+      }
+    }
+  ],
+  "skills": [
+    "skill_forged-file-standard_71f049f5"
+  ],
+  "capabilities": [
+    "cap_forged-file-standard_v1"
+  ],
+  "backlinks": {
+    "f0": "f0-71f049f5444e",
+    "manifest_prefix": "manifest:ff-71f049f5-v1:"
+  }
+}

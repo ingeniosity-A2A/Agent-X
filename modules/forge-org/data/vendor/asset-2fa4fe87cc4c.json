@@ -1,0 +1,20 @@
+{
+  "asset_id": "asset-2fa4fe87cc4c",
+  "repo": "ava007/demo",
+  "filename": "live-config.json",
+  "sha256": "2fa4fe87cc4c2353ac830a4b5cd479c9db4a6723ffad79c7d323a7b56e6e69f2",
+  "size_bytes": 85,
+  "format": "tokenizer-config",
+  "classification": "vendor config/tokenizer metadata",
+  "facts": {
+    "architectures": [
+      "Ava007ForCausalLM"
+    ],
+    "model_type": "ava007",
+    "vocab_size": 32000
+  },
+  "quarantined": false,
+  "vendored_at": "2026-09-07T08:28:18.984+00:00",
+  "spec": "forged-file-standard/1.0.0",
+  "note": "Hugging Face is a vendor/input boundary — original artifact stays in the vendor store; vault holds metadata only."
+}
