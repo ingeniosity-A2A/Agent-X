@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 
 /**
@@ -64,7 +64,7 @@ export async function GET() {
   const gsapPkg = join(process.cwd(), "node_modules", "gsap", "package.json");
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    gsapVersion = require(gsapPkg).version ?? gsapVersion;
+    gsapVersion = JSON.parse(readFileSync(gsapPkg, "utf8")).version ?? gsapVersion;
   } catch {
     /* keep "not installed" — honest */
   }
