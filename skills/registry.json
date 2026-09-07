@@ -1,5 +1,5 @@
 {
-  "registry_version": "0.2.0",
+  "registry_version": "0.3.0",
   "invariant": "No skill -> no capability. No verified firmware -> no capability authority.",
   "authority_model": {
     "firmware": "Cybernetic-Ava007",
@@ -19,12 +19,19 @@
     },
     {
       "skill_id": "agent-browser",
-      "version": "0.1.0",
-      "provides": ["browser.agent"],
+      "version": "0.2.0",
+      "provides": ["browser.agent", "ui.authority.all-systems"],
       "firmware_ref": "Cybernetic-Ava007:skills/agent-browser/SKILL.md",
       "adapter_path": "skills/agent-browser",
       "authority": "firmware",
       "execution_surface": "Agent-X",
+      "ui_authority": {
+        "substrate": "a2a-exoskeleton",
+        "manifest": "exoskeleton/firmware/manifests/agent-browser.json",
+        "mount_proof": "scripts/mount_agent_browser.py (sha256-verified, fails closed)",
+        "controls": "all systems UI",
+        "directive": "owner directive 2026-09-07"
+      },
       "status": "present"
     },
     {

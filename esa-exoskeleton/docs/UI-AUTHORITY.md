@@ -5,9 +5,13 @@ Status: binding. Read before touching ANY file in this directory.
 ## Doctrine (owner's rule, non-negotiable)
 
 1. **The exoskeleton has NO UI authority.** UI authority lives with the
-   **Agent Browser** surface and the uploaded shell attachments (v6/UI8 —
-   `ava-shell.css` is the attached authority). Attachments are applied
-   verbatim and never redesigned here.
+   **Agent Browser** — homed in the A2A Exoskeleton substrate
+   (`a2a-exoskeleton`: `exoskeleton/interface/ui_authority.py` +
+   hash-verified firmware mount `exoskeleton/firmware/manifests/agent-browser.json`,
+   owner directive 2026-09-07) — and the uploaded shell attachments
+   (v6/UI8 — `ava-shell.css` is the attached authority). Attachments are
+   applied verbatim and never redesigned here. This directory only
+   *consumes* that authority.
 2. **ESA and Help Assembly are service companies (tenants).** They receive
    the Exoskeleton to streamline their service — that is all they get.
 3. **Brands do not mingle.** Tenant branding exists ONLY inside tenant
