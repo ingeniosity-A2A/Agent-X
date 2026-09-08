@@ -11,6 +11,7 @@
  *   /agent-browser/interface/3d-rendering                → 3D-Rendering pipeline
  *   /agent-browser/interface/3d-rendering/esa            → 3D-Rendering / ESA
  *   /agent-browser/interface/3d-rendering/helpassembly   → 3D-Rendering / HelpAssembly
+ *   /agent-browser/interface/aetheris                    → Aetheris Memory Timeline File Explorer
  */
 export type SectionId =
   | "browser"
@@ -18,7 +19,8 @@ export type SectionId =
   | "bento"
   | "rendering"
   | "esa"
-  | "helpassembly";
+  | "helpassembly"
+  | "aetheris";
 
 export interface SectionMeta {
   id: SectionId;
@@ -64,6 +66,13 @@ export const SECTIONS: Record<SectionId, SectionMeta> = {
     label: "HelpAssembly",
     description: "Help Assembly rendering surface",
     route: "/agent-browser/interface/3d-rendering/helpassembly",
+  },
+  aetheris: {
+    id: "aetheris",
+    label: "Aetheris",
+    description:
+      "3D memory timeline file system — L0-L3 tiers, lock-and-slide governance, Rev.ike zero-copy streaming",
+    route: "/agent-browser/interface/aetheris",
   },
 };
 

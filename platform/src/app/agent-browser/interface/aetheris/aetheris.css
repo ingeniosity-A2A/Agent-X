@@ -1,0 +1,405 @@
+/* ============================================================
+   AETHERIS // 3D MEMORY TIMELINE FILE EXPLORER
+   Bento UI8 plugin surface — Agent Browser (Forge UI8 Canvas)
+
+   Token architecture (Bento-Exoskel-UI Master Skill):
+     Layer 1 base     --exoskel-bg-base   #18181b
+     Layer 1 card     --exoskel-card-dark #242427  (white/10 border)
+     Layer 2 contrast --exoskel-bg-light  #e5e5e0
+                      --exoskel-card-beige #f4f4ee (unlocked focus)
+     Layer 3 glass    --exoskel-glass-tinted rgba(20,20,25,.75)
+                      blur(20px) saturate(160%), border rgba(255,255,255,.12)
+   Cognitive constants:
+     100ms perceptual fusion   (hover / gauges)
+     0.6s unprepared slideout  (back.out(1.1))
+     perspective 1200px · 250vh scroll driver · 32px scoop clipping
+   ============================================================ */
+
+.aetheris {
+  --exoskel-bg-base: #18181b;
+  --exoskel-card-dark: #242427;
+  --exoskel-bg-light: #e5e5e0;
+  --exoskel-card-beige: #f4f4ee;
+  --exoskel-glass-tinted: rgba(20, 20, 25, 0.75);
+  --exoskel-glass-border: rgba(255, 255, 255, 0.12);
+  --exoskel-ink: #f4f4ee;
+  --exoskel-ink-dim: rgba(244, 244, 238, 0.55);
+  --exoskel-stream: #22d3ee; /* pulsating cyan ingestion telemetry */
+  --fusion: 0.1s;
+  --slideout: 0.6s;
+
+  min-height: 100%;
+  background: var(--exoskel-bg-base);
+  color: var(--exoskel-ink);
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  padding: 18px 20px 26px;
+}
+
+.aetheris__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px 18px;
+  border-bottom: 1px solid var(--exoskel-glass-border);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+.aetheris__title {
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+}
+.aetheris__title em {
+  color: var(--exoskel-ink-dim);
+  font-style: normal;
+}
+.aetheris__node {
+  font-size: 11px;
+  color: var(--exoskel-ink-dim);
+  letter-spacing: 0.08em;
+}
+.aetheris__reset {
+  margin-left: auto;
+}
+
+/* Bento grid: timeline (left) + glass inspector (right) */
+.aetheris__grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 380px) 1fr;
+  gap: 18px;
+  align-items: stretch;
+}
+@media (max-width: 900px) {
+  .aetheris__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Dual-layer sidebar: 3D space + scroll driver ---------- */
+.timeline-pane {
+  position: relative;
+  border: 1px solid var(--exoskel-glass-border);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(36, 36, 39, 0.5), rgba(24, 24, 27, 0));
+  min-height: 560px;
+  overflow: hidden;
+}
+.timeline-pane__label {
+  position: relative;
+  z-index: 30;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  color: var(--exoskel-ink-dim);
+  padding: 12px 14px 4px;
+}
+.aetheris-3d {
+  position: absolute;
+  inset: 52px 14px 14px;
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
+  transform-style: preserve-3d;
+  z-index: 25; /* pills float above the scroll-driver overlay */
+  pointer-events: none; /* card bodies stay scroll-through (native physics) */
+}
+.memory-card {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 8px;
+  min-height: 128px;
+  background: var(--exoskel-card-dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 14px;
+  will-change: transform, opacity;
+  transition: background var(--fusion) ease, color var(--fusion) ease,
+    border-color var(--fusion) ease, box-shadow var(--fusion) ease;
+  clip-path: polygon(0 0, calc(100% - 32px) 0, 100% 32px, 100% 100%, 0 100%); /* scoop corner */
+}
+.memory-card:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35);
+}
+.memory-card.is-hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35);
+}
+.memory-card__tier {
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  color: var(--exoskel-ink-dim);
+}
+.memory-card__file {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 4px 0 2px;
+  word-break: break-all;
+}
+.memory-card__name {
+  font-size: 12px;
+  color: var(--exoskel-ink);
+  opacity: 0.9;
+}
+.memory-card__desc {
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: var(--exoskel-ink-dim);
+  margin: 6px 0 8px;
+}
+.memory-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: var(--exoskel-ink-dim);
+}
+.memory-card.is-unlocked {
+  background: var(--exoskel-card-beige);
+  color: #18181b;
+  border-color: rgba(0, 0, 0, 0.25);
+}
+.memory-card.is-unlocked .memory-card__tier,
+.memory-card.is-unlocked .memory-card__desc,
+.memory-card.is-unlocked .memory-card__meta {
+  color: rgba(24, 24, 27, 0.6);
+}
+.memory-card.is-streaming {
+  border-color: var(--exoskel-stream);
+}
+
+/* tactile pill micro-controls — the only pointer-interactive card parts;
+   they float above the scroll-driver (native scroll stays uninterrupted) */
+.pill {
+  pointer-events: auto;
+  border: 1px solid var(--exoskel-glass-border);
+  background: rgba(24, 24, 27, 0.6);
+  color: var(--exoskel-ink);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: transform var(--fusion) ease, background var(--fusion) ease,
+    color var(--fusion) ease, border-color var(--fusion) ease;
+}
+.pill:hover {
+  transform: scale(1.04);
+}
+.pill:active {
+  transform: scale(0.97);
+}
+.pill--locked {
+  border-color: rgba(244, 244, 238, 0.35);
+}
+.memory-card.is-unlocked .pill {
+  background: #18181b;
+  color: var(--exoskel-card-beige);
+  border-color: #18181b;
+}
+.pill--primary {
+  background: var(--exoskel-card-beige);
+  color: #18181b;
+  border-color: var(--exoskel-card-beige);
+  font-weight: 700;
+}
+.pill:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* scroll-driver overlay — native physics (inertia, rubber-banding) */
+.scroll-driver {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 20;
+  scrollbar-width: none;
+}
+.scroll-driver::-webkit-scrollbar {
+  display: none;
+}
+.scroll-driver__spacer {
+  height: 250vh;
+}
+
+/* ---------- Inspector pane (glass) ---------- */
+.inspector-pane {
+  border: 1px solid var(--exoskel-glass-border);
+  border-radius: 12px;
+  background: var(--exoskel-glass-tinted);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 560px;
+}
+.inspector-pane__title {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--exoskel-ink-dim);
+}
+.ctx-state {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ctx-chip {
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--exoskel-glass-border);
+  border-radius: 999px;
+  padding: 3px 10px;
+  color: var(--exoskel-ink-dim);
+}
+.ctx-chip.is-active {
+  color: var(--exoskel-ink);
+  border-color: rgba(244, 244, 238, 0.4);
+}
+.inspector-pane h3 {
+  font-size: 16px;
+  margin: 2px 0 6px;
+}
+.inspector-pane .lede {
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--exoskel-ink-dim);
+}
+.schema-list {
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--exoskel-ink-dim);
+}
+.schema-list b {
+  color: var(--exoskel-ink);
+  font-weight: 600;
+}
+
+/* symbol graph */
+.symbol-wrap {
+  border: 1px solid var(--exoskel-glass-border);
+  border-radius: 10px;
+  background: rgba(24, 24, 27, 0.45);
+  padding: 8px;
+}
+.symbol-wrap svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.symbol-node {
+  cursor: pointer;
+}
+.symbol-node:hover circle {
+  stroke: var(--exoskel-stream);
+}
+.mermaid-src {
+  font-size: 10px;
+  color: var(--exoskel-ink-dim);
+  white-space: pre-wrap;
+  max-height: 130px;
+  overflow: auto;
+  border-top: 1px dashed var(--exoskel-glass-border);
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+/* payload drill-down */
+.payload {
+  font-size: 10.5px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: rgba(12, 12, 14, 0.7);
+  border: 1px solid var(--exoskel-glass-border);
+  border-radius: 10px;
+  padding: 10px;
+  max-height: 220px;
+  overflow: auto;
+  color: rgba(244, 244, 238, 0.85);
+}
+
+/* telemetry */
+.telemetry {
+  border-top: 1px solid var(--exoskel-glass-border);
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.telemetry__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.telemetry__gauge {
+  flex: 1;
+  min-width: 180px;
+}
+.gauge-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.gauge-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(34, 211, 238, 0.5), var(--exoskel-stream));
+}
+.telemetry__stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 10.5px;
+  color: var(--exoskel-ink-dim);
+}
+.telemetry__stats b {
+  color: var(--exoskel-ink);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.report-block {
+  font-size: 10px;
+  line-height: 1.5;
+  white-space: pre;
+  overflow: auto;
+  background: rgba(12, 12, 14, 0.7);
+  border: 1px solid rgba(34, 211, 238, 0.35);
+  border-radius: 10px;
+  padding: 10px;
+  max-height: 200px;
+}
+.log-trace {
+  font-size: 10px;
+  color: var(--exoskel-ink-dim);
+  max-height: 110px;
+  overflow: auto;
+  border-top: 1px dashed var(--exoskel-glass-border);
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* diagnostics drawer */
+.diagnostics {
+  margin-top: 16px;
+  border: 1px solid var(--exoskel-glass-border);
+  border-radius: 10px;
+  background: var(--exoskel-glass-tinted);
+  backdrop-filter: blur(20px) saturate(160%);
+  padding: 10px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  align-items: center;
+  font-size: 10.5px;
+  color: var(--exoskel-ink-dim);
+}
+.diagnostics b {
+  color: var(--exoskel-ink);
+}

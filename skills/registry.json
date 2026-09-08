@@ -1,72 +1,105 @@
 {
-  "registry_version": "0.3.0",
-  "invariant": "No skill -> no capability. No verified firmware -> no capability authority.",
-  "authority_model": {
-    "firmware": "Cybernetic-Ava007",
-    "substrate": "a2a-exoskeleton",
-    "execution": "Agent-X"
+ "registry_version": "0.3.0",
+ "invariant": "No skill -> no capability. No verified firmware -> no capability authority.",
+ "authority_model": {
+  "firmware": "Cybernetic-Ava007",
+  "substrate": "a2a-exoskeleton",
+  "execution": "Agent-X"
+ },
+ "skills": [
+  {
+   "skill_id": "onomondo-ncs",
+   "version": "0.1.0",
+   "provides": [
+    "cellular.softsim.cli"
+   ],
+   "firmware_ref": "Cybernetic-Ava007:skills/onomondo-ncs/SKILL.md",
+   "adapter_path": "skills/onomondo-ncs",
+   "authority": "firmware",
+   "execution_surface": "Agent-X",
+   "status": "present"
   },
-  "skills": [
-    {
-      "skill_id": "onomondo-ncs",
-      "version": "0.1.0",
-      "provides": ["cellular.softsim.cli"],
-      "firmware_ref": "Cybernetic-Ava007:skills/onomondo-ncs/SKILL.md",
-      "adapter_path": "skills/onomondo-ncs",
-      "authority": "firmware",
-      "execution_surface": "Agent-X",
-      "status": "present"
-    },
-    {
-      "skill_id": "agent-browser",
-      "version": "0.2.0",
-      "provides": ["browser.agent", "ui.authority.all-systems"],
-      "firmware_ref": "Cybernetic-Ava007:skills/agent-browser/SKILL.md",
-      "adapter_path": "skills/agent-browser",
-      "authority": "firmware",
-      "execution_surface": "Agent-X",
-      "ui_authority": {
-        "substrate": "a2a-exoskeleton",
-        "manifest": "exoskeleton/firmware/manifests/agent-browser.json",
-        "mount_proof": "scripts/mount_agent_browser.py (sha256-verified, fails closed)",
-        "controls": "all systems UI",
-        "directive": "owner directive 2026-09-07"
-      },
-      "status": "present"
-    },
-    {
-      "skill_id": "headless-reflex-arc",
-      "version": "0.1.0",
-      "provides": ["shell.gated.local"],
-      "firmware_ref": null,
-      "adapter_path": "skills/headless-reflex-arc",
-      "authority": "execution",
-      "execution_surface": "Agent-X",
-      "status": "scaffold"
-    },
-    {
-      "skill_id": "forge-org",
-      "version": "1.0.0",
-      "provides": ["vault.forged-file-standard", "vault.f0-f3", "vault.rocksdb.skills", "vault.duckdb.intelligence", "vault.hf.vendor.boundary"],
-      "firmware_ref": null,
-      "adapter_path": "skills/forge-org",
-      "authority": "execution",
-      "execution_surface": "Agent Browser (operating environment) + Agent-X platform API",
-      "spec": "skills/forge-org/FORGED-FILE-STANDARD.md (canonical)",
-      "housing": "modules/forge-org/data",
-      "engine": "scripts/forged_vault.py",
-      "tier": 1,
-      "status": "present"
-    },
-    {
-      "skill_id": "ava007-ui-kit",
-      "version": "0.1.0",
-      "provides": ["ui.kit.ava007"],
-      "firmware_ref": "Cybernetic-Ava007:skills/ava007-ui-kit/SKILL.md",
-      "adapter_path": "skills/ava007-ui-kit",
-      "authority": "firmware",
-      "execution_surface": "Agent-X",
-      "status": "present"
-    }
-  ]
+  {
+   "skill_id": "agent-browser",
+   "version": "0.2.0",
+   "provides": [
+    "browser.agent",
+    "ui.authority.all-systems"
+   ],
+   "firmware_ref": "Cybernetic-Ava007:skills/agent-browser/SKILL.md",
+   "adapter_path": "skills/agent-browser",
+   "authority": "firmware",
+   "execution_surface": "Agent-X",
+   "ui_authority": {
+    "substrate": "a2a-exoskeleton",
+    "manifest": "exoskeleton/firmware/manifests/agent-browser.json",
+    "mount_proof": "scripts/mount_agent_browser.py (sha256-verified, fails closed)",
+    "controls": "all systems UI",
+    "directive": "owner directive 2026-09-07"
+   },
+   "status": "present"
+  },
+  {
+   "skill_id": "headless-reflex-arc",
+   "version": "0.1.0",
+   "provides": [
+    "shell.gated.local"
+   ],
+   "firmware_ref": null,
+   "adapter_path": "skills/headless-reflex-arc",
+   "authority": "execution",
+   "execution_surface": "Agent-X",
+   "status": "scaffold"
+  },
+  {
+   "skill_id": "forge-org",
+   "version": "1.0.0",
+   "provides": [
+    "vault.forged-file-standard",
+    "vault.f0-f3",
+    "vault.rocksdb.skills",
+    "vault.duckdb.intelligence",
+    "vault.hf.vendor.boundary"
+   ],
+   "firmware_ref": null,
+   "adapter_path": "skills/forge-org",
+   "authority": "execution",
+   "execution_surface": "Agent Browser (operating environment) + Agent-X platform API",
+   "spec": "skills/forge-org/FORGED-FILE-STANDARD.md (canonical)",
+   "housing": "modules/forge-org/data",
+   "engine": "scripts/forged_vault.py",
+   "tier": 1,
+   "status": "present"
+  },
+  {
+   "skill_id": "ava007-ui-kit",
+   "version": "0.1.0",
+   "provides": [
+    "ui.kit.ava007"
+   ],
+   "firmware_ref": "Cybernetic-Ava007:skills/ava007-ui-kit/SKILL.md",
+   "adapter_path": "skills/ava007-ui-kit",
+   "authority": "firmware",
+   "execution_surface": "Agent-X",
+   "status": "present"
+  },
+  {
+   "skill_id": "aetheris-memory-fs",
+   "version": "1.0.0",
+   "provides": [
+    "fs.memory-tdai",
+    "ingest.rev-ike.zero-copy",
+    "context.tdai-offloading",
+    "ui.bento-ui8.aetheris"
+   ],
+   "firmware_ref": null,
+   "adapter_path": "skills/aetheris",
+   "authority": "execution",
+   "execution_surface": "Agent Browser (operating environment) + Agent-X platform API",
+   "housing": "modules/aetheris/data",
+   "engine": "scripts/memory_tdai.py",
+   "tier": 1,
+   "status": "present"
+  }
+ ]
 }
