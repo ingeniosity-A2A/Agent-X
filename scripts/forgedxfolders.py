@@ -943,18 +943,15 @@ def detect_artifact(buf: bytes, filename: str) -> tuple[str, str, dict, bool]:
     return "unknown", "unrecognized artifact", {}, True
 
 
-def cmd_vendor(args, fx: ForgedXFolders) -> None:
-    src = Path(args.path)
-    if not src.is_file():
-        die(f"vendor path not found: {args.path}")
-    buf = src.read_bytes()
+def _vendor_store(fx: ForgedXFolders, buf: bytes, repo: str, filename: str) -> dict:
+    """Artifact detection + vendor-store record — shared by `vendor` and `vendor-hf`."""
     digest = sha256(buf)
     asset_id = f"asset-{digest[:12]}"
-    fmt, classification, facts, quarantined = detect_artifact(buf, args.filename or src.name)
+    fmt, classification, facts, quarantined = detect_artifact(buf, filename)
     record = {
         "asset_id": asset_id,
-        "repo": args.repo or "(direct upload)",
-        "filename": args.filename or src.name,
+        "repo": repo,
+        "filename": filename,
         "sha256": digest,
         "size_bytes": len(buf),
         "format": fmt,
@@ -981,7 +978,66 @@ def cmd_vendor(args, fx: ForgedXFolders) -> None:
             con.close()
         except Exception as e:
             record["duckdb_warning"] = str(e)[:200]
-    out({"ok": True, "deduped": existing, **record})
+    return {"ok": True, "deduped": existing, **record}
+
+
+def cmd_vendor(args, fx: ForgedXFolders) -> None:
+    src = Path(args.path)
+    if not src.is_file():
+        die(f"vendor path not found: {args.path}")
+    out(_vendor_store(fx, src.read_bytes(), args.repo or "(direct upload)", args.filename or src.name))
+
+
+def cmd_vendor_hf(args, fx: ForgedXFolders) -> None:
+    """Hugging Face → vendor boundary. Pin revision → commit hash, fail-safe on
+    size, classify, record metadata only (bytes stay in the vendor store).
+    Standard §6: HF is an input boundary — nothing here enters F0→F3."""
+    try:
+        from huggingface_hub import HfApi, hf_hub_download
+    except ImportError:
+        die("huggingface_hub not installed — restore with: pip install -r requirements.txt (see refs/huggingface_hub/PROVENANCE.md)", 3)
+
+    api = HfApi()
+    # 1. resolve the revision to a pinned commit hash (no floating refs)
+    try:
+        info = api.repo_info(args.repo, repo_type=args.repo_type, revision=args.revision, files_metadata=True)
+    except Exception as e:
+        die(f"repo not reachable: {args.repo} (revision={args.revision}): {e}", 4)
+    commit = info.sha
+    if not commit:
+        die(f"could not resolve {args.repo}@{args.revision} to a commit hash", 4)
+    pin = f"{args.repo}@{commit[:12]}"
+
+    # 2. fail-safe size check BEFORE downloading (siblings carry file sizes)
+    size = next((s.size for s in (info.siblings or []) if s.rfilename == args.filename), None)
+    if size is None:
+        die(f"file not in repo listing: {args.filename} ({pin})", 4)
+    if size > args.max_bytes:
+        die(f"refusing download: {args.filename} is {size:,} bytes > --max-bytes {args.max_bytes:,} (fail-safe, Standard §6)", 5)
+
+    # 3. best-effort Hub security scan verdict (RepoFile.security / BlobSecurityInfo)
+    security = None
+    if not args.no_security:
+        try:
+            for entry in api.list_repo_tree(args.repo, repo_type=args.repo_type, revision=commit, expand=True, recursive=False):
+                if getattr(entry, "path", "") == args.filename and getattr(entry, "security", None):
+                    security = {"file_status": getattr(entry.security, "fileStatus", None), "scanner": getattr(entry.security, "scanner", None)}
+                    break
+        except Exception:
+            security = None  # best-effort only — never blocks vendoring
+
+    if args.dry_run:
+        out({"ok": True, "dry_run": True, "repo_pin": pin, "commit": commit, "filename": args.filename, "size_bytes": size, "would_classify_route": "vendor-store → artifact detection", "security": security})
+        return
+
+    path = hf_hub_download(repo_id=args.repo, repo_type=args.repo_type, filename=args.filename, revision=commit)
+    buf = Path(path).read_bytes()
+    if len(buf) != size:  # listing-size vs downloaded-size agreement gate
+        die(f"post-download size mismatch: got {len(buf):,}, listing said {size:,}", 5)
+    result = _vendor_store(fx, buf, pin, args.filename)
+    result["commit"] = commit
+    result["security"] = security
+    out(result)
 
 
 def main() -> None:
@@ -1016,6 +1072,15 @@ def main() -> None:
     p.add_argument("--repo", default=None)
     p.add_argument("--filename", default=None)
 
+    p = sub.add_parser("vendor-hf")
+    p.add_argument("--repo", required=True)
+    p.add_argument("--filename", required=True)
+    p.add_argument("--repo-type", default="model", choices=["model", "dataset", "space"])
+    p.add_argument("--revision", default="main")
+    p.add_argument("--max-bytes", type=int, default=209_715_200, help="fail-safe cap before download (default 200 MiB)")
+    p.add_argument("--dry-run", action="store_true", help="resolve pin + size + security verdict; download nothing")
+    p.add_argument("--no-security", action="store_true", help="skip best-effort Hub security-scan lookup")
+
     args = ap.parse_args()
 
     if getattr(args, "db", None):
@@ -1044,6 +1109,8 @@ def main() -> None:
             cmd_entry(args, fx)
         elif args.cmd == "vendor":
             cmd_vendor(args, fx)
+        elif args.cmd == "vendor-hf":
+            cmd_vendor_hf(args, fx)
         elif args.cmd == "stats":
             cmd_stats(args, fx)
     finally:

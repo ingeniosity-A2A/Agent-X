@@ -10,6 +10,7 @@ Pages:
 | **[[Naming Register]]** | ONE canonical name per concept; every retired alias with file-level evidence and disposition |
 | **[[Mercury 2 Wiring]]** | The Cortex-tier backend: env contract, verification evidence, model access policy |
 | **[[Aetheris Trial]]** | Validation record for the kept trial system — candidate to become the next FORGED |
+| **[[HuggingFace Vendor]]** | HF as vendor/input boundary (outside F0→F3): pin-then-download, size gates, quarantine, vendored source evidence |
 
 ## Ground rules
 
@@ -40,6 +41,10 @@ Pages:
    and TypeScript: `MERCURY2_API_KEY` / `MERCURY2_ENDPOINT` / `MERCURY2_MODEL`.
 8. **Secrets never enter git.** `.env` / `.env.local` are gitignored; the tracked
    `.env.example` files are the durable contract.
+9. **Vendor boundaries stay outside the lifecycle.** Hugging Face (and every
+   other vendor) is an input boundary: pin-then-download, classify, record
+   metadata only — nothing enters F0→F3 without an explicit ingest (Standard
+   §6). Evidence lives in [[HuggingFace Vendor]].
 
 ## Mirroring to GitHub
 

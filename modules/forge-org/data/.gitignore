@@ -1,4 +1,4 @@
 rocksdb/
-vault.duckdb
-vault.duckdb.wal
+forgedxfolders.duckdb
+forgedxfolders.duckdb.wal
 raw/*/original.bin

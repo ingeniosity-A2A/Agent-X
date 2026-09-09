@@ -1,1 +1,11 @@
-# Zero dependencies — Python stdlib only
+# Dependency contract — restore after any environment reset with:
+#   pip install -r requirements.txt
+#
+# Engine core (scripts/forgedxfolders.py — ForgedxFolders F0→F3 lifecycle):
+rocksdict>=0.3.25          # RocksDB control plane (namespaced CFs: control/idx/manifest/meta)
+duckdb>=1.0                # intelligence layer (forged_files, vendor_assets tables)
+
+# Vendor boundary (Hugging Face — input boundary OUTSIDE F0→F3, Standard §6):
+#   used by `vendor-hf` (HF hub download → artifact detection → vendor store).
+#   Core engine stays stdlib-only; HF import degrades gracefully if absent.
+huggingface_hub>=1.9,<2    # pinned minor: API + RepoFile.security semantics (see refs/huggingface_hub/PROVENANCE.md)
