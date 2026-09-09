@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LockGlyph, TreeTone } from "./widgets";
 
 /**
- * VaultTree — the reference explorer's `sidebar-tree` custom element ported
+ * ForgedxFoldersTree — the reference explorer's `sidebar-tree` custom element ported
  * to React with its accessibility model intact: role=tree/treeitem/group,
  * aria-level / aria-setsize / aria-posinset, aria-expanded + aria-owns,
  * aria-current="page", roving tabindex, Arrow/Home/End/* keyboard nav,
@@ -12,7 +12,7 @@ import { LockGlyph, TreeTone } from "./widgets";
  * match / related / filtered filter states (min 3 chars).
  *
  * Per FORGED-FILE-STANDARD §7 the geometry and interaction model stay intact;
- * entries are the real vault folders (F0..F3, RocksDB, DuckDB, vendor,
+ * entries are the real ForgedxFolders folders (F0..F3, RocksDB, DuckDB, vendor,
  * quarantine, curation) with dynamic children from the engine.
  */
 
@@ -41,7 +41,7 @@ interface FlatItem {
   element: HTMLElement;
 }
 
-export function VaultTree({
+export function ForgedxFoldersTree({
   groups,
   activeId,
   onSelect,
@@ -433,7 +433,7 @@ export function VaultTree({
               <path d="M12 3v18M3 12h18" strokeLinecap="round" />
             </svg>
             <span>
-              AVA007 Vault
+              ForgedxFolders
               <small>Forged File Standard 1.0.0</small>
             </span>
           </h1>
@@ -465,8 +465,8 @@ export function VaultTree({
             </div>
           </form>
         </header>
-        <nav aria-label="AVA007 Forged File Vault">
-          <div className="forge-tree" ref={rootRef} role="tree" aria-label="AVA007 Forged File Vault" onKeyDown={onKeyDown}>
+        <nav aria-label="ForgedxFolders">
+          <div className="forge-tree" ref={rootRef} role="tree" aria-label="ForgedxFolders" onKeyDown={onKeyDown}>
             <ul role="tree">
               {itemsIndex.map((group, gi) => (
                 <li role="none" key={gi}>

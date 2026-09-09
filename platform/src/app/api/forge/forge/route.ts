@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { errJson, forgeEngine, repoRoot } from "@/lib/forge/engine";
 
 /**
- * POST /api/forge/forge — Normalize → Capability Harness → F2 Forged File →
+ * POST /api/forge/forge — Normalize → Exoskeleton Application → F2 Forged File →
  * housing (RocksDB skills/capabilities + DuckDB intelligence) → F3 append.
  * Immutability: forging the same source again yields version v+1, never a
  * silent modification (the Standard's traceability contract).

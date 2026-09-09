@@ -24,7 +24,7 @@ from .rf_physical import RFPhysicalLayer, CC1101Config, SX1262Config
 from .task_memory import GriptapeTaskMemory, MemoryEntry
 from .lora_mesh import LoRaMeshProtocol, AODVRouter, ChaCha20, ReedSolomonFEC, MeshNode, MeshPacket, Transport
 from .flipper import FlipperEncoder, FlipperCommand, FlipperSignal, FlipperProtocol
-from .zero_latency_harness import ZeroLatencyHarness
+from .zero_latency_router import ZeroLatencyRouter
 from .termux_bridge import TermuxHardwareBridge, TermuxSMS, TermuxLocation, TermuxSensors, TermuxNotification, TermuxTTS
 from .beeper_bridge import MatrixClient, BeeperQuantumBridge
 
@@ -55,7 +55,7 @@ __all__ = [
     "FlipperCommand",
     "FlipperSignal",
     "FlipperProtocol",
-    "ZeroLatencyHarness",
+    "ZeroLatencyRouter",
     "TermuxHardwareBridge",
     "TermuxSMS",
     "TermuxLocation",

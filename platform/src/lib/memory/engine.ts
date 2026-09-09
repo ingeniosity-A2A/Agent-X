@@ -7,7 +7,7 @@ const exec = promisify(execFile);
 /**
  * memory-tdai engine bridge — /api/memory/* routes drive the Aetheris
  * file-system engine (scripts/memory_tdai.py) the same way /api/forge/*
- * drives forged_vault.py: JSON on stdout, NDJSON progress lines when
+ * drives forgedxfolders.py: JSON on stdout, NDJSON progress lines when
  * --progress-every is set (streamed to the explorer via SSE).
  *
  * The engine implements the Sovereign Ingestion protocol: zero-copy

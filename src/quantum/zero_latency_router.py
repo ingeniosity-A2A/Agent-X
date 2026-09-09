@@ -1,7 +1,7 @@
-"""Zero Latency Quantum Harness.
+"""Zero Latency Quantum Router.
 
-Agent-X execution harness. Cognitive interpretation remains upstream in
-Cybernetic-Ava007; this harness records only opaque intent/capability
+Agent-X execution router. Cognitive interpretation remains upstream in
+Cybernetic-Ava007; this router records only opaque intent/capability
 references and execution observations in substrate quanta.
 """
 
@@ -9,7 +9,7 @@ import json
 import time
 from typing import Optional
 
-from src.harness import Harness
+from src.capability_router import CapabilityRouter
 from src.quantum.quantum import InteractionQuantum, QuantumBuilder, TweenType
 from src.quantum.crypto import QuantumSigner
 from src.quantum.dag import TashiDAG
@@ -21,20 +21,20 @@ from src.quantum.flipper import FlipperEncoder
 from src.quantum.lora_mesh import LoRaMeshProtocol
 
 
-class ZeroLatencyHarness:
-    """Layered Agent-X execution harness with substrate lineage."""
+class ZeroLatencyRouter:
+    """Layered Agent-X execution router with substrate lineage."""
 
     def __init__(
         self,
         mercury_engine=None,
-        storage_dir: str = ".openclaw/tmp/quantum_harness",
-        source_did: str = "did:helpassembly:harness:001",
+        storage_dir: str = ".openclaw/tmp/quantum_router",
+        source_did: str = "did:helpassembly:router:001",
         signing_key: Optional[bytes] = None,
         enable_flipper: bool = False,
         enable_lora: bool = False,
         enable_vfile: bool = False,
     ):
-        self.base_harness = Harness(mercury_engine=mercury_engine)
+        self.base_router = CapabilityRouter(mercury_engine=mercury_engine)
         self.source_did = source_did
         self.signer = QuantumSigner(private_key=signing_key, did=source_did)
         self.dag = TashiDAG(storage_path=f"{storage_dir}/dag.jsonl")
@@ -62,7 +62,7 @@ class ZeroLatencyHarness:
         self.stats["total"] += 1
         start = time.time()
 
-        cached = self.base_harness.reflex.match(query)
+        cached = self.base_router.reflex.match(query)
         if cached:
             latency = (time.time() - start) * 1000
             q = self._create_quantum(query, "reflex_hit", 1.0, cached["result"], latency, "reflex", ctx)
@@ -75,14 +75,14 @@ class ZeroLatencyHarness:
         if pr:
             pattern_name, score = pr
             schema = generate_from_pattern(pattern_name, ctx)
-            self.base_harness.reflex.learn(query, schema)
+            self.base_router.reflex.learn(query, schema)
             latency = (time.time() - start) * 1000
             q = self._create_quantum(query, pattern_name, score, schema, latency, "quantum", ctx)
             self.stats["quantum"] += 1
             self._record_latency(latency)
             return self._build_response(q, schema, "quantum", latency, 0)
 
-        skill = self.base_harness.arena.find_matching_skill(query)
+        skill = self.base_router.arena.find_matching_skill(query)
         if skill:
             latency = (time.time() - start) * 1000
             response = {"skill": skill}
@@ -118,8 +118,8 @@ class ZeroLatencyHarness:
                     self._record_latency(latency)
                     return self._build_response(q, response, "lineage", latency, 0)
 
-        if self.base_harness.mercury:
-            result = self.base_harness.mercury.generate_action_schema(query, ctx.get("tools", []), ctx)
+        if self.base_router.mercury:
+            result = self.base_router.mercury.generate_action_schema(query, ctx.get("tools", []), ctx)
             try:
                 response = json.loads(result.text)
             except (json.JSONDecodeError, AttributeError):
@@ -141,7 +141,7 @@ class ZeroLatencyHarness:
         parent_ids = [parent_id] if parent_id else ([self._recent_quanta[-1].quantum_id] if self._recent_quanta else [])
         q = (QuantumBuilder()
              .source(self.source_did)
-             .intent(intent, confidence=confidence, role="harness")
+             .intent(intent, confidence=confidence, role="router")
              .tween(TweenType.EASE, duration_ms=min(int(latency_ms), 500))
              .payload({
                  "query": query, "response": response, "tier": tier,
@@ -231,8 +231,8 @@ class ZeroLatencyHarness:
 
 
 def run_quantum_benchmark():
-    """Run the Zero Latency Quantum Harness benchmark."""
-    harness = ZeroLatencyHarness(enable_flipper=True, enable_lora=True, enable_vfile=True)
+    """Run the Zero Latency Quantum Router benchmark."""
+    router = ZeroLatencyRouter(enable_flipper=True, enable_lora=True, enable_vfile=True)
     tests = [
         ("Send reminder for tomorrow", "quantum"),
         ("What's the price for IKEA MALM?", "quantum"),
@@ -249,11 +249,11 @@ def run_quantum_benchmark():
         ("Analyze quarterly revenue", "fallback"),
     ]
     for query, expected_tier in tests:
-        result = harness.process(query, {"customer": "Test", "city": "Atlanta"})
+        result = router.process(query, {"customer": "Test", "city": "Atlanta"})
         tier = result["tier"]
         mark = "V" if expected_tier in tier or tier in ("reflex", "quantum", "skill", "memory", "lineage") else "X"
         print(f"{mark} [{tier:>12}] {result['latency_ms']:6.1f}ms | Q:{result['quantum']['id'][:16]}... | {query[:40]}")
-    print(harness.get_stats())
+    print(router.get_stats())
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 """
-quantum_fetch — Model Acquisition via Zero Latency Harness
+quantum_fetch — Model Acquisition via Zero Latency Router
 
 Wraps HuggingFace downloads inside Interaction Quanta.
 Every model pull gets:
@@ -30,7 +30,7 @@ from src.quantum.crypto import QuantumSigner
 from src.quantum.dag import TashiDAG
 from src.quantum.memory_lake import AtomicMemoryLake
 from src.quantum.task_memory import GriptapeTaskMemory
-from src.quantum.zero_latency_harness import ZeroLatencyHarness
+from src.quantum.zero_latency_router import ZeroLatencyRouter
 
 
 class QuantumFetcher:

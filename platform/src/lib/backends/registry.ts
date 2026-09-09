@@ -29,7 +29,7 @@ export const ENV_VAR_DOCS: Record<string, { required: boolean; note: string }> =
     },
     MERCURY2_MODEL: {
       required: false,
-      note: "Override the default model (mercury-coder-small)",
+      note: "Override the default model (mercury-2 — verified for post-Feb-2026 accounts)",
     },
   };
 
@@ -68,10 +68,11 @@ export async function probeBackend(
       return { ok: false, backend: id, error: "MERCURY2_API_KEY not set" };
     }
     try {
-      // Minimal block-generation probe — 16 tokens, one complete prompt.
+      // Minimal block-generation probe — mercury-2 reasons before answering,
+      // so a tiny cap would return null content. 256 gives it headroom.
       const { usage } = await m2.generate(
         [{ role: "user", content: "Reply with the single word: ready." }],
-        16
+        256
       );
       return { ok: true, backend: id, usage };
     } catch (err) {

@@ -14,7 +14,7 @@
     "blank_collapse": 0,
     "nfc_changed": 0
   },
-  "harness": {
+  "exoskeleton": {
     "checks": {
       "deterministic_rechunk": true,
       "hashes_stable": 89,

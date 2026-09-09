@@ -98,12 +98,12 @@ fi
 EOF
 chmod +x "$BASE/run_reasoning.sh"
 
-# --- Quantum Harness (Zero Latency) ---
+# --- Quantum Router (Zero Latency) ---
 cat > "$BASE/run_quantum.sh" << 'EOF'
 #!/bin/bash
 cd "$(dirname "$0")"
-echo "⚛ Quantum Harness — Zero Latency"
-python3 -m src.quantum.zero_latency_harness
+echo "⚛ Quantum Router — Zero Latency"
+python3 -m src.quantum.zero_latency_router
 EOF
 chmod +x "$BASE/run_quantum.sh"
 
@@ -226,7 +226,7 @@ cat > "$BASE/QUICKREF.md" << 'QR'
 | Script | What it does |
 |--------|-------------|
 | `./run_reasoning.sh` | Start Destiny-4B via ollama |
-| `./run_quantum.sh` | Zero Latency Quantum Harness |
+| `./run_quantum.sh` | Zero Latency Quantum Router |
 | `./run_sms.sh` | SMS bridge (Termux API) |
 | `./run_api.sh` | API server (port 7474) |
 | `./run_appless.sh` | Appless VCF care (port 7476) |
@@ -240,7 +240,7 @@ cat > "$BASE/QUICKREF.md" << 'QR'
 ```
 S26 Ultra (Orchestrator)
 ├── Reasoning: Destiny-4B (ollama/llama.cpp)
-├── Quantum: Zero Latency Harness (6-layer)
+├── Quantum: Zero Latency Router (6-layer)
 ├── Memory: TashiDAG + TaskMemory + MemoryLake
 ├── SMS: Termux API bridge
 ├── Care: Appless VCF server
@@ -261,7 +261,7 @@ S26 Ultra (Orchestrator)
 | Feature | Root Required? | Alternative |
 |---------|---------------|-------------|
 | Reasoning Core | No | ollama/llama.cpp |
-| Quantum Harness | No | Python in Termux |
+| Quantum Router | No | Python in Termux |
 | SMS Bridge | No | Termux API |
 | UWB Ranging | No | Android UWB API |
 | Raw RF TX/RX | **Yes** | Flipper Zero / LoRa |
@@ -277,7 +277,7 @@ step "Bootstrap Complete!"
 echo ""
 echo "Run scripts:"
 echo "  ./run_reasoning.sh   # AI reasoning"
-echo "  ./run_quantum.sh     # Quantum harness"
+echo "  ./run_quantum.sh     # Quantum router"
 echo "  ./run_sms.sh         # SMS bridge"
 echo "  ./run_api.sh         # API server"
 echo "  ./run_uwb.sh         # UWB check"

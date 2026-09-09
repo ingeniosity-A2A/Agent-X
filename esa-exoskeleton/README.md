@@ -15,7 +15,7 @@
 - ✅ **Web console** - left sidebar styled as a scene/layers panel: Console ⇄ Library tabs, filtered log feed, and a search bar (hidden on mobile)
 - ✅ **React module** - Ingestion Interface is React (esm.sh CDN, no build step); Arrow.js sandboxes the rest of the Exoskeleton
 - ✅ **DuckDB WASM** - Help Assembly catalog streaming (furniture services + hardware, zero local storage)
-- ✅ **Separate ESA Exoskeleton** - `/esa-console` is a sandboxed second console with ESA hotel-maintenance content (HD Supply PTAC catalog, Seasons PTAC product cards, service broadcasting) — no architecture mixing
+- ✅ **Separate ESA service cards console** - `/esa-console` is a sandboxed second console with ESA hotel-maintenance content (HD Supply PTAC catalog, Seasons PTAC product cards, service broadcasting) — no architecture mixing
 - ✅ **Lens → render flow** - upload/capture a photo → visual catalog picker → tap the match → renders the product card with info + quote (Help Assembly) or 3D preview + inventory + workorder actions (ESA)
 - ✅ **GLB 3D rendering** - `<model-viewer>` (CDN, no build step) renders a GLB per SKU in the product cards and parts-card model zones; catalog items carry a `model` URL (demo placeholders from the Khronos glTF samples — swap for real product GLBs) with CSS visual fallback
 - ✅ **Identity** - Agent X = logic & reasoning; Ava007 = voice; console scope is Help Assembly Services only
@@ -91,8 +91,8 @@ esa-exoskeleton/
 │   │   ├── gruvbox-colors.js        # Theme configuration
 │   │   └── duckdb-setup.js          # DuckDB WASM initialization (help_assembly_catalog)
 │   ├── index.html                   # HELP ASSEMBLY EXOSKELETON console (site root)
-│   └── esa-console/                 # SEPARATE sandboxed ESA EXOSKELETON console (/esa-console)
-│       ├── index.html               # ESA EXOSKELETON — hotel maintenance + PTAC content
+│   └── esa-console/                 # SEPARATE sandboxed ESA service-cards console (/esa-console)
+│       ├── index.html               # ESA SERVICE CARDS — hotel maintenance + PTAC content
 │       ├── integration.js           # ESA console wiring (light theme, HD Supply hub)
 │       ├── components/              # PTAC/HD Supply cards (Seasons PTAC, Ptac-B, QA…)
 │       ├── hooks/use-esa-chat.js    # ESA chat hook — HD Supply catalog engine
@@ -144,7 +144,7 @@ Add:
 ## Component Architecture
 
 ```
-ESA EXOSKELETON
+ESA SERVICE CARDS
 │
 ├── ESA Console (left sidebar — scene/layers panel style, hidden on mobile)
 │   ├── Header (✦ icon + title + subtitle)
@@ -230,7 +230,7 @@ window.addEventListener('esa:ready', (e) => {
 
 ## Theme Configuration
 
-The ESA Exoskeleton uses a **Gruvbox color scheme** with dark/light modes:
+The ESA service cards console uses a **Gruvbox color scheme** with dark/light modes:
 
 ```javascript
 import { setTheme, toggleTheme, activeTheme } from './config/gruvbox-colors.js';

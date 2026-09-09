@@ -31,7 +31,7 @@ export default function HomePage() {
             href="/agent-browser/interface/3d-rendering/esa"
             className="block rounded-xl border border-[#7c3aed]/40 bg-[#12121a] px-5 py-4 hover:border-[#7c3aed]"
           >
-            <p className="font-medium">ESA Exoskeleton</p>
+            <p className="font-medium">ESA Service Cards</p>
             <p className="text-xs text-[#777]">
               Select Card · parts · service · green shield ·{" "}
               /agent-browser/interface/3d-rendering/esa

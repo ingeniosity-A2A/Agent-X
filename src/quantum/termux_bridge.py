@@ -313,8 +313,8 @@ class TermuxHardwareBridge:
     produces an Interaction Quantum with full signal metadata.
     """
 
-    def __init__(self, quantum_harness=None):
-        self.harness = quantum_harness
+    def __init__(self, quantum_router=None):
+        self.router = quantum_router
         self.sms = TermuxSMS()
         self.telephony = TermuxTelephony()
         self.location = TermuxLocation()
@@ -327,15 +327,15 @@ class TermuxHardwareBridge:
         self.tts = TermuxTTS()
 
     def poll_sms(self) -> list[dict]:
-        """Poll for new SMS and process through quantum harness."""
+        """Poll for new SMS and process through quantum router."""
         new_msgs = self.sms.get_new()
         results = []
         for msg in new_msgs:
             sender = msg.get("number", "unknown")
             body = msg.get("body", "")
             
-            if self.harness:
-                result = self.harness.process(body, {
+            if self.router:
+                result = self.router.process(body, {
                     "source": "sms",
                     "sender": sender,
                     "transport": "termux",
@@ -395,7 +395,7 @@ class TermuxHardwareBridge:
 # ─── SMS Polling Daemon ─────────────────────────────────────────────
 
 def run_sms_daemon(
-    harness=None,
+    quantum_router=None,
     poll_interval: int = 5,
     auto_reply: bool = True,
 ):
@@ -403,14 +403,14 @@ def run_sms_daemon(
     Background SMS polling daemon.
     
     Continuously polls for new SMS, processes through
-    the quantum harness, and auto-replies.
+    the quantum router, and auto-replies.
     """
-    bridge = TermuxHardwareBridge(quantum_harness=harness)
+    bridge = TermuxHardwareBridge(quantum_router=quantum_router)
     
     print("📱 Termux SMS Daemon")
     print(f"  Poll interval: {poll_interval}s")
     print(f"  Auto-reply: {auto_reply}")
-    print(f"  Harness: {'quantum' if harness else 'none'}")
+    print(f"  Router: {'quantum' if quantum_router else 'none'}")
     print()
 
     while True:

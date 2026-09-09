@@ -49,7 +49,7 @@ The `Agent-X/` folder in this project (docs-pipeline snapshot) is a **reference/
 | Domain | Status | Key Artifacts |
 |--------|--------|---------------|
 | App-less Protocols | ✅ Implemented | vCard generator, `did:helpassembly:*` (8 DIDs), `a2a_send`/`a2a_request` patterns, review request flow |
-| Quantum Atomic & Tashi | ✅ Implemented | `TashiDAG` class, `InteractionQuantum`, `TweenAtom`, GSAP timeline, `rf_physical`, `crypto_routing`, `zero_latency_harness` |
+| Quantum Atomic & Tashi | ✅ Implemented | `TashiDAG` class, `InteractionQuantum`, `TweenAtom`, GSAP timeline, `rf_physical`, `crypto_routing`, `zero_latency_router` |
 | A2A Mesh Routing | ✅ Implemented | `wss://a2a.ava.network/beeper`, delegation chains (`did:ava:parent`), VFile transport |
 | UWB/NFC | ✅ Implemented | `uwb_ranging.py`, dashboard real-time display (±10cm), Channel 9 (7.987 GHz) |
 | eSIM / WebRTC / Captive Portal | 📋 Designed | Specified in architecture PDFs; implementation in Termux SDK repos |

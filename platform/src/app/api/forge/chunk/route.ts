@@ -4,7 +4,8 @@ import { errJson, forgeEngine, repoRoot } from "@/lib/forge/engine";
 /**
  * POST /api/forge/chunk — F1 Chunk (GSAP SplitText stage).
  * body: { f0_id, max_bytes? } → deterministic chunk plan with FNV-1a hashes,
- * line bounds, parent headers + harness verdict (replay-proven rechunk).
+ * line bounds, parent headers + exoskeleton verdict (Exoskeleton replay
+ * verification — replay-proven rechunk).
  */
 export async function POST(req: Request) {
   let root: string;

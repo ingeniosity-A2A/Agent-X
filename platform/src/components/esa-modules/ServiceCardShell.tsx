@@ -3,18 +3,25 @@
 import React from "react";
 
 /* ═══════════════════════════════════════════════════════════
-   ESA HARNESS
-   Outer wrapper for the entire ESA Exoskeleton project.
-   Provides global ESA branding, a gold-accent top bar, and
-   consistent layout shell around all ESA views.
+   ESA SERVICE CARD SHELL
+   Layout chrome around the ESA service views. ESA = Extended Stay America:
+   the brand lives on the service cards (work orders, supply ordering,
+   inventory) — the shell is chrome, so it carries the client label only as
+   the host of those cards.
+   History: ESAHarness → ESAExoskeleton → ServiceCardShell. The decorative
+   "EXOSKELETON APPLIED" pill was REMOVED (that string is the F2 forge
+   verdict pill, not UI chrome) and "HARNESS/Exoskeleton" naming left with it
+   — per owner doctrine, 2026-09-09.
+   Provides the gold-accent top bar and a consistent layout shell around all
+   ESA service views.
    ═══════════════════════════════════════════════════════════ */
 
-export function ESAHarness({ children }: { children: React.ReactNode }) {
+export function ServiceCardShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="esa-harness">
-      {/* Top harness bar — ESA Exoskeleton branding */}
-      <div className="esa-harness-bar">
-        <div className="esa-harness-inner">
+    <div className="service-card-shell">
+      {/* Top bar — hosts the ESA service cards */}
+      <div className="service-card-shell-bar">
+        <div className="service-card-shell-inner">
           <div className="flex items-center gap-2.5">
             {/* ESA logo mark */}
             <div
@@ -46,10 +53,10 @@ export function ESAHarness({ children }: { children: React.ReactNode }) {
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                ESA Exoskeleton
+                ESA Service Cards
               </div>
               <div className="text-[9px] font-mono tracking-widest" style={{ color: "rgba(201,168,76,0.4)" }}>
-                HARNESS ACTIVE
+                EXTENDED STAY AMERICA
               </div>
             </div>
           </div>
@@ -65,7 +72,7 @@ export function ESAHarness({ children }: { children: React.ReactNode }) {
                   borderRadius: "50%",
                   background: "#22c55e",
                   boxShadow: "0 0 6px #22c55e",
-                  animation: "esa-harness-pulse 2s ease-in-out infinite",
+                  animation: "service-card-shell-pulse 2s ease-in-out infinite",
                 }}
               />
               <span className="text-[9px] font-mono font-semibold" style={{ color: "#22c55e" }}>
@@ -76,22 +83,22 @@ export function ESAHarness({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      {/* Harness body — renders all child content */}
-      <div className="esa-harness-body">{children}</div>
+      {/* Shell body — renders all child content */}
+      <div className="service-card-shell-body">{children}</div>
 
       {/* Inline keyframes */}
       <style>{`
-        @keyframes esa-harness-pulse {
+        @keyframes service-card-shell-pulse {
           0%, 100% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.4; transform: scale(1.4); }
         }
-        .esa-harness {
+        .service-card-shell {
           display: flex;
           flex-direction: column;
           min-height: 100vh;
           background: #09090b;
         }
-        .esa-harness-bar {
+        .service-card-shell-bar {
           position: sticky;
           top: 0;
           z-index: 50;
@@ -100,7 +107,7 @@ export function ESAHarness({ children }: { children: React.ReactNode }) {
           backdrop-filter: blur(12px);
           padding: 0.4rem 0;
         }
-        .esa-harness-inner {
+        .service-card-shell-inner {
           max-width: 1400px;
           margin: 0 auto;
           padding: 0 1.25rem;
@@ -108,7 +115,7 @@ export function ESAHarness({ children }: { children: React.ReactNode }) {
           align-items: center;
           justify-content: space-between;
         }
-        .esa-harness-body {
+        .service-card-shell-body {
           flex: 1;
           display: flex;
           flex-direction: column;

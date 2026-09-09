@@ -3,7 +3,7 @@ from src.patterns import match_pattern, generate_from_pattern, list_patterns
 from src.reflex_router import ReflexRouter
 from src.skill_arena import SkillArena
 from src.tier_router import TierRouter
-class Harness:
+class CapabilityRouter:
     def __init__(self, mercury_engine=None):
         self.mercury = mercury_engine; self.reflex = ReflexRouter(); self.arena = SkillArena(); self.router = TierRouter()
         self.stats = {"total":0,"t0":0,"t1":0,"t2":0,"reflex":0,"skill":0,"saved":0,"latency":0}
@@ -60,7 +60,7 @@ class Harness:
         zt = self.stats["t0"]+self.stats["reflex"]+self.stats["skill"]
         return {**self.stats, "zero_token_pct":f"{(zt/t)*100:.1f}%", "avg_ms":f"{self.stats['latency']/t:.1f}", "patterns":len(list_patterns())}
 def run_benchmark():
-    print("Harness Benchmark — Help Assembly Services LLC"); h = Harness()
+    print("Capability Router Benchmark — Help Assembly Services LLC"); h = CapabilityRouter()
     tests = [("Send reminder for tomorrow","tier0"),("What's the price for IKEA MALM?","tier0"),("Book appointment in Marietta","tier0"),("Dispatch tech Marcus","tier0"),("Customer complaint wobbling","tier0"),("Send invoice","tier0"),("Check schedule","tier0"),("What areas do you serve?","tier0"),("Request review","tier0"),("Check weather","tier0"),("What's your warranty?","tier0"),("Complex commercial 15 workstations","tier2"),("Analyze quarterly revenue","tier2")]
     for q, exp in tests:
         r = h.process(q, {"customer":"Test","city":"Atlanta"})

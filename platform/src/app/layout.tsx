@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Agent-X · ESA Exoskeleton",
+  title: "Agent-X",
   description:
-    "Help Assembly Exoskeleton execution surface. ESA Exoskeleton — Select Card — not a peer Intellect.",
+    "Help Assembly + ESA service execution surface — Select Card — not a peer Intellect.",
   keywords: [
     "Agent-X",
     "ESA",

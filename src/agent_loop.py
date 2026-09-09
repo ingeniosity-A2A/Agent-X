@@ -1,11 +1,11 @@
 import os, json
-from src.harness import Harness
-from src.mercury_engine import MercuryEngine
+from src.capability_router import CapabilityRouter
+from src.mercury_engine import Mercury2Engine
 from src.config import COMPANY_NAME, SERVICE_AREA, AGENT_X_TOOLS
 def main():
-    k = os.environ.get("MERCURY_API_KEY","")
-    if not k: print("ERROR: Set MERCURY_API_KEY"); exit(1)
-    m = MercuryEngine(k); h = Harness(mercury_engine=m)
+    k = os.environ.get("MERCURY2_API_KEY","")
+    if not k: print("ERROR: Set MERCURY2_API_KEY"); exit(1)
+    m = Mercury2Engine(k); h = CapabilityRouter(mercury_engine=m)
     print(f"{COMPANY_NAME} — Agent X v2.0 — {SERVICE_AREA}")
     print(f"Budget: {m.budget.remaining:,} tokens\nType query or 'quit'.\n")
     while True:

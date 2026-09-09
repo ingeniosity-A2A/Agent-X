@@ -7,8 +7,8 @@ import { tmpdir } from "node:os";
 const exec = promisify(execFile);
 
 /**
- * FORGE-ORG engine bridge — /api/forge/* routes drive the vault engine
- * (scripts/forged_vault.py) exactly the way /api/render-stack drives
+ * FORGE-ORG engine bridge — /api/forge/* routes drive the ForgedxFolders engine
+ * (scripts/forgedxfolders.py) exactly the way /api/render-stack drives
  * rocks_stack.py: real RocksDB control plane + real DuckDB intelligence,
  * JSON on stdout, JSON errors on failure. The engine enforces the Forged
  * File Standard (immutable F0/F1/F2, append-only F3, HF vendor boundary).
@@ -27,7 +27,7 @@ export async function repoRoot(): Promise<string> {
 
 export async function forgeEngine(root: string, args: string[]): Promise<Record<string, unknown>> {
   const py = process.env.ROCKS_PY || "python3";
-  const script = path.join(root, "scripts", "forged_vault.py");
+  const script = path.join(root, "scripts", "forgedxfolders.py");
   const { stdout } = await exec(py, [script, ...args], {
     cwd: root,
     timeout: 30_000,

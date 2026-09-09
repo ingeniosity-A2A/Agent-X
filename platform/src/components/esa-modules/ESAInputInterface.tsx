@@ -99,7 +99,7 @@ const MATTE       = "#080808";
 
 /* ─────────────────────────────────────────────────────────
    MAIN COMPONENT
-   ESA Exoskeleton \u00b7 Ingestion Interface
+   Ava007 \u00b7 Ingestion Interface (per ESA-MODULE-MAPPING: ingestion layer, not an ESA card)
 ───────────────────────────────────────────────────────── */
 interface ESAInputInterfaceProps {
   capturedImage: string | null;

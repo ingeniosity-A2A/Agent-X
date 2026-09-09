@@ -14,15 +14,17 @@
  * Constraint: context must be COMPLETE before the call. No mid-call
  * steering. Output arrives as a block, not a token stream.
  *
- * # Configuration (env vars, matching the constellation .env)
+ * # Configuration (env vars — canonical name set, shared with src/config.py)
  *   MERCURY2_ENDPOINT — https://api.inceptionlabs.ai/v1/chat/completions
- *   MERCURY2_API_KEY  — sk-... (from dashboard.inceptionlabs.ai)
- *   MERCURY2_MODEL    — mercury-coder-small (default)
+ *   MERCURY2_API_KEY  — sk_... (from dashboard.inceptionlabs.ai)
+ *   MERCURY2_MODEL    — mercury-2 (default; verified live 2026-09-09).
+ *       mercury-coder-small is account-gated for accounts created after
+ *       Feb 24, 2026 — do not revert.
  */
 
 export const MERCURY2_DEFAULT_ENDPOINT =
   "https://api.inceptionlabs.ai/v1/chat/completions";
-export const MERCURY2_DEFAULT_MODEL = "mercury-coder-small";
+export const MERCURY2_DEFAULT_MODEL = "mercury-2";
 
 export interface Mercury2Message {
   role: "system" | "user" | "assistant";
@@ -99,7 +101,7 @@ export class Mercury2Backend {
     }
 
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 60_000); // diffusion can be slow
+    const timer = setTimeout(() => controller.abort(), 120_000); // diffusion + reasoning can be slow
     try {
       const resp = await fetch(this.endpoint, {
         method: "POST",

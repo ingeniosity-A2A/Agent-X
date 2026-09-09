@@ -21,7 +21,7 @@ function buildEodBody() {
   );
   const outOfStock = inv.parts.filter((p) => p.status === "out_of_stock");
 
-  const subject = `EOD ESA Exoskeleton snapshot — ${new Date().toISOString().slice(0, 10)}`;
+  const subject = `EOD ESA service snapshot — ${new Date().toISOString().slice(0, 10)}`;
   const text = [
     `From: Ava007 <${AVA_EMAIL}>`,
     `To: Manager <${MANAGER_EMAIL}>`,
@@ -54,7 +54,7 @@ function buildEodBody() {
       ? outOfStock.map((p) => `  ${p.sku} — ${p.name}`).join("\n")
       : "  None",
     "",
-    "— ESA Exoskeleton Console · Agent-X",
+    "— ESA Service Cards · Agent-X",
   ].join("\n");
 
   return {
@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
       "",
       JSON.stringify(body.context, null, 2),
       "",
-      "— ESA Exoskeleton · Select Card send-alone",
+      "— ESA Service Cards · Select Card send-alone",
     ].join("\n");
 
     const result = await sendViaAgentMail({ to, subject, text });

@@ -1,13 +1,16 @@
-# AETHERIS — Memory Timeline File System (Tier 1 Skill)
+# AETHERIS — Memory Timeline Pipeline (Tier 1 Skill · TRIAL)
 
-**skill_id:** `aetheris-memory-fs` · **tier:** 1 · **status:** present
+**skill_id:** `aetheris-memory-fs` · **tier:** 1 · **status:** trial — next-FORGED candidate
+(owner ruling 2026-09-09: Aetheris is KEPT; its pipeline is the candidate to become
+the next FORGED and must be tested and validated — Forged File Standard §11)
 **execution_surface:** Agent Browser (operating environment) + Agent-X platform API
 **housing:** `modules/aetheris/data` · **engine:** `scripts/memory_tdai.py` (+ `scripts/rev_ike_streamer.py`, `scripts/rev_ike_benchmark.py`)
 **ui:** `/agent-browser/interface/aetheris` (Bento UI8 plugin on the Forge UI8 Canvas)
 
 ## What it provides
 
-- `fs.memory-tdai` — the 4-tier memory file system:
+- `memory-tdai` — the 4-tier memory timeline (L3→L0; the `fs.*` claim is pending
+  next-FORGED promotion — Forged File Standard §11):
   `L3_Persona/` (cognitive anchor) → `L2_Scenario/` (active projects) →
   `L1_Atoms/` (distilled JSONL fact atoms) → `L0_Trace/` (sequential raw logs)
   + `refs/` (out-of-band payload archives) + `.meta/` (governance + manifests)
@@ -37,13 +40,14 @@
 - Dedup is bounded-window (`DEDUP_WINDOW=1024`): stream memory stays flat
   regardless of dataset scale.
 
-## Boundary
+## Boundary (owner ruling 2026-09-09 — Aetheris KEPT on trial)
 
-Aetheris is the lived-in file system of the Agent Browser environment. The
-Forged File Vault (FORGE-ORG, F0→F3) is the governance pipeline that promotes
-assets into RocksDB Skills / DuckDB Intelligence — Aetheris feeds it, it does
-not replace it. Hugging Face remains the vendor boundary OUTSIDE F0→F3
-(`hf:` sources in Rev.ike are vendor imports, not vault writes).
+ForgedxFolders (FORGE-ORG, F0→F3) is the canonical file system. Aetheris is the
+**trial pipeline to become the next FORGED** (Standard §11): its outputs enter
+the lifecycle through F0 like any upload until it is tested and validated — it
+is not a competing file system. Hugging Face remains the vendor boundary
+OUTSIDE F0→F3 (`hf:` sources in Rev.ike are vendor imports, not ForgedxFolders
+writes).
 
 ## Canonical specs
 

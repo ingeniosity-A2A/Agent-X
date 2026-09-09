@@ -129,5 +129,5 @@ export function SplitTextStage({ text, runId }: { text: string; runId: number })
 /** Small verdict pill reused across the canvas + inspector. */
 export function VerdictPill({ verdict }: { verdict: string }) {
   const pass = verdict === "pass";
-  return <span className={`forge-pill ${pass ? "forge-pill--pass" : "forge-pill--fail"}`}>{pass ? "HARNESS PASS" : `HARNESS ${verdict.toUpperCase()}`}</span>;
+  return <span className={`forge-pill ${pass ? "forge-pill--pass" : "forge-pill--fail"}`}>{pass ? "EXOSKELETON APPLIED" : `EXOSKELETON ${verdict.toUpperCase()}`}</span>;
 }

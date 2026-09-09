@@ -5,14 +5,29 @@ specification for Mastering-Ava007-Curation. Where any other file, ZIP, demo, or
 interface disagrees with this Standard, **this Standard wins**. Nothing competes
 with it; existing material is brought INTO compliance.
 
-Spec version: `1.0.0` · Owner directive: 2026-09-07
+Spec version: `1.1.0` · Owner directive: 2026-09-07 · Naming revision: 2026-09-09
+
+**Naming authority (owner rulings, 2026-09-09):**
+
+1. The file system is **ForgedxFolders**. "Forged File Vault", "AVA007 Vault",
+   and every "vault" alias are retired — the names entered at commits `762d626`
+   / `41a286e` without owner sanction (evidence: wiki Naming Register).
+2. **ESA is Extended Stay America** — the client. The ESA brand appears ONLY on
+   the cards that perform their service (maintenance work, supply ordering,
+   maintenance inventory). It is never a shell, console, sandbox, or framework name.
+3. **Aetheris is KEPT** as a trial system: its pipeline is the candidate to
+   become the next FORGED. It must be tested and validated; until then its
+   outputs enter the canonical lifecycle through F0 like any upload (§11).
+4. **We don't do harnesses. We apply Exoskeleton.** Harness→Exoskeleton is a
+   redesign: documents are rewritten for the framework or removed — never
+   relabeled. The forge stage is **Exoskeleton Application** (§1, §4).
 
 ---
 
 ## 1. Canonical architecture
 
 ```text
-AVA007 VAULT
+FORGEDXFOLDERS
                     │
                     ▼
     THE CURATED EXOSKELETON CONFIGURATION
@@ -40,8 +55,8 @@ AVA007 VAULT
              └──────┬───────┘
                     ▼
              ┌──────────────┐
-             │ CAPABILITY   │   measurable static checks; deterministic
-             │ HARNESS      │   replay verification
+             │ EXOSKELETON │   measurable static checks; deterministic
+             │ APPLICATION │   replay verification
              └──────┬───────┘
                     ▼
              ┌──────────────┐
@@ -62,6 +77,7 @@ AVA007 VAULT
              └──────────────┘
 
 HUGGING FACE VENDOR ── whole-model vendoring ── OUTSIDE F0 → F3
+AETHERIS (trial — next-FORGED candidate) ── feeds F0 ── see §11
 ```
 
 ## 2. The four-tier role lock
@@ -70,7 +86,7 @@ HUGGING FACE VENDOR ── whole-model vendoring ── OUTSIDE F0 → F3
 |------|------|--------|
 | **RocksDB** | Skills — executable procedural knowledge; the **control plane** | namespaces (§5), never model weights, never blobs |
 | **DuckDB** | Intelligence — structured knowledge, metadata, facts | SQL tables over the forged corpus + vendor facts |
-| **Hugging Face** | Vendor / input boundary — **NOT a fourth intelligence layer** | models / tokenizers / configs in the vendor store; only metadata crosses into the vault |
+| **Hugging Face** | Vendor / input boundary — **NOT a fourth intelligence layer** | models / tokenizers / configs in the vendor store; only metadata crosses into ForgedxFolders |
 | **F0–F3** | The forging lifecycle | governed artifacts + append-only provenance |
 
 The vendor system may provide model metadata to the Capability system, but the
@@ -102,15 +118,15 @@ That chain is the real purpose of F3.
 
 ## 4. Capability is the compile-time unit
 
-Dependencies, Skill, and Harness are not unrelated objects — they are compiled
-into one **CAPABILITY** the runtime can actually load:
+Dependencies, Skill, and the Exoskeleton binding are not unrelated objects —
+they are compiled into one **CAPABILITY** the runtime can actually load:
 
 ```json
 {
   "capability_id": "cap_<slug>_v<n>",
   "dependencies": {},
   "skill":      { "skill_id": "skill_...", "provides": [], "source_forged": "..." },
-  "harness":    { "checks": [], "verdict": "pass|fail", "measured": {} },
+  "exoskeleton": { "checks": [], "verdict": "pass|fail", "measured": {} },
   "inputs":     { "schema": "text" },
   "outputs":    { "schema": "text" },
   "permissions": [],
@@ -160,7 +176,7 @@ HF Repository / upload
 ```
 
 - Multi-GB weights **stay in the Hugging Face vendor / content-addressed store**.
-  The vault records metadata + facts only; bytes never enter `modules/forge-org/data`.
+  ForgedxFolders records metadata + facts only; bytes never enter `modules/forge-org/data`.
 - Known-but-unparsed weight archives (.pt/.pth/.ckpt/.bin/.h5) register with
   `classification: weight-archive (not parsed)` — recorded, not quarantined.
 - **Quarantine is fail-safe**: unknown format → `quarantine/` + DuckDB row with
@@ -204,7 +220,7 @@ modules/forge-org/data/
 ├── vendor/<asset_id>.json  vendor metadata records (bytes NEVER stored here)
 ├── quarantine/<asset_id>.json
 ├── rocksdb/                control plane (gitignored, regenerable from raw+forged)
-└── vault.duckdb            intelligence (gitignored)
+└── forgedxfolders.duckdb  intelligence (gitignored)
 ```
 
 ## 9. UI state model
@@ -228,10 +244,10 @@ MASTERING-AVA007-CURATION
 ├── CORE PARAMETERS                       DEV-LOCKED
 ├── THE CURATED EXOSKELETON CONFIGURATION DEV-LOCKED
 │   ├── Manifesto Collection / Beyond The Rainbow Learning / VLA / Voice-Audio
-├── FORGED FILE ENGINE
+├── FORGEDXFOLDERS
 │   ├── F0 Raw / F1 Chunk / F2 Forge / F3 Manifest
 ├── CAPABILITY CATALOG
-│   ├── Dependencies / Skills / Harnesses
+│   ├── Dependencies / Skills / Exoskeleton Bindings
 ├── ROCKSDB        → Forged Skills        (orange)
 ├── DUCKDB         → Forged Intelligence  (yellow)
 ├── HUGGING FACE   → Vendor Assets        (neutral; weights DEV-LOCKED)
@@ -242,3 +258,20 @@ Curation **selects/refines** what Ava007 should use; forging **governs** what ha
 been produced, classified, stored, and traced. The Sandbox is downstream of
 curation — it shows what the current configuration produces; it is not another
 place where architecture is defined.
+
+## 11. Aetheris — trial pipeline, next-FORGED candidate (owner ruling 2026-09-09)
+
+Aetheris is **kept** as a trial system. Its pipeline (memory-tdai tiers
+L3→L2→L1→L0, Rev.ike zero-copy ingestion, symbol-graph context offloading) is
+the candidate to become the next FORGED. Consequences:
+
+- Aetheris is **not** a second file system competing with ForgedxFolders; it is
+  a pipeline on trial whose outputs enter F0 like any upload until validated.
+- It **must be tested and validated** (engine, streaming, flat-RAM contract,
+  tier immutability, content-addressed recall). Evidence is recorded in the
+  wiki (`Aetheris-Trial`) and referenced here.
+- On a passing validation, its lifecycle graduates INTO this Standard as the
+  next FORGED revision (this section is replaced by the promotion spec).
+- Until then: no capability may claim authority from Aetheris alone
+  (`registry.json` keeps its `status` honest), and the HF vendor boundary
+  applies to `hf:` sources exactly as it does here (§6).

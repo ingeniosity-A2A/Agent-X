@@ -2,9 +2,13 @@ import os
 COMPANY_NAME = os.environ.get("COMPANY_NAME", "Help Assembly Services LLC")
 SERVICE_AREA = os.environ.get("SERVICE_AREA", "Metro Atlanta")
 BUSINESS_PHONE = os.environ.get("BUSINESS_PHONE", "+14044391350")
-MERCURY_API_URL = os.environ.get("MERCURY_API_URL", "https://api.inceptionlabs.ai/v1/chat/completions")
-MERCURY_API_KEY = os.environ.get("MERCURY_API_KEY", "")
-MERCURY_MODEL = os.environ.get("MERCURY_MODEL", "mercury-2")
+# Mercury2 — canonical env contract (single name set, shared with platform/):
+#   MERCURY2_API_KEY / MERCURY2_ENDPOINT / MERCURY2_MODEL
+# Model `mercury-2` verified live 2026-09-09 (mercury-coder-small is
+# account-gated: "only available to accounts created before Feb 24, 2026").
+MERCURY2_ENDPOINT = os.environ.get("MERCURY2_ENDPOINT", "https://api.inceptionlabs.ai/v1/chat/completions")
+MERCURY2_API_KEY = os.environ.get("MERCURY2_API_KEY", "")
+MERCURY2_MODEL = os.environ.get("MERCURY2_MODEL", "mercury-2")
 COST_INPUT_PER_M = 0.25
 COST_OUTPUT_PER_M = 0.75
 CORPUS_EXAMPLES_PER_SECTION = int(os.environ.get("CORPUS_EXAMPLES_PER_SECTION", "50"))
@@ -14,7 +18,7 @@ CACHE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "cache")
 CORPUS_DIR = os.path.join(DATA_DIR, "corpus")
 REFLEX_CACHE_PATH = os.path.join(CACHE_DIR, "reflex", "cache.json")
 SKILL_CACHE_PATH = os.path.join(CACHE_DIR, "skills", "arena.json")
-MERCURY_CACHE_PATH = os.path.join(CACHE_DIR, "mercury", "response_cache.json")
+MERCURY2_CACHE_PATH = os.path.join(CACHE_DIR, "mercury2", "response_cache.json")
 SERVICES = {
     "standard": {"name": "Standard Assembly", "items": ["IKEA KALLAX", "IKEA MALM dresser", "IKEA HEMNES bed", "IKEA BILLY bookcase", "IKEA PAX wardrobe", "baby crib", "dining table set", "bookshelf", "entertainment center"], "price": (75, 250)},
     "premium": {"name": "Premium Assembly", "items": ["IKEA kitchen island", "walk-in closet system", "Murphy bed", "modular sectional", "treadmill", "home gym power rack"], "price": (200, 600)},

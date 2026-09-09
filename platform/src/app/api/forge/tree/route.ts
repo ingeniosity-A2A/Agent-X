@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { errJson, forgeEngine, repoRoot } from "@/lib/forge/engine";
 
-/** GET /api/forge/tree — the vault tree the explorer sidebar renders. */
+/** GET /api/forge/tree — the ForgedxFolders tree the explorer sidebar renders. */
 export async function GET() {
   let root: string;
   try {
@@ -13,6 +13,6 @@ export async function GET() {
     const result = await forgeEngine(root, ["tree"]);
     return NextResponse.json({ ...result, service: "forge-org" }, { status: result.ok ? 200 : 400 });
   } catch (e) {
-    return errJson(`vault tree failed: ${e instanceof Error ? e.message : String(e)}`);
+    return errJson(`forgedxfolders tree failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 }

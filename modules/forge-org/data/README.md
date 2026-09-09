@@ -1,4 +1,4 @@
-# forge-org — Vault Housing
+# forge-org — ForgedxFolders Housing
 
 FORGE-ORG is a Tier 1 skill (`skills/forge-org/`). This directory is its data housing,
 same doctrine as `modules/esa/data/rocksdb` and `modules/helpassembly/data/rocksdb`.
@@ -12,5 +12,5 @@ forged/       F2 governed immutable artifacts (<forged_id>.json, chunks inside)
 vendor/       HF vendor metadata ONLY — model bytes never land here
 quarantine/   unknown artifacts (fail-safe classification)
 rocksdb/      control plane — gitignored internals (regenerable from raw/ + forged/)
-vault.duckdb  intelligence — gitignored
+forgedxfolders.duckdb  intelligence — gitignored
 ```

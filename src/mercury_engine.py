@@ -1,7 +1,7 @@
 import os, time, json, ssl, hashlib, urllib.request
 from dataclasses import dataclass
 from pathlib import Path
-from src.config import MERCURY_API_URL, MERCURY_API_KEY, MERCURY_MODEL, COST_INPUT_PER_M, COST_OUTPUT_PER_M, MERCURY_CACHE_PATH
+from src.config import MERCURY2_ENDPOINT, MERCURY2_API_KEY, MERCURY2_MODEL, COST_INPUT_PER_M, COST_OUTPUT_PER_M, MERCURY2_CACHE_PATH
 
 @dataclass
 class InferenceResult:
@@ -16,7 +16,7 @@ class TokenBudget:
 
 class ResponseCache:
     def __init__(self):
-        self.path = Path(MERCURY_CACHE_PATH); self.entries = {}
+        self.path = Path(MERCURY2_CACHE_PATH); self.entries = {}
         if self.path.exists():
             try: self.entries = json.loads(self.path.read_text())
             except: pass
@@ -28,10 +28,10 @@ class ResponseCache:
     def key(self, msgs, sys=""):
         return hashlib.sha256((sys + "|" + "|".join(m.get("content","") for m in msgs)).encode()).hexdigest()[:16]
 
-class MercuryEngine:
+class Mercury2Engine:
     def __init__(self, api_key="", budget=9_992_775):
-        self.api_key = api_key or MERCURY_API_KEY
-        if not self.api_key: raise ValueError("MERCURY_API_KEY not set")
+        self.api_key = api_key or MERCURY2_API_KEY
+        if not self.api_key: raise ValueError("MERCURY2_API_KEY not set")
         self.budget = TokenBudget(budget); self.cache = ResponseCache()
         self.stats = {"calls": 0, "errors": 0, "cache_hits": 0}
 
@@ -46,10 +46,10 @@ class MercuryEngine:
                 return InferenceResult(c["text"], c["ti"], c["to"], 0, 0, 0, True)
         est = int(len(json.dumps(full).split()) * 1.3 + max_tokens)
         if not self.budget.can_afford(est): raise RuntimeError(f"Budget exhausted: {self.budget.remaining:,}")
-        payload = {"model": MERCURY_MODEL, "messages": full, "max_tokens": max_tokens, "temperature": temperature}
+        payload = {"model": MERCURY2_MODEL, "messages": full, "max_tokens": max_tokens, "temperature": temperature}
         if response_format: payload["response_format"] = response_format
         headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}
-        req = urllib.request.Request(MERCURY_API_URL, json.dumps(payload).encode(), headers, method="POST")
+        req = urllib.request.Request(MERCURY2_ENDPOINT, json.dumps(payload).encode(), headers, method="POST")
         start = time.time()
         try:
             with urllib.request.urlopen(req, timeout=30, context=ssl.create_default_context()) as resp:
@@ -73,8 +73,10 @@ class MercuryEngine:
         return {"remaining": f"{self.budget.remaining:,}", "used": f"{self.budget.used:,}", "calls": self.stats["calls"], "cache_hits": self.stats["cache_hits"], "errors": self.stats["errors"]}
 
 def run_test():
-    print("Mercury 2 Test"); e = MercuryEngine()
-    r = e.generate([{"role": "user", "content": "What does a furniture assembly company do?"}], max_tokens=80)
+    print("Mercury 2 Test"); e = Mercury2Engine()
+    # mercury-2 is a reasoning model — give it headroom so reasoning passes
+    # don't consume the whole budget before content is emitted.
+    r = e.generate([{"role": "user", "content": "What does a furniture assembly company do?"}], max_tokens=512)
     print(f"{r.text[:100]} | {r.latency_ms:.0f}ms | {r.tokens_per_sec:.0f} tok/s")
     for k, v in e.budget_report().items(): print(f"  {k}: {v}")
 

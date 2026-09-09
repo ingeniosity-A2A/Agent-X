@@ -16,5 +16,5 @@
   "quarantined": false,
   "vendored_at": "2026-09-07T08:28:18.984+00:00",
   "spec": "forged-file-standard/1.0.0",
-  "note": "Hugging Face is a vendor/input boundary — original artifact stays in the vendor store; vault holds metadata only."
+  "note": "Hugging Face is a vendor/input boundary \u2014 original artifact stays in the vendor store; ForgedxFolders holds metadata only."
 }

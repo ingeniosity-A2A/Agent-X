@@ -13,6 +13,6 @@ export async function GET() {
     const result = await forgeEngine(root, ["stats"]);
     return NextResponse.json({ ...result, service: "forge-org" }, { status: result.ok ? 200 : 400 });
   } catch (e) {
-    return errJson(`vault stats failed: ${e instanceof Error ? e.message : String(e)}`);
+    return errJson(`forgedxfolders stats failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 }

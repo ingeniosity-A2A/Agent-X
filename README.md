@@ -12,8 +12,8 @@ Ava007 never lives inside the experiment.
 
 - Headless capability under the rotational Exoskeleton when attached
 - Does **not** own device runtime, model routing, or persistent memory
-- Untrusted code prefers WASM / isolated process (`wasm_sandbox` harness class)
-- Mercury2 and other backends are **harnesses**, not Agent X’s identity
+- Untrusted code prefers WASM / isolated process (`wasm_sandbox` isolation class)
+- Mercury2 and other backends are **inference backends behind the capability router**, not Agent X's identity
 
 Canonical contract: [`docs/exoskeleton/Agent-X-Capability.md`](docs/exoskeleton/Agent-X-Capability.md)
 
@@ -21,11 +21,11 @@ Related repos:
 - [Ava007](https://github.com/ingeniosity-A2A/Ava007) — Intellect + architecture SoR
 - [Core-Membrain](https://github.com/ingeniosity-A2A/Core-Membrain) — memory membrane
 
-## Run (existing harness)
+## Run (existing capability router)
 
 ```bash
 export MERCURY_API_KEY="your-key"
-python3 -m src.harness
+python3 -m src.capability_router
 ```
 
 Platform app: see `platform/`.
@@ -34,7 +34,7 @@ Platform app: see `platform/`.
 
 | Path | Role |
 |------|------|
-| `src/` | Harness, routers, patterns, mercury engine, API |
+| `src/` | Capability router, routers, patterns, mercury engine, API |
 | `platform/` | Help Assembly Services UI / Next.js surface |
 | `docs/exoskeleton/` | Capability identity and alignment |
 | `imports/qag-skills-agent_x/` | Snapshot from QAG-MemBrain for reconciliation |

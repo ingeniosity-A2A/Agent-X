@@ -3,17 +3,17 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "@/lib/gsap/suite";
 import { createASCIIShift } from "@/lib/asciiGlitch";
-import { VaultTree, type TreeNode, type TreeEntry } from "./VaultTree";
+import { ForgedxFoldersTree, type TreeNode, type TreeEntry } from "./ForgedxFoldersTree";
 import { Odometer, SplitTextStage, VerdictPill, LockGlyph, type TreeTone } from "./widgets";
 /**
- * FILE EXPLORER CANVAS — the UI implementation of the AVA007 FORGED FILE VAULT
+ * FILE EXPLORER CANVAS — the UI implementation of ForgedxFolders — the file system
  * (FORGED-FILE-STANDARD.md 1.0.0). The reference explorer's geometry,
  * navigation, inspector, grid/list behavior, breadcrumbs, search, sorting and
  * interaction model are preserved; the pipeline stages, stage rail, three
  * colors, and semantic animations are the Forged File architecture additions.
  *
  * Pipeline: F0 Raw Upload → [PRE-CHECK → INTERCEPT] → F1 Chunk (GSAP
- * SplitText) → Refactor/Normalize → Capability Harness → F2 Forged File →
+ * SplitText) → Refactor/Normalize → Exoskeleton Application → F2 Forged File →
  * RocksDB Skills / DuckDB Intelligence → F3 Manifest (append-only).
  * Hugging Face vendor imports stay OUTSIDE F0→F3.
  */
@@ -23,7 +23,7 @@ type Folder = "overview" | "f0" | "f1" | "f2" | "f3" | "skills" | "intelligence"
 const FOLDER_ORDER: Folder[] = ["overview", "f0", "f1", "f2", "f3", "skills", "intelligence", "vendor", "quarantine", "curation"];
 
 const FOLDER_META: Record<Folder, { label: string; tone: TreeTone; blurb: string }> = {
-  overview: { label: "Overview", tone: "neutral", blurb: "Vault status — real RocksDB control plane + real DuckDB intelligence" },
+  overview: { label: "Overview", tone: "neutral", blurb: "ForgedxFolders status — real RocksDB control plane + real DuckDB intelligence" },
   f0: { label: "F0 Raw Upload", tone: "neutral", blurb: "Write-once original evidence · sha256-addressed · dedupe on identical bytes" },
   f1: { label: "F1 Chunk Engine", tone: "neutral", blurb: "Deterministic chunking · GSAP SplitText is the mandatory visual language" },
   f2: { label: "F2 Forged Files", tone: "neutral", blurb: "Governed immutable artifacts — changes forge a new version, never modify history" },
@@ -35,10 +35,10 @@ const FOLDER_META: Record<Folder, { label: string; tone: TreeTone; blurb: string
   curation: { label: "Mastering-Ava007-Curation", tone: "neutral", blurb: "Curation selects/refines; forging governs what was produced and traced" },
 };
 
-interface VaultTreeData {
+interface ForgedXTreeData {
   ok?: boolean;
   f0: (TreeEntry & { bytes?: number; ts?: string })[];
-  f2: (TreeEntry & { harness?: string; chunks?: number; version?: number; ts?: string })[];
+  f2: (TreeEntry & { exoskeleton?: string; chunks?: number; version?: number; ts?: string })[];
   skills: (TreeEntry & { provides?: number; ts?: string })[];
   capabilities: (TreeEntry & { verdict?: string; ts?: string })[];
   vendor: (TreeEntry & { format?: string; ts?: string })[];
@@ -60,7 +60,7 @@ interface ManifestData {
     chunk_count: number;
     skills: string[];
     capabilities: string[];
-    harness: string;
+    exoskeleton: string;
     forged_at: string;
     provenance_events: number;
   }[];
@@ -81,11 +81,11 @@ interface EntryDetail extends Record<string, unknown> {
 const bytes = (n?: number) => (typeof n === "number" ? `${(n / 1024).toFixed(n < 102400 ? 1 : 0)} KB` : "—");
 const fmtBytes = (n: number) => (n < 1024 ? `${n} B` : n < 1048576 ? `${(n / 1024).toFixed(1)} KB` : `${(n / 1048576).toFixed(1)} MB`);
 
-export function VaultExplorer() {
+export function ForgedxFoldersExplorer() {
   const [folder, setFolder] = useState<Folder>("overview");
   const [mode, setMode] = useState<"grid" | "list">("grid");
   const [sort, setSort] = useState<"name" | "size" | "time" | "kind">("name");
-  const [tree, setTree] = useState<VaultTreeData | null>(null);
+  const [tree, setTree] = useState<ForgedXTreeData | null>(null);
   const [manifest, setManifest] = useState<ManifestData | null>(null);
   const [stats, setStats] = useState<StatsData | null>(null);
   const [detail, setDetail] = useState<EntryDetail | null>(null);
@@ -113,7 +113,7 @@ export function VaultExplorer() {
       if (m?.ok) setManifest(m);
       if (s?.ok) setStats(s);
     } catch {
-      setError("vault engine unreachable — is the platform server running?");
+      setError("ForgedxFolders engine unreachable — is the platform server running?");
     }
   }, []);
 
@@ -130,7 +130,7 @@ export function VaultExplorer() {
         const s = await fetch("/api/forge/stats").then((r) => r.json());
         if (!cancelled && s?.ok) setStats(s);
       } catch {
-        if (!cancelled) setError("vault engine unreachable — is the platform server running?");
+        if (!cancelled) setError("ForgedxFolders engine unreachable — is the platform server running?");
       }
     })();
     return () => {
@@ -298,7 +298,7 @@ export function VaultExplorer() {
     [refresh],
   );
 
-  // ── sidebar tree data (reference geometry, vault content) ────────────────
+  // ── sidebar tree data (reference geometry, ForgedxFolders content) ────────────────
   const groups: TreeNode[][] = [
     [{ id: "overview", label: "Overview", tone: "neutral" }],
     [
@@ -370,12 +370,12 @@ export function VaultExplorer() {
 
   return (
     <div className="forge-root" data-folder={folder}>
-      <VaultTree groups={groups} activeId={selection ?? folder} onSelect={select} />
+      <ForgedxFoldersTree groups={groups} activeId={selection ?? folder} onSelect={select} />
 
       <main className="forge-main">
         <div className="forge-topbar">
           <nav className="forge-crumbs" aria-label="Breadcrumb">
-            <span>Vault</span>
+            <span>ForgedxFolders</span>
             <span aria-hidden="true">/</span>
             <b>{meta.label}</b>
             {selection && (
@@ -547,7 +547,7 @@ export function VaultExplorer() {
 
 /* ── views ─────────────────────────────────────────────────────────────────── */
 
-type Row = { id: string; name: string; size?: number; ts?: string; kind?: string; harness?: string; chunks?: number; meta?: string };
+type Row = { id: string; name: string; size?: number; ts?: string; kind?: string; exoskeleton?: string; chunks?: number; meta?: string };
 
 function Cell({ row, mode, tone, selected, onSelect, ripple, children }: { row: Row; mode: "grid" | "list"; tone: TreeTone; selected: boolean; onSelect: () => void; ripple?: boolean; children?: React.ReactNode }) {
   const titleRef = useRef<HTMLSpanElement>(null);
@@ -700,7 +700,7 @@ function F0View({ rows, mode, busy, rippleId, dragOver, setDragOver, onIngest, s
               <button className="forge-btn" onClick={() => onChunk(r.id)} disabled={busy} title="Run F1 chunk on this upload">
                 F1
               </button>
-              <button className="forge-btn forge-btn--accent" onClick={() => onForge(r.id)} disabled={busy} title="Forge through harness to F2">
+              <button className="forge-btn forge-btn--accent" onClick={() => onForge(r.id)} disabled={busy} title="Apply Exoskeleton — forge to F2">
                 Forge
               </button>
             </span>
@@ -709,7 +709,7 @@ function F0View({ rows, mode, busy, rippleId, dragOver, setDragOver, onIngest, s
       </div>
       {rows.length === 0 && (
         <p className="forge-mono" style={{ fontSize: 11, color: "var(--forge-muted)" }}>
-          Vault is empty — the first upload lands here, then flows F1 → F2 → skills/intelligence → F3.
+          ForgedxFolders is empty — the first upload lands here, then flows F1 → F2 → skills/intelligence → F3.
         </p>
       )}
     </div>
@@ -727,7 +727,7 @@ function F1View({ f0Rows, chunkF0, setChunkF0, chunkResult, activeChunk, setActi
 }) {
   const chunks = (chunkResult?.chunks as { seq: number; hash: string; bytes: number; startLine: number; endLine: number; parent: { kind: string; name: string } | null; signals: Record<string, unknown> }[] | undefined) ?? [];
   const norm = (chunkResult?.normalize as Record<string, number | boolean> | undefined) ?? {};
-  const harness = chunkResult?.harness as { verdict: string; checks: Record<string, unknown>; measured_us: number } | undefined;
+  const exoskeleton = chunkResult?.exoskeleton as { verdict: string; checks: Record<string, unknown>; measured_us: number } | undefined;
   const preview = String(chunkResult?.preview ?? "");
   return (
     <div>
@@ -746,7 +746,7 @@ function F1View({ f0Rows, chunkF0, setChunkF0, chunkResult, activeChunk, setActi
         <button className="forge-btn forge-btn--accent" disabled={!chunkF0 || busy} onClick={() => setChunkF0(chunkF0)}>
           {busy ? "chunking…" : "Run F1 chunk"}
         </button>
-        {harness && <VerdictPill verdict={harness.verdict} />}
+        {exoskeleton && <VerdictPill verdict={exoskeleton.verdict} />}
       </div>
 
       {chunkResult?.ok === true && (
@@ -759,7 +759,7 @@ function F1View({ f0Rows, chunkF0, setChunkF0, chunkResult, activeChunk, setActi
               <Odometer value={Number(norm.trailing_ws ?? 0)} /> trailing-ws lines
             </span>
             <span className="cell-sub" style={{ display: "block", marginTop: 4 }}>
-              replay-proven: re-chunk produced the same {String(harness?.checks.hashes_stable ?? chunks.length)} hashes · harness measured {harness?.measured_us}µs · F0 untouched
+              Exoskeleton replay verification: re-chunk produced the same {String(exoskeleton?.checks.hashes_stable ?? chunks.length)} hashes · measured {exoskeleton?.measured_us}µs · F0 untouched
             </span>
           </div>
 
@@ -803,7 +803,7 @@ function F2View({ rows, mode, selected, onSelect }: { rows: Row[]; mode: "grid" 
     <div className={mode === "grid" ? "forge-grid" : "forge-rows"}>
       {rows.map((r) => (
         <Cell key={r.id} row={r} mode={mode} tone="neutral" selected={selected === `f2:${r.id}`} onSelect={() => onSelect(r.id)}>
-          {r.harness && <VerdictPill verdict={r.harness} />}
+          {r.exoskeleton && <VerdictPill verdict={r.exoskeleton} />}
         </Cell>
       ))}
       {rows.length === 0 && (
@@ -836,7 +836,7 @@ function F3View({ manifest, onSelect }: { manifest: ManifestData | null; onSelec
               <span className="cell-sub" style={{ margin: 0 }}>
                 {f.name} · v{f.version} · {f.chunk_count} chunks · {f.provenance_events} events
               </span>
-              <VerdictPill verdict={f.harness} />
+              <VerdictPill verdict={f.exoskeleton} />
             </span>
           </button>
         ))}
@@ -912,7 +912,7 @@ function VendorView({ rows, quarantined, mode, busy, result, onVendor, selected,
           <input className="forge-mono" placeholder="hf repo (optional, e.g. meta-llama/Llama-3)" value={repo} onChange={(e) => setRepo(e.target.value)} style={{ background: "var(--forge-inset)", color: "var(--forge-ink)", border: "1px solid var(--forge-line)", borderRadius: 8, padding: "4px 8px", fontSize: 10.5, width: 260 }} />
         </div>
         <div className="forge-mono" style={{ fontSize: 9.5, marginTop: 6, opacity: 0.7 }}>
-          safetensors / GGUF / ONNX / tokenizer-config parsed for facts · weight-archives recorded · unknown → quarantine · bytes NEVER enter the vault
+          safetensors / GGUF / ONNX / tokenizer-config parsed for facts · weight-archives recorded · unknown → quarantine · bytes NEVER enter ForgedxFolders
         </div>
       </div>
 
@@ -987,7 +987,7 @@ function CurationView({ onGo }: { onGo: (f: Folder) => void }) {
       <button className="forge-cell" onClick={() => onGo("skills")} style={{ textAlign: "left" }}>
         <span className="cell-title">Capability Catalog → RocksDB</span>
         <span className="cell-sub" style={{ display: "block" }}>
-          Dependencies · Skills · Harnesses — live
+          Dependencies · Skills · Exoskeleton — live
         </span>
       </button>
       <button className="forge-cell" onClick={() => onGo("intelligence")} style={{ textAlign: "left" }}>
@@ -1010,7 +1010,7 @@ function CurationView({ onGo }: { onGo: (f: Folder) => void }) {
 /* ── inspector ─────────────────────────────────────────────────────────────── */
 
 function Inspector({ detail, selection, busy, folder }: { detail: EntryDetail | null; selection: string | null; busy: boolean; folder: Folder }) {
-  if (busy) return <p className="forge-mono sub">reading vault…</p>;
+  if (busy) return <p className="forge-mono sub">reading ForgedxFolders…</p>;
   if (!detail?.ok) {
     return (
       <>

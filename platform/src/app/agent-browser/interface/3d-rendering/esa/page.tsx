@@ -16,7 +16,7 @@ type CardTab = "parts" | "service" | "green" | "stack";
  * ESA rendering surface — Select Card (never "select console").
  * Cards: Daily To-Dos · Parts + Inventory · Service Request · Green Shield
  */
-export default function ESAExoskeletonSurface() {
+export default function ESARenderingCards() {
   const [card, setCard] = useState<CardTab>("parts");
   const [todosOpen, setTodosOpen] = useState(false);
   const [jobs, setJobs] = useState<TodayJob[]>([]);
@@ -52,7 +52,7 @@ export default function ESAExoskeletonSurface() {
             className="text-xs text-[#00d4ff]"
             onClick={() => setMobileParts(false)}
           >
-            ← Exoskeleton
+            ← Cards
           </button>
           <span className="text-xs text-[#888]">Parts Card · mobile</span>
         </div>
@@ -84,10 +84,10 @@ export default function ESAExoskeletonSurface() {
       <aside className="flex w-16 shrink-0 flex-col border-r border-[#1e1e2e] bg-[#0d0d14] sm:w-56">
         <div className="border-b border-[#1e1e2e] px-3 py-4">
           <p className="hidden text-[10px] uppercase tracking-[0.15em] text-[#7c3aed] sm:block">
-            ESA Exoskeleton
+            Rendering Cards
           </p>
           <h1 className="hidden text-sm font-semibold sm:block">Select Card</h1>
-          <p className="text-center text-xs font-semibold text-[#7c3aed] sm:hidden">ESA</p>
+          <p className="text-center text-xs font-semibold text-[#7c3aed] sm:hidden">Cards</p>
         </div>
 
         <nav className="flex flex-1 flex-col gap-1 p-2">
@@ -158,7 +158,7 @@ export default function ESAExoskeletonSurface() {
 
       <main className="min-w-0 flex-1 overflow-y-auto p-4">
         <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-[#555]">
-          ESA Exoskeleton · {card === "parts" ? "Parts + Inventory Card" : card === "service" ? "Service Request Card" : card === "stack" ? "Asset Stack — RocksDB housing" : "Green Shield Card"}
+          ESA Rendering Cards · {card === "parts" ? "Parts + Inventory Card" : card === "service" ? "Service Request Card" : card === "stack" ? "Asset Stack — RocksDB housing" : "Green Shield Card"}
         </p>
         {card === "parts" && (
           <div className="mx-auto max-w-2xl">

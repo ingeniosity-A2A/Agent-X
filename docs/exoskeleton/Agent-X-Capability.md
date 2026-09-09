@@ -103,8 +103,8 @@ Call shape remains one Intent-facing primitive; substrate fills isolation detail
 | Intellect / Intent | Cybernetic Ava007 |
 | Memory retain | Core-Membrain + Ava embedded DB |
 | Substrate / Arrow highway | Exoskeleton |
-| Deep reasoning methods | RIM / Cortex harnesses |
-| Device mesh as identity | Dedicated harnesses (e.g. Onomondo, SIF) |
+| Deep reasoning methods | RIM / Cortex reasoning stacks (external — not applied here) |
+| Device mesh as identity | Dedicated connectivity skills (e.g. Onomondo, SIF) |
 
 ---
 

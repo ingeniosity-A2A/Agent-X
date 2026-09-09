@@ -55,11 +55,11 @@
    "skill_id": "forge-org",
    "version": "1.0.0",
    "provides": [
-    "vault.forged-file-standard",
-    "vault.f0-f3",
-    "vault.rocksdb.skills",
-    "vault.duckdb.intelligence",
-    "vault.hf.vendor.boundary"
+    "forgedxfolders.standard",
+    "forgedxfolders.f0-f3",
+    "forgedxfolders.rocksdb.skills",
+    "forgedxfolders.duckdb.intelligence",
+    "forgedxfolders.hf.vendor.boundary"
    ],
    "firmware_ref": null,
    "adapter_path": "skills/forge-org",
@@ -67,7 +67,7 @@
    "execution_surface": "Agent Browser (operating environment) + Agent-X platform API",
    "spec": "skills/forge-org/FORGED-FILE-STANDARD.md (canonical)",
    "housing": "modules/forge-org/data",
-   "engine": "scripts/forged_vault.py",
+   "engine": "scripts/forgedxfolders.py",
    "tier": 1,
    "status": "present"
   },
@@ -87,7 +87,7 @@
    "skill_id": "aetheris-memory-fs",
    "version": "1.0.0",
    "provides": [
-    "fs.memory-tdai",
+    "memory-tdai.tiers",
     "ingest.rev-ike.zero-copy",
     "context.tdai-offloading",
     "ui.bento-ui8.aetheris"
@@ -99,7 +99,8 @@
    "housing": "modules/aetheris/data",
    "engine": "scripts/memory_tdai.py",
    "tier": 1,
-   "status": "present"
+   "status": "trial",
+   "note": "Owner ruling 2026-09-09: kept as trial; pipeline is the next-FORGED candidate; must be tested and validated (Forged File Standard section 11)."
   }
  ]
 }

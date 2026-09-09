@@ -5,7 +5,7 @@
 ## Last Updated: 2026-08-22
 ## Deployment: ESA.ingeniosity.tech
 ## Identity: Agent X = logic & reasoning for the capabilities layer · Ava007 = voice · Scope = Help Assembly Services only
-## Exoskeletons: `public/` = Help Assembly Services console · `public/esa-console/` = ESA Exoskeleton (hotel maintenance, HD Supply PTAC) — sandboxed separately, no shared architecture
+## Exoskeletons: `public/` = Help Assembly Services console · `public/esa-console/` = ESA service cards console (hotel maintenance, HD Supply PTAC) — sandboxed separately, no shared architecture
 
 ---
 
@@ -33,7 +33,7 @@
 ## Component Architecture
 
 ```
-ESA EXOSKELETON (ESA.ingeniosity.tech)
+ESA SERVICE CARDS (ESA.ingeniosity.tech)
 │
 ├── 📋 ESA.Console (left sidebar — scene/layers panel, hidden on mobile)
 │   ├── Header (✦ + title + subtitle) · Console ⇄ Library tabs · search footer
@@ -67,7 +67,7 @@ ESA EXOSKELETON (ESA.ingeniosity.tech)
 ## Component Notes
 
 ### ESA.Ingestion AI (React module)
-- **Purpose**: Sole communication hub for the ESA EXOSKELETON console
+- **Purpose**: Sole communication hub for the ESA service cards console
 - **Scope**: ESA content only (HD Supply catalog, inventory, diagnostics)
 - **Rendering**: message parts — text, inline images (lens), tool-style cards (DuckDB/HD Supply)
 - **Dock**: bottom interface with 🔍 lens, 📄 PDF/TXT upload, ✉️ email-to, input + audio visualizer overlay
@@ -201,4 +201,4 @@ npm run dev      # http://localhost:8787
 
 ---
 
-*ESA EXOSKELETON - Execution surface for Help Assembly capabilities*
+*ESA SERVICE CARDS - Execution surface for Help Assembly capabilities*

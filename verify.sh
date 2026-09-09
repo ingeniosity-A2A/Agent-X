@@ -70,11 +70,11 @@ MODULES=(
     "src/quantum/beeper_bridge.py"
     "src/quantum/termux_bridge.py"
     "src/quantum/sms_bridge.py"
-    "src/quantum/zero_latency_harness.py"
+    "src/quantum/zero_latency_router.py"
     "src/appless/__init__.py"
     "src/appless/vcf_generator.py"
     "src/appless/server.py"
-    "src/harness.py"
+    "src/capability_router.py"
     "src/patterns.py"
     "src/reflex_router.py"
     "src/skill_arena.py"
@@ -99,7 +99,7 @@ python3 -c "from src.quantum import GriptapeTaskMemory; print('OK')" 2>/dev/null
 python3 -c "from src.quantum import LoRaMeshProtocol, ChaCha20; print('OK')" 2>/dev/null && pass "Import: lora mesh" || fail "Import: lora mesh"
 python3 -c "from src.quantum import FlipperEncoder; print('OK')" 2>/dev/null && pass "Import: flipper" || fail "Import: flipper"
 python3 -c "from src.quantum import VFile, MatrixClient; print('OK')" 2>/dev/null && pass "Import: vfile" || fail "Import: vfile"
-python3 -c "from src.quantum import ZeroLatencyHarness; print('OK')" 2>/dev/null && pass "Import: zero latency harness" || fail "Import: zero latency harness"
+python3 -c "from src.quantum import ZeroLatencyRouter; print('OK')" 2>/dev/null && pass "Import: zero latency router" || fail "Import: zero latency router"
 python3 -c "from src.quantum import TermuxHardwareBridge; print('OK')" 2>/dev/null && pass "Import: termux bridge" || fail "Import: termux bridge"
 python3 -c "from src.quantum import BeeperQuantumBridge; print('OK')" 2>/dev/null && pass "Import: beeper bridge" || fail "Import: beeper bridge"
 
@@ -184,22 +184,22 @@ assert vf.fingerprint() is not None
 print('OK')
 " 2>/dev/null && pass "VFile: wrap quantum" || fail "VFile: wrap quantum"
 
-# Harness
+# Capability Router
 python3 -c "
-from src.quantum import ZeroLatencyHarness
-h = ZeroLatencyHarness()
+from src.quantum import ZeroLatencyRouter
+h = ZeroLatencyRouter()
 r = h.process('test query', {})
 assert r['tier'] in ('reflex','quantum','skill','memory','lineage','mercury','fallback')
 print('OK')
-" 2>/dev/null && pass "Harness: process query" || fail "Harness: process query"
+" 2>/dev/null && pass "Capability router: process query" || fail "Capability router: process query"
 
 # ─── Runtime Stats ───────────────────────────────────────────────
 echo ""
 echo -e "${CYAN}── Runtime Stats ──${NC}"
 
 python3 -c "
-from src.quantum import ZeroLatencyHarness
-h = ZeroLatencyHarness()
+from src.quantum import ZeroLatencyRouter
+h = ZeroLatencyRouter()
 for q in ['dispatch tech', 'quote price', 'schedule tomorrow', 'send invoice']:
     h.process(q, {})
 s = h.get_stats()

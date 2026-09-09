@@ -322,7 +322,7 @@ def _build_landing_html(variant: str, service_id: str) -> str:
 # ─── Request Handler ─────────────────────────────────────────────────
 
 class ApplessHandler(BaseHTTPRequestHandler):
-    harness = None  # Injected from Agent-X
+    capability_router = None  # Injected from Agent-X
 
     def log_message(self, *a):
         pass  # Quiet logs
@@ -391,9 +391,9 @@ class ApplessHandler(BaseHTTPRequestHandler):
             query = body.get("query", "")
             context = body.get("context", {})
 
-            if ApplessHandler.harness:
+            if ApplessHandler.capability_router:
                 try:
-                    result = ApplessHandler.harness.process(query, context)
+                    result = ApplessHandler.capability_router.process(query, context)
                     self._json(result)
                 except Exception as e:
                     self._json({"error": str(e)}, 500)
@@ -401,7 +401,7 @@ class ApplessHandler(BaseHTTPRequestHandler):
                 # Fallback: echo with helpful message
                 self._json({
                     "response": {
-                        "message": f"Received: '{query}'. Agent-X harness not connected — start with: python3 -m src.appless.server",
+                        "message": f"Received: '{query}'. Agent-X capability router not connected — start with: python3 -m src.appless.server",
                         "actions": [],
                     },
                     "tier": "none",
@@ -430,45 +430,45 @@ class ApplessHandler(BaseHTTPRequestHandler):
 
 # ─── App Factory ─────────────────────────────────────────────────────
 
-def create_app(harness=None):
+def create_app(capability_router=None):
     """Create and return the Appless HTTP server."""
-    ApplessHandler.harness = harness
+    ApplessHandler.capability_router = capability_router
     return HTTPServer(("0.0.0.0", 7475), ApplessHandler)
 
 
 # ─── CLI Entry ───────────────────────────────────────────────────────
 
 def main():
-    """Run Appless standalone with Zero Latency Quantum Harness."""
+    """Run Appless standalone with Zero Latency Quantum CapabilityRouter."""
     port = int(os.environ.get("APPLESS_PORT", "7475"))
 
-    # Try to connect Zero Latency Quantum Harness
-    harness = None
+    # Try to connect Zero Latency Quantum CapabilityRouter
+    capability_router = None
     try:
-        mercury_key = os.environ.get("MERCURY_API_KEY", "")
+        mercury_key = os.environ.get("MERCURY2_API_KEY", "")
         if mercury_key:
-            from src.quantum.zero_latency_harness import ZeroLatencyHarness
-            harness = ZeroLatencyHarness(
+            from src.quantum.zero_latency_router import ZeroLatencyRouter
+            capability_router = ZeroLatencyRouter(
                 mercury_engine=None,  # Set up if key available
                 enable_flipper=True,
                 enable_lora=True,
                 enable_vfile=True,
             )
-            print(f"  ✓ Zero Latency Quantum Harness connected")
+            print(f"  ✓ Zero Latency Quantum CapabilityRouter connected")
     except Exception as e:
-        print(f"  ⚠ Quantum Harness not available: {e}")
-        # Fallback to base harness
+        print(f"  ⚠ Quantum CapabilityRouter not available: {e}")
+        # Fallback to base capability router
         try:
-            from src.mercury_engine import MercuryEngine
-            from src.harness import Harness
-            harness = Harness(mercury_engine=MercuryEngine(mercury_key))
-            print(f"  ✓ Base Agent-X harness connected")
+            from src.mercury_engine import Mercury2Engine
+            from src.capability_router import CapabilityRouter
+            capability_router = CapabilityRouter(mercury_engine=Mercury2Engine(mercury_key))
+            print(f"  ✓ Base Agent-X capability router connected")
         except Exception as e2:
             print(f"  ⚠ Agent-X not available: {e2}")
 
     server = HTTPServer(("0.0.0.0", port), ApplessHandler)
     server.socket.setsockopt(__import__("socket").SOL_SOCKET, __import__("socket").SO_REUSEADDR, 1)
-    ApplessHandler.harness = harness  # Wire up the harness
+    ApplessHandler.capability_router = capability_router  # Wire up the capability router
     print(f"\n  Appless™ Mobile Care")
     print(f"  ─────────────────────")
     print(f"  Company:  {COMPANY_NAME}")

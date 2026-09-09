@@ -5,7 +5,7 @@ import { cleanupStage, errJson, forgeEngine, repoRoot, stageUpload, MAX_UPLOAD_B
  * POST /api/forge/vendor — Hugging Face vendor boundary (OUTSIDE F0→F3).
  * multipart: file + optional repo/filename. The artifact detector classifies
  * (safetensors / gguf / onnx / tokenizer-config / weight-archive / unknown→
- * quarantine); the vault stores METADATA ONLY — bytes are discarded here.
+ * quarantine); ForgedxFolders stores METADATA ONLY — bytes are discarded here.
  */
 export async function POST(req: Request) {
   let root: string;
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       stage.name,
     ]);
     return NextResponse.json(
-      { ...result, service: "forge-org", bytes_retained: 0, note: "vendor bytes never enter the vault (Standard §6)" },
+      { ...result, service: "forge-org", bytes_retained: 0, note: "vendor bytes never enter ForgedxFolders (Standard §6)" },
       { status: result.ok ? 200 : 400 },
     );
   } catch (e) {

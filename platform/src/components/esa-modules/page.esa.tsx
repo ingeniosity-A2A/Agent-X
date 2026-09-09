@@ -33,29 +33,27 @@ import {
 } from "@/components/ui/sheet";
 import {
   InventoryPulseOrb,
-} from "@/components/ava/InventoryPulseOrb";
+} from "@/components/esa-modules/InventoryPulseOrb";
 import {
   InventoryCard,
   StatPill,
   PartDetailContent,
   type InventoryPart,
-} from "@/components/ava/InventoryCard";
+} from "@/components/esa-modules/InventoryCard";
 import {
   InventoryPartCard,
   DEMO_PARTS,
-} from "@/components/ava/InventoryPartCard";
+} from "@/components/esa-modules/InventoryPartCard";
 import {
   MaintenanceRequestComplete,
   DEMO_MAINTENANCE_REQUESTS,
-} from "@/components/ava/MaintenanceRequestComplete";
-import ESAMaintenanceCard from "@/components/ava/ESAMaintenanceCard";
-import { ESAHarness } from "@/components/ava/ESAHarness";
+} from "@/components/esa-modules/MaintenanceRequestComplete";
+import ESAMaintenanceCard from "@/components/esa-modules/ESAMaintenanceCard";
+import { ServiceCardShell } from "@/components/esa-modules/ServiceCardShell";
 // Ingestion components (ESAInputInterface, CameraLens, IngeniosityLens, PianoWaver)
 // are NOT part of the ESA UI. They belong to the Ava007 ingestion/exoskeleton layer.
 // Removed from this file — ESA is self-contained.
-import ExoskeletonDashboard from "@/components/ava/ExoskeletonDashboard";
-import ESAWebUI from "@/components/ava/ESAWebUI";
-import GrokConsole from "@/components/ava/GrokConsole";
+import ESAWebUI from "@/components/esa-modules/ESAWebUI";
 import { useReorderStore } from "@/lib/reorder-store";
 
 /* ═══════════════════════════════════════════════════════════
@@ -322,7 +320,7 @@ export default function AVAInventoryInterface() {
   };
 
   return (
-    <ESAHarness>
+    <ServiceCardShell>
       <div style={{ minHeight: "100vh", overflowX: "hidden", position: "relative" }}>
       {/* Grid overlay */}
       <div
@@ -408,7 +406,7 @@ export default function AVAInventoryInterface() {
             { key: "partcard", label: "Part Card", icon: Package },
             { key: "maintenance", label: "ESA Maint.", icon: Wrench },
             { key: "maintenance-legacy", label: "Maint. Complete", icon: Wrench },
-            { key: "exoskeleton", label: "Exoskeleton", icon: Cpu },
+            { key: "exoskeleton", label: "Service Shell", icon: Cpu },
             { key: "console", label: "Console", icon: Bot },
           ] as const).map((tab) => (
             <button
@@ -484,11 +482,7 @@ export default function AVAInventoryInterface() {
         </div>
       )}
       {/* Audio module removed — not an ESA module. */}
-      {cardMode === "console" && (
-        <div className="relative z-10" style={{ minHeight: "calc(100vh - 96px)" }}>
-          <GrokConsole />
-        </div>
-      )}
+      {/* Grok Console removed — not an ESA module (component does not exist in this repo). */}
 
       {/* Camera Lens removed — ingestion is not an ESA module. */}
 
@@ -703,7 +697,7 @@ export default function AVAInventoryInterface() {
         </SheetContent>
       </Sheet>
       </div>
-    </ESAHarness>
+    </ServiceCardShell>
   );
 }
 

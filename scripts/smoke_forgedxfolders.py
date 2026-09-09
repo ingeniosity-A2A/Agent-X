@@ -16,8 +16,8 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-V = ROOT / "scripts" / "forged_vault.py"
-DATA_DIR = Path(tempfile.gettempdir()) / f"forge-smoke-vault-{id(object())}"
+V = ROOT / "scripts" / "forgedxfolders.py"
+DATA_DIR = Path(tempfile.gettempdir()) / f"forge-smoke-fx-{id(object())}"
 
 PASS = FAIL = 0
 
@@ -34,7 +34,7 @@ def ck(got, want, label: str) -> None:
 
 
 def run(*args: str) -> dict:
-    # isolated vault housing — the smoke test never touches the live vault
+    # isolated housing — the smoke test never touches live ForgedxFolders
     r = subprocess.run(
         [sys.executable, str(V), "--db", str(DATA_DIR), *args],
         capture_output=True,
@@ -79,8 +79,8 @@ def main() -> int:
         print("== F1 chunk ==")
         r = run("chunk", "--f0", f0)
         ck(r.get("ok"), True, "F1 chunk ok")
-        ck(r.get("harness", {}).get("verdict"), "pass", "F1 harness verdict pass")
-        ck(r.get("harness", {}).get("checks", {}).get("deterministic_rechunk"), True, "F1 deterministic replay")
+        ck(r.get("exoskeleton", {}).get("verdict"), "pass", "F1 exoskeleton verdict pass")
+        ck(r.get("exoskeleton", {}).get("checks", {}).get("deterministic_rechunk"), True, "F1 deterministic replay")
         ck("normalize" in r, True, "F1 normalize stats present")
         ck(r.get("chunk_count", 0) >= 1, True, f"F1 chunk count measurable ({r.get('chunk_count')})")
         r2 = run("ingest", "--path", str(tmp / "huge.txt"), "--name", "huge.txt")
@@ -91,7 +91,7 @@ def main() -> int:
         r = run("forge", "--f0", f0)
         ck(r.get("ok"), True, "F2 forge ok")
         fid = r.get("forged_id", "")
-        ck(r.get("harness", {}).get("verdict"), "pass", "F2 harness pass")
+        ck(r.get("exoskeleton", {}).get("verdict"), "pass", "F2 exoskeleton pass")
         ck(len(r.get("skills", [])) >= 1, True, f"F2 forged skill(s) {r.get('skills')}")
         ck(len(r.get("capabilities", [])) >= 1, True, f"F2 compiled capability {r.get('capabilities')}")
         r2 = run("forge", "--f0", f0)

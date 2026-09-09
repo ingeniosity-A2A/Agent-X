@@ -17,14 +17,14 @@ const geistMono = Geist_Mono({
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://esa.ingeniosity.tech";
 
 export const metadata: Metadata = {
-  title: "ESA Exoskeleton — Extended Stay America",
+  title: "ESA Service Cards — Extended Stay America",
   description: "ESA Green Shield inspection console, inventory management, and maintenance operations for Extended Stay America. AI-powered by Ingeniosity.",
-  keywords: ["ESA", "Green Shield", "Exoskeleton", "Ingeniosity", "Extended Stay America", "Maintenance", "Inventory", "HD Supply"],
+  keywords: ["ESA", "Green Shield", "Service Cards", "Ingeniosity", "Extended Stay America", "Maintenance", "Inventory", "HD Supply"],
   authors: [{ name: "Ingeniosity" }],
   metadataBase: new URL(siteUrl),
   alternates: { canonical: "/" },
   openGraph: {
-    siteName: "ESA Exoskeleton",
+    siteName: "ESA Service Cards",
     type: "website",
     locale: "en_US",
   },

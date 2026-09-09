@@ -15,7 +15,7 @@ Ingestion (barcode, image, Agent X, IngeniosityLens, PianoWaver) = separate Ava0
 | Part Card | `InventoryPartCard`, `StepperWheel` | Part Card | ACTIVE |
 | ESA Maintenance | `ESAMaintenanceCard`, `ESAJobTracker`, `ESARequestForm` | ESA Maint. | ACTIVE |
 | Maint. Complete | `MaintenanceRequestComplete` | Maint. Complete | ACTIVE |
-| Exoskeleton | `ESAWebUI` | Exoskeleton | ACTIVE |
+| Service card shell | `ESAWebUI` (+ `ServiceCardShell` chrome) | Service Shell | ACTIVE |
 | Green Shield Operations | `ESAWebUI` sidebar/SOP data | Exoskeleton | ACTIVE |
 | Console | `GrokConsole` | Console | ACTIVE |
 

@@ -76,7 +76,7 @@ step "Verifying Python Modules"
 MODULES=(
     "src/quantum/__init__.py"
     "src/quantum/quantum.py"
-    "src/quantum/zero_latency_harness.py"
+    "src/quantum/zero_latency_router.py"
     "src/quantum/termux_bridge.py"
     "src/quantum/sms_bridge.py"
     "src/quantum/beeper_bridge.py"
@@ -85,7 +85,7 @@ MODULES=(
     "src/quantum/vfile.py"
     "src/appless/vcf_generator.py"
     "src/appless/server.py"
-    "src/harness.py"
+    "src/capability_router.py"
     "src/config.py"
 )
 
@@ -110,7 +110,7 @@ step "Testing Python Imports"
 cd "$AGENT_X_DIR"
 
 python3 -c "from src.quantum import QuantumBuilder; print('OK')" 2>/dev/null && log "Core quantum" || warn "Core quantum import failed"
-python3 -c "from src.quantum import ZeroLatencyHarness; print('OK')" 2>/dev/null && log "Zero Latency Harness" || warn "Harness import failed"
+python3 -c "from src.quantum import ZeroLatencyRouter; print('OK')" 2>/dev/null && log "Zero Latency Router" || warn "Router import failed"
 python3 -c "from src.quantum import TermuxHardwareBridge; print('OK')" 2>/dev/null && log "Termux bridge" || warn "Termux bridge import failed"
 python3 -c "from src.quantum import FlipperEncoder; print('OK')" 2>/dev/null && log "Flipper encoder" || warn "Flipper import failed"
 python3 -c "from src.quantum import LoRaMeshProtocol; print('OK')" 2>/dev/null && log "LoRa mesh" || warn "LoRa import failed"
@@ -185,8 +185,8 @@ chmod +x "$AGENT_X_DIR/run_beeper.sh"
 cat > "$AGENT_X_DIR/run_benchmark.sh" << 'RUNEOF'
 #!/bin/bash
 cd "$(dirname "$0")"
-echo "Running Zero Latency Harness benchmark..."
-python3 -m src.quantum.zero_latency_harness
+echo "Running Zero Latency Router benchmark..."
+python3 -m src.quantum.zero_latency_router
 RUNEOF
 chmod +x "$AGENT_X_DIR/run_benchmark.sh"
 
@@ -243,5 +243,5 @@ echo "  ./run_destiny.sh 'Dispatch tech Marcus'"
 echo ""
 echo "  # Or run modules directly:"
 echo "  cd ~/Agent-X"
-echo "  python3 -m src.quantum.zero_latency_harness"
+echo "  python3 -m src.quantum.zero_latency_router"
 echo ""

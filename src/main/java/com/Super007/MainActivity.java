@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public void logToNative(String message) {
-            android.util.Log.d("007-Harness", message);
+            android.util.Log.d("007-Router", message);
         }
 
         @JavascriptInterface

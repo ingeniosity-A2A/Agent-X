@@ -358,7 +358,7 @@ function ESASidebar({
           <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: "1.15rem", fontWeight: 700, color: "#fff", lineHeight: 1 }}>E</span>
         </div>
         <div>
-          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.82rem", fontWeight: 700, color: "#f5f0eb", letterSpacing: "0.02em" }}>ESA Exoskeleton</div>
+          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.82rem", fontWeight: 700, color: "#f5f0eb", letterSpacing: "0.02em" }}>ESA Service Cards</div>
           <div style={{ fontSize: "0.5rem", color: "rgba(245,240,235,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Extended Stay America · Green Shield</div>
         </div>
       </div>
@@ -545,10 +545,10 @@ function ESASidebar({
         ))}
       </div>
 
-      {/* Harness Status */}
+      {/* Service status */}
       <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", padding: "0.3rem 0", marginTop: "auto" }}>
         <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 8px #22c55e" }} />
-        <span style={{ fontSize: "0.46rem", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#7ec8a0" }}>ESA Harness Active</span>
+        <span style={{ fontSize: "0.46rem", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#7ec8a0" }}>ESA Service Active</span>
         <span style={{ fontSize: "0.38rem", color: "rgba(245,240,235,0.2)", marginLeft: "auto", fontFamily: "monospace" }}>v2.4.1</span>
       </div>
     </div>

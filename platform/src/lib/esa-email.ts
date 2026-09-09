@@ -1,5 +1,5 @@
 /**
- * ESA Exoskeleton email identities + AgentMail transport.
+ * ESA service email identities + AgentMail transport.
  * Ava: ava007@agentmail.to → Manager: bmccray02@gmail.com
  */
 

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""FORGE-ORG vault engine — Forged File Standard 1.0.0.
+"""FORGE-ORG engine — ForgedxFolders — Forged File Standard 1.1.0.
 
 Control plane : real RocksDB (rocksdict) — namespaces per the Standard:
     skill:{skill_id}  capability:{capability_id}  asset:{asset_id}
     layer:{stack_id}:{layer_id}  idx:hash:{hash}  idx:asset:{asset_id}
     manifest:{forged_id}:{seq} (append-only)  stack:{job}:{frame}:{depth}
-Intelligence  : real DuckDB (vault.duckdb) — SQL facts over the forged corpus.
+Intelligence  : real DuckDB (forgedxfolders.duckdb) — SQL facts over the forged corpus.
 Lifecycle     : F0 write-once → F1 deterministic chunks (replay-proven) →
-                normalize → capability harness → F2 immutable (versioned on
+                normalize → Exoskeleton Application → F2 immutable (versioned on
                 change) → housing (skills/intelligence) → F3 manifest append.
 Vendor        : Hugging Face boundary OUTSIDE F0→F3. Artifact detector
                 (safetensors / GGUF / ONNX-sniff / tokenizer-config JSON /
@@ -38,7 +38,7 @@ from pathlib import Path
 import rocksdict
 from rocksdict import Options, Rdict, ReadOptions, WriteBatch
 
-SPEC = "forged-file-standard/1.0.0"
+SPEC = "forged-file-standard/1.1.0"
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "modules" / "forge-org" / "data"
 RAW = DATA / "raw"
@@ -46,7 +46,7 @@ FORGED_DIR = DATA / "forged"
 VENDOR_DIR = DATA / "vendor"
 QUAR = DATA / "quarantine"
 ROCKS = DATA / "rocksdb"
-DUCK = DATA / "vault.duckdb"
+DUCK = DATA / "forgedxfolders.duckdb"
 MAX_UPLOAD = 32 * 1024 * 1024  # honest cap, documented in the Standard
 
 CF_CONTROL = "control"
@@ -134,7 +134,7 @@ def init_duck() -> None:
             """CREATE TABLE IF NOT EXISTS forged_files (
                 forged_id VARCHAR PRIMARY KEY, version INTEGER, f0_id VARCHAR,
                 sha256 VARCHAR, name VARCHAR, chunk_count INTEGER,
-                skills_forged INTEGER, harness_verdict VARCHAR,
+                skills_forged INTEGER, exoskeleton_verdict VARCHAR,
                 forged_at TIMESTAMP, spec VARCHAR)"""
         )
         con.execute(
@@ -155,7 +155,7 @@ def init_duck() -> None:
         pass
 
 
-class Vault:
+class ForgedXFolders:
     """One RocksDB instance, four column families, WriteBatch + bounded scans.
 
     RocksDB is single-writer: concurrent engine processes (e.g. parallel API
@@ -177,7 +177,7 @@ class Vault:
                 last = e
                 time.sleep(delay)
         if self.db is None:
-            die(f"vault busy (rocksdb lock): {last}", 2)
+            die(f"engine busy (rocksdb lock): {last}", 2)
         existing = set(Rdict.list_cf(str(ROCKS)))
         for name in (CF_CONTROL, CF_IDX, CF_MANIFEST, CF_META):
             if name not in existing:
@@ -353,10 +353,11 @@ def normalize(text: str) -> tuple[str, dict]:
     return "\n".join(out_lines), stats
 
 
-# ── Capability harness ───────────────────────────────────────────────────────
+# ── Exoskeleton application ───────────────────────────────────────────────────────
 
-def harness(text: str, chunk_hashes: list[str]) -> dict:
-    """Measurable static checks + deterministic replay verification."""
+def apply_exoskeleton(text: str, chunk_hashes: list[str]) -> dict:
+    """Exoskeleton Application stage — measurable static checks + deterministic
+    Exoskeleton replay verification (re-chunk must reproduce the hashes)."""
     t0 = time.perf_counter()
     replay = [c["hash"] for c in make_chunks(text)]
     deterministic = replay == chunk_hashes
@@ -398,7 +399,7 @@ def make_chunks(text: str, max_size: int = 1200) -> list[dict]:
 
 # ── Lifecycle commands ───────────────────────────────────────────────────────
 
-def cmd_ingest(args, vault: Vault) -> None:
+def cmd_ingest(args, fx: ForgedXFolders) -> None:
     src = Path(args.path)
     if not src.is_file():
         die(f"upload path not found: {args.path}")
@@ -425,7 +426,7 @@ def cmd_ingest(args, vault: Vault) -> None:
     if not deduped:
         (target / "f0.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2))
         # idx:hash reverse index + DuckDB intelligence (idempotent write-once)
-        vault.put(CF_IDX, f"idx:hash:{digest}", json.dumps({"f0_id": f0_id, "kind": "f0"}))
+        fx.put(CF_IDX, f"idx:hash:{digest}", json.dumps({"f0_id": f0_id, "kind": "f0"}))
         try:
             con = duck_connect()
             con.execute(
@@ -438,7 +439,7 @@ def cmd_ingest(args, vault: Vault) -> None:
     out({"ok": True, **meta})
 
 
-def cmd_chunk(args, vault: Vault) -> None:
+def cmd_chunk(args, fx: ForgedXFolders) -> None:
     f0_id = args.f0
     d = RAW / f0_id
     if not (d / "f0.json").is_file():
@@ -455,10 +456,10 @@ def cmd_chunk(args, vault: Vault) -> None:
     chunks = make_chunks(normalized, args.max_bytes)
     t0 = time.perf_counter()
     hashes = [c["hash"] for c in chunks]
-    h = harness(normalized, hashes)
-    harness_us = int((time.perf_counter() - t0) * 1e6)
+    h = apply_exoskeleton(normalized, hashes)
+    exoskeleton_us = int((time.perf_counter() - t0) * 1e6)
     # persist content-addressed chunks to the idx plane + intelligence
-    vault.batch_put_if_absent(
+    fx.batch_put_if_absent(
         CF_IDX,
         [(f"idx:hash:{c['hash']}", json.dumps({"kind": "chunk", "f0_id": f0_id, "seq": c["seq"], "bytes": c["bytes"]})) for c in chunks],
     )
@@ -481,8 +482,8 @@ def cmd_chunk(args, vault: Vault) -> None:
             "normalize": nstats,
             "chunk_count": len(chunks),
             "chunks": [{k: v for k, v in c.items() if k != "content"} for c in chunks],
-            "harness": h,
-            "harness_us": harness_us,
+            "exoskeleton": h,
+            "exoskeleton_us": exoskeleton_us,
             "preview": normalized[:400],
         }
     )
@@ -493,7 +494,7 @@ def slugify(name: str) -> str:
     return (s or "file")[:40]
 
 
-def cmd_forge(args, vault: Vault) -> None:
+def cmd_forge(args, fx: ForgedXFolders) -> None:
     f0_id = args.f0
     d = RAW / f0_id
     if not (d / "f0.json").is_file():
@@ -507,7 +508,7 @@ def cmd_forge(args, vault: Vault) -> None:
     normalized, nstats = normalize(text)
     chunks = make_chunks(normalized, args.max_bytes)
     hashes = [c["hash"] for c in chunks]
-    h = harness(normalized, hashes)
+    h = apply_exoskeleton(normalized, hashes)
 
     # versioning: same sha → new immutable version, never modify history
     existing = sorted(FORGED_DIR.glob(f"ff-{meta['sha256'][:8]}-v*.json"))
@@ -530,7 +531,7 @@ def cmd_forge(args, vault: Vault) -> None:
             "spec": SPEC,
         }
         skills.append(skill)
-        vault.put(CF_CONTROL, f"skill:{skill_id}", json.dumps(skill, ensure_ascii=False))
+        fx.put(CF_CONTROL, f"skill:{skill_id}", json.dumps(skill, ensure_ascii=False))
 
     # compiled capability unit (the runtime-loadable object)
     capabilities = []
@@ -540,7 +541,7 @@ def cmd_forge(args, vault: Vault) -> None:
             "capability_id": cap_id,
             "dependencies": {},
             "skill": {"skill_id": skills[0]["skill_id"], "provides": skills[0]["provides"], "source_forged": forged_id},
-            "harness": {"checks": h["checks"], "verdict": h["verdict"], "measured_us": h["measured_us"]},
+            "exoskeleton": {"checks": h["checks"], "verdict": h["verdict"], "measured_us": h["measured_us"]},
             "inputs": {"schema": "text"},
             "outputs": {"schema": "text"},
             "permissions": [],
@@ -548,8 +549,8 @@ def cmd_forge(args, vault: Vault) -> None:
             "provenance": {"f0_id": f0_id, "sha256": meta["sha256"], "manifest": f"manifest:{forged_id}"},
         }
         capabilities.append(cap)
-        vault.put(CF_CONTROL, f"capability:{cap_id}", json.dumps(cap, ensure_ascii=False))
-        vault.put(CF_IDX, f"idx:asset:{cap_id}", json.dumps({"forged_id": forged_id, "kind": "capability"}))
+        fx.put(CF_CONTROL, f"capability:{cap_id}", json.dumps(cap, ensure_ascii=False))
+        fx.put(CF_IDX, f"idx:asset:{cap_id}", json.dumps({"forged_id": forged_id, "kind": "capability"}))
 
     artifact = {
         "spec": SPEC,
@@ -561,7 +562,7 @@ def cmd_forge(args, vault: Vault) -> None:
         "size_bytes": meta["size_bytes"],
         "forged_at": now_iso(),
         "normalize": nstats,
-        "harness": h,
+        "exoskeleton": h,
         "chunk_count": len(chunks),
         "chunks": [{k: v for k, v in c.items() if k != "content"} for c in chunks],
         "skills": [s["skill_id"] for s in skills],
@@ -571,7 +572,7 @@ def cmd_forge(args, vault: Vault) -> None:
     (FORGED_DIR / f"{forged_id}.json").write_text(json.dumps(artifact, ensure_ascii=False, indent=2))
 
     # F3 append-only manifest event
-    seq = vault.manifest_append(
+    seq = fx.manifest_append(
         forged_id,
         {
             "event": "forged",
@@ -582,7 +583,7 @@ def cmd_forge(args, vault: Vault) -> None:
             "chunks": len(chunks),
             "skills": artifact["skills"],
             "capabilities": artifact["capabilities"],
-            "harness": h["verdict"],
+            "exoskeleton": h["verdict"],
             "spec": SPEC,
         },
     )
@@ -608,11 +609,11 @@ def cmd_forge(args, vault: Vault) -> None:
     out({"ok": True, **{k: v for k, v in artifact.items() if k != "chunks"}})
 
 
-def cmd_manifest(args, vault: Vault) -> None:
+def cmd_manifest(args, fx: ForgedXFolders) -> None:
     forges = []
     for p in sorted(FORGED_DIR.glob("ff-*-v*.json")):
         a = json.loads(p.read_text())
-        chain = vault.manifest_chain(a["forged_id"])
+        chain = fx.manifest_chain(a["forged_id"])
         forges.append(
             {
                 "forged_id": a["forged_id"],
@@ -623,7 +624,7 @@ def cmd_manifest(args, vault: Vault) -> None:
                 "chunk_count": a["chunk_count"],
                 "skills": a["skills"],
                 "capabilities": a["capabilities"],
-                "harness": a["harness"]["verdict"],
+                "exoskeleton": a["exoskeleton"]["verdict"],
                 "forged_at": a["forged_at"],
                 "provenance_events": len(chain),
             }
@@ -644,7 +645,7 @@ def cmd_manifest(args, vault: Vault) -> None:
     )
 
 
-def cmd_tree(args, vault: Vault) -> None:
+def cmd_tree(args, fx: ForgedXFolders) -> None:
     def entries(kind: str):
         rows = []
         if kind == "f0":
@@ -654,15 +655,15 @@ def cmd_tree(args, vault: Vault) -> None:
         elif kind == "f2":
             for p in sorted(FORGED_DIR.glob("ff-*-v*.json")):
                 a = json.loads(p.read_text())
-                rows.append({"id": a["forged_id"], "name": a["name"], "bytes": a["size_bytes"], "ts": a["forged_at"], "harness": a["harness"]["verdict"], "chunks": a["chunk_count"]})
+                rows.append({"id": a["forged_id"], "name": a["name"], "bytes": a["size_bytes"], "ts": a["forged_at"], "exoskeleton": a["exoskeleton"]["verdict"], "chunks": a["chunk_count"]})
         elif kind == "skills":
-            for k, v in vault.scan(CF_CONTROL, "skill:"):
+            for k, v in fx.scan(CF_CONTROL, "skill:"):
                 s = json.loads(v)
                 rows.append({"id": s["skill_id"], "name": s["skill_id"], "bytes": len(v), "provides": len(s.get("provides", [])), "ts": s.get("source_forged", "")})
         elif kind == "capabilities":
-            for k, v in vault.scan(CF_CONTROL, "capability:"):
+            for k, v in fx.scan(CF_CONTROL, "capability:"):
                 c = json.loads(v)
-                rows.append({"id": c["capability_id"], "name": c["capability_id"], "bytes": len(v), "verdict": c["harness"]["verdict"], "ts": c["provenance"]["f0_id"]})
+                rows.append({"id": c["capability_id"], "name": c["capability_id"], "bytes": len(v), "verdict": c["exoskeleton"]["verdict"], "ts": c["provenance"]["f0_id"]})
         elif kind == "vendor":
             for p in sorted(VENDOR_DIR.glob("*.json")):
                 a = json.loads(p.read_text())
@@ -686,7 +687,7 @@ def cmd_tree(args, vault: Vault) -> None:
     )
 
 
-def cmd_entry(args, vault: Vault) -> None:
+def cmd_entry(args, fx: ForgedXFolders) -> None:
     kind, eid = args.kind, args.id
     if kind == "f0":
         d = RAW / eid
@@ -704,11 +705,11 @@ def cmd_entry(args, vault: Vault) -> None:
         if not p.is_file():
             die(f"unknown forged: {eid}")
         a = json.loads(p.read_text())
-        a["provenance"] = vault.manifest_chain(eid)
+        a["provenance"] = fx.manifest_chain(eid)
         out({"ok": True, "kind": "f2", **a})
     elif kind in ("skill", "capability"):
         key = f"{kind}:{eid}"
-        v = vault.get(CF_CONTROL, key)
+        v = fx.get(CF_CONTROL, key)
         if v is None:
             die(f"unknown {kind}: {eid}")
         out({"ok": True, "kind": kind, **json.loads(v)})
@@ -722,7 +723,7 @@ def cmd_entry(args, vault: Vault) -> None:
         die(f"unknown kind: {kind}")
 
 
-def cmd_stats(args, vault: Vault) -> None:
+def cmd_stats(args, fx: ForgedXFolders) -> None:
     tables = {}
     try:
         con = duck_connect()
@@ -739,10 +740,10 @@ def cmd_stats(args, vault: Vault) -> None:
             "ok": True,
             "spec": SPEC,
             "rocksdb": {
-                "control_keys": vault.count(CF_CONTROL),
-                "idx_keys": vault.count(CF_IDX),
-                "manifest_keys": vault.count(CF_MANIFEST),
-                "meta_keys": vault.count(CF_META),
+                "control_keys": fx.count(CF_CONTROL),
+                "idx_keys": fx.count(CF_IDX),
+                "manifest_keys": fx.count(CF_MANIFEST),
+                "meta_keys": fx.count(CF_META),
             },
             "duckdb": tables,
             "files": {
@@ -942,7 +943,7 @@ def detect_artifact(buf: bytes, filename: str) -> tuple[str, str, dict, bool]:
     return "unknown", "unrecognized artifact", {}, True
 
 
-def cmd_vendor(args, vault: Vault) -> None:
+def cmd_vendor(args, fx: ForgedXFolders) -> None:
     src = Path(args.path)
     if not src.is_file():
         die(f"vendor path not found: {args.path}")
@@ -962,15 +963,15 @@ def cmd_vendor(args, vault: Vault) -> None:
         "quarantined": quarantined,
         "vendored_at": now_iso(),
         "spec": SPEC,
-        "note": "Hugging Face is a vendor/input boundary — original artifact stays in the vendor store; vault holds metadata only.",
+        "note": "Hugging Face is a vendor/input boundary — original artifact stays in the vendor store; ForgedxFolders holds metadata only.",
     }
     (QUAR if quarantined else VENDOR_DIR).mkdir(parents=True, exist_ok=True)
     target = (QUAR if quarantined else VENDOR_DIR) / f"{asset_id}.json"
     existing = target.exists()
     if not existing:
         target.write_text(json.dumps(record, ensure_ascii=False, indent=2))
-        vault.put(CF_CONTROL, f"asset:{asset_id}", json.dumps(record, ensure_ascii=False))
-        vault.put(CF_IDX, f"idx:asset:{asset_id}", json.dumps({"format": fmt, "quarantined": quarantined}))
+        fx.put(CF_CONTROL, f"asset:{asset_id}", json.dumps(record, ensure_ascii=False))
+        fx.put(CF_IDX, f"idx:asset:{asset_id}", json.dumps({"format": fmt, "quarantined": quarantined}))
         try:
             con = duck_connect()
             con.execute(
@@ -984,7 +985,7 @@ def cmd_vendor(args, vault: Vault) -> None:
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(prog="forged_vault.py")
+    ap = argparse.ArgumentParser(prog="forgedxfolders.py")
     ap.add_argument("--db", default=None, help=argparse.SUPPRESS)
     sub = ap.add_subparsers(dest="cmd", required=True)
 
@@ -1025,28 +1026,28 @@ def main() -> None:
         VENDOR_DIR = DATA / "vendor"
         QUAR = DATA / "quarantine"
         ROCKS = DATA / "rocksdb"
-        DUCK = DATA / "vault.duckdb"
+        DUCK = DATA / "forgedxfolders.duckdb"
 
-    vault = Vault()
+    fx = ForgedXFolders()
     try:
         if args.cmd == "ingest":
-            cmd_ingest(args, vault)
+            cmd_ingest(args, fx)
         elif args.cmd == "chunk":
-            cmd_chunk(args, vault)
+            cmd_chunk(args, fx)
         elif args.cmd == "forge":
-            cmd_forge(args, vault)
+            cmd_forge(args, fx)
         elif args.cmd == "manifest":
-            cmd_manifest(args, vault)
+            cmd_manifest(args, fx)
         elif args.cmd == "tree":
-            cmd_tree(args, vault)
+            cmd_tree(args, fx)
         elif args.cmd == "entry":
-            cmd_entry(args, vault)
+            cmd_entry(args, fx)
         elif args.cmd == "vendor":
-            cmd_vendor(args, vault)
+            cmd_vendor(args, fx)
         elif args.cmd == "stats":
-            cmd_stats(args, vault)
+            cmd_stats(args, fx)
     finally:
-        vault.close()
+        fx.close()
 
 
 if __name__ == "__main__":
