@@ -3,7 +3,7 @@
 ## Version: 3.6.0
 ## Status: Active ✓
 ## Last Updated: 2026-08-22
-## Deployment: ESA.ingeniosity.tech
+## Deployment: www.Ava007.Ingeniosity.tech
 ## Identity: Agent X = logic & reasoning for the capabilities layer · Ava007 = voice · Scope = Help Assembly Services only
 ## Exoskeletons: `public/` = Help Assembly Services console · `public/esa-console/` = ESA service cards console (hotel maintenance, HD Supply PTAC) — sandboxed separately, no shared architecture
 
@@ -33,7 +33,7 @@
 ## Component Architecture
 
 ```
-ESA SERVICE CARDS (ESA.ingeniosity.tech)
+ESA SERVICE CARDS (www.Ava007.Ingeniosity.tech)
 │
 ├── 📋 ESA.Console (left sidebar — scene/layers panel, hidden on mobile)
 │   ├── Header (✦ + title + subtitle) · Console ⇄ Library tabs · search footer
@@ -163,7 +163,7 @@ setTheme('light');    // Force light mode
 ## Deployment
 
 ### Cloudflare Pages
-- **URL**: https://ESA.ingeniosity.tech
+- **URL**: https://www.Ava007.Ingeniosity.tech
 - **Build**: Static (no build step required)
 - **CI/CD**: GitHub Actions on push to main
 

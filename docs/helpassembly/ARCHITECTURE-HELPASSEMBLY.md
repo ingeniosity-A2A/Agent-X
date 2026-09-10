@@ -249,7 +249,7 @@ Nav hub: links to ESA Exoskeleton and Help Assembly consoles. Displays AgentMail
 - **Runtime**: Next.js 16 standalone output (`.next/standalone/`)
 - **Reverse proxy**: Caddy on port 81 → `localhost:3000`
 - **Database**: SQLite file at `db/custom.db`
-- **Target**: `ESA.ingeniosity.tech` (per `enforcer.ts` deployment spec)
+- **Target**: `www.Ava007.Ingeniosity.tech` (per `enforcer.ts` deployment spec)
 - **Port**: 3000 (Next.js), 81 (Caddy)
 
 ### Environment variables

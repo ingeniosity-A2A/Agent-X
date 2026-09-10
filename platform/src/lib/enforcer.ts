@@ -123,7 +123,7 @@ const DEFAULT_ESA_FEATURES: ESAFeatureFlag[] = [
   {
     id: "esa.deploy",
     label: "Deploy capability",
-    description: "Register and hydrate ESA.ingeniosity.tech under Exoskeleton",
+    description: "Register and hydrate www.Ava007.Ingeniosity.tech under Exoskeleton",
     enabled: true,
     requires: ["repo", "dns", "build"],
   },
@@ -171,7 +171,7 @@ export class ExoskeletonEnforcer {
       property: "Extended Stay America · Buckhead · Brookhaven, GA",
       port: 3000,
       caddyPort: 81,
-      fqn: "ESA.ingeniosity.tech",
+      fqn: "www.Ava007.Ingeniosity.tech",
     });
   }
 

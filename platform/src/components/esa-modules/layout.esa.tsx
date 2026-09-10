@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// ESA.ingeniosity.tech — set via NEXT_PUBLIC_SITE_URL at build time
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://esa.ingeniosity.tech";
+// www.Ava007.Ingeniosity.tech — set via NEXT_PUBLIC_SITE_URL at build time
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.Ava007.Ingeniosity.tech";
 
 export const metadata: Metadata = {
   title: "ESA Service Cards — Extended Stay America",

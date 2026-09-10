@@ -2,7 +2,7 @@
 
 **Help Assembly Services Exoskeleton** - A cloud-native furniture-assembly service console: 3D rendering cards, DuckDB catalog, and the Ingestion Interface as the sole communication hub. **Agent X** provides the logic and reasoning for the capabilities layer; **Ava007** provides the voice.
 
-[![Deployed on Cloudflare](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://ESA.ingeniosity.tech)
+[![Deployed on Cloudflare](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://www.Ava007.Ingeniosity.tech)
 [![Version](https://img.shields.io/badge/version-3.5.0-green.svg)](https://github.com/ingeniosity-A2A/Agent-X/tree/main/esa-exoskeleton)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -353,6 +353,6 @@ MIT © ESA Team
 
 ---
 
-**Live URL**: [ESA.ingeniosity.tech](https://ESA.ingeniosity.tech)
+**Live URL**: [www.Ava007.Ingeniosity.tech](https://www.Ava007.Ingeniosity.tech)
 
 **Issues**: [GitHub Issues](https://github.com/ingeniosity-A2A/Agent-X/issues)
