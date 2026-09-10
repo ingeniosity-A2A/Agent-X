@@ -6,15 +6,28 @@ import {
   setQuantity,
   inventoryBootstrapRequired,
 } from "@/lib/inventory-store";
+import { getCatalog, revalidateCatalog } from "@/lib/catalog-cache";
 
 export async function GET() {
+  // HD Supply catalog via RocksDB housing (fast rendering — the process
+  // cache makes every call after the first a plain memory read).
+  const catalog = getCatalog();
+  const snap = await snapshot();
   return NextResponse.json({
     ok: true,
     mandatoryInventory: inventoryBootstrapRequired(),
     message: inventoryBootstrapRequired()
       ? "No inventory database — inventory session is mandatory before ordering."
       : "Inventory loaded",
-    ...snapshot(),
+    catalog: {
+      vendor: catalog.vendor,
+      source: catalog.source,
+      loadedAt: catalog.loadedAt,
+      items: catalog.items,
+    },
+    ...snap,
+    // streamCatalog kept for card compat — served from the RocksDB snapshot
+    streamCatalog: catalog.items,
   });
 }
 
@@ -22,6 +35,15 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const action = body.action as string;
+
+    if (action === "catalog_refresh") {
+      const catalog = await revalidateCatalog();
+      return NextResponse.json({
+        ok: true,
+        message: `Catalog revalidated from ${catalog.source} (${catalog.items.length} items)`,
+        catalog,
+      });
+    }
 
     if (action === "scan_add" || action === "photo_add") {
       const quantity = Number(body.quantity ?? 0);
@@ -47,7 +69,7 @@ export async function POST(req: NextRequest) {
               ? `${part.name} marked out of stock (red). Add a service request?`
               : `Recorded ${part.name} at qty ${part.quantity}. Scan next or order parts?`,
         },
-        ...snapshot(),
+        ...(await snapshot()),
       });
     }
 
@@ -60,7 +82,7 @@ export async function POST(req: NextRequest) {
           { status: 404 }
         );
       }
-      return NextResponse.json({ ok: true, part, ...snapshot() });
+      return NextResponse.json({ ok: true, part, ...(await snapshot()) });
     }
 
     if (action === "set_quantity") {
@@ -68,7 +90,7 @@ export async function POST(req: NextRequest) {
       if (!part) {
         return NextResponse.json({ ok: false, error: "Part not found" }, { status: 404 });
       }
-      return NextResponse.json({ ok: true, part, ...snapshot() });
+      return NextResponse.json({ ok: true, part, ...(await snapshot()) });
     }
 
     return NextResponse.json({ ok: false, error: "Unknown action" }, { status: 400 });

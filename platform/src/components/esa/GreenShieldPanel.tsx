@@ -27,14 +27,23 @@ function monthLabel(year: number, month: number) {
   });
 }
 
+/**
+ * LOCAL today — never toISOString() (UTC) for the initial selection, or the
+ * card opens on yesterday for operators west of UTC. Owner directive: the
+ * to-do card shows the CORRECT Green Shield for today.
+ */
+function localToday(): string {
+  const n = new Date();
+  const p = (x: number) => String(x).padStart(2, "0");
+  return `${n.getFullYear()}-${p(n.getMonth() + 1)}-${p(n.getDate())}`;
+}
+
 export function GreenShieldPanel() {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
   const [days, setDays] = useState<GreenDay[]>([]);
-  const [selected, setSelected] = useState<string>(
-    now.toISOString().slice(0, 10)
-  );
+  const [selected, setSelected] = useState<string>(localToday);
   const [day, setDay] = useState<GreenDay | null>(null);
   const [error, setError] = useState<string | null>(null);
 

@@ -28,3 +28,10 @@ next-env.d.ts
 # (the databases ESA / Help Assembly house; code + seeds are tracked, internals are not)
 modules/esa/data/rocksdb/
 modules/helpassembly/data/rocksdb/
+
+# ESA Product card runtime data — regenerable/runtime tiers (owner 2026-09-10):
+# catalog snapshots reseed via scripts/seed_hdsupply_catalog.py; the order
+# log is runtime append-only data.
+modules/esa/data/catalog/
+modules/esa/data/orders/
+platform/tsconfig.tsbuildinfo

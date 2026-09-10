@@ -54,6 +54,7 @@ export function PartsCard({
   const [orderSku, setOrderSku] = useState("");
   const [orderQty, setOrderQty] = useState("1");
   const [lastOrder, setLastOrder] = useState<string | null>(null);
+  const [lastOrderUrl, setLastOrderUrl] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     const res = await fetch("/api/inventory");
@@ -169,6 +170,7 @@ export function PartsCard({
     setBusy(true);
     setError(null);
     setLastOrder(null);
+    setLastOrderUrl(null);
     try {
       const res = await fetch("/api/parts", {
         method: "POST",
@@ -181,12 +183,24 @@ export function PartsCard({
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.error || "Order failed");
       setLastOrder(data.message || data.orderId);
-      setAvaPrompt(`Order placed: ${data.orderId}. HD Supply / Punch-In fallback available.`);
+      setLastOrderUrl(data.orderUrl ?? null);
+      setAvaPrompt(
+        `Order placed: ${data.orderId}. HD Supply Punch-In is one click away.`
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Order failed");
     } finally {
       setBusy(false);
     }
+  }
+
+  function orderPartRow(part: PartRow) {
+    setOrderSku(part.sku);
+    setOrderQty(part.status === "out_of_stock" ? "2" : "1");
+    setMode("order");
+    setAvaPrompt(
+      `Ordering ${part.name} (${part.sku}). Confirm quantity and order — Punch-In handoff is ready.`
+    );
   }
 
   async function addServiceTodo(part: PartRow) {
@@ -355,6 +369,16 @@ export function PartsCard({
             </button>
           </div>
           {lastOrder && <p className="text-xs text-emerald-300">{lastOrder}</p>}
+          {lastOrderUrl && (
+            <a
+              href={lastOrderUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 rounded-lg border border-[#00d4ff]/40 bg-[#00d4ff]/10 px-2.5 py-1 text-xs text-[#00d4ff] hover:bg-[#00d4ff]/20"
+            >
+              Open HD Supply Punch-In ↗
+            </a>
+          )}
         </div>
       )}
 
@@ -395,6 +419,15 @@ export function PartsCard({
               >
                 + todo
               </button>
+              {(p.status === "low" || p.status === "out_of_stock") && (
+                <button
+                  type="button"
+                  className="ml-1 text-[10px] text-amber-300 hover:text-amber-200"
+                  onClick={() => orderPartRow(p)}
+                >
+                  order +
+                </button>
+              )}
             </div>
           </li>
         ))}

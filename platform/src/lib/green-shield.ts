@@ -19,8 +19,24 @@ export type GreenShieldDay = {
   checklist: ChecklistItem[];
 };
 
+function pad2(n: number) {
+  return String(n).padStart(2, "0");
+}
+
+/**
+ * Local-date formatting — NEVER toISOString() for day keys. toISOString
+ * renders UTC, which shifts the calendar a day for operators west/east of
+ * UTC (owner directive: the to-do card shows the CORRECT Green Shield for
+ * TODAY — local). Same noon-guard spirit as the parity contract in
+ * esa-exoskeleton/public/config/green-shield.js.
+ */
 function iso(d: Date) {
-  return d.toISOString().slice(0, 10);
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+
+/** The operator's local today (server-local clock). */
+export function todayISO(): string {
+  return iso(new Date());
 }
 
 function addDays(base: Date, n: number) {
@@ -59,8 +75,13 @@ const TEMPLATES: { title: string; items: Omit<ChecklistItem, "id" | "done">[] }[
   },
 ];
 
-/** In-memory checklist state keyed by date */
-const dayState = new Map<string, GreenShieldDay>();
+/** In-memory checklist state keyed by date — globalThis-pinned so the
+ * calendar GET and the toggle POST (separate route bundles in dev) share
+ * one source of truth. */
+type GreenShieldGlobal = { __avaGreenShield?: Map<string, GreenShieldDay> };
+const gsGlobal = globalThis as GreenShieldGlobal;
+if (!gsGlobal.__avaGreenShield) gsGlobal.__avaGreenShield = new Map();
+const dayState = gsGlobal.__avaGreenShield;
 
 function buildDay(dateStr: string, index: number): GreenShieldDay {
   const tpl = TEMPLATES[index % TEMPLATES.length];
@@ -88,10 +109,13 @@ export function getMonthDays(year: number, month: number): GreenShieldDay[] {
     }
     out.push(dayState.get(dateStr)!);
   }
-  const today = iso(new Date());
+  const today = todayISO();
   for (const day of out) {
-    if (day.date > today) day.due = dWeekdayDue(day.date);
-    else day.due = !day.completed;
+    // Green Shield SOP contract: inspections are DUE every weekday except
+    // Sunday; a completed day is no longer due. This now holds for past,
+    // today AND future days (previously today/past ignored the Sunday
+    // exemption — today on a Sunday showed "due").
+    day.due = dWeekdayDue(day.date) && !day.completed;
   }
   return out;
 }
@@ -129,12 +153,12 @@ export function setRoomsOutOfService(dateStr: string, rooms: string[]): GreenShi
 }
 
 export function greenShieldSummary(dateStr?: string) {
-  const today = dateStr ?? iso(new Date());
+  const today = dateStr ?? todayISO();
   const day = getDay(today);
-  const month = getMonthDays(
-    new Date(today).getFullYear(),
-    new Date(today).getMonth()
-  );
+  // Noon guard on the parse too — bare "YYYY-MM-DD" parses as UTC midnight
+  // and shifts the month parts on non-UTC servers.
+  const noon = new Date(today + "T12:00:00");
+  const month = getMonthDays(noon.getFullYear(), noon.getMonth());
   const completedDays = month.filter((d) => d.completed).length;
   const dueDays = month.filter((d) => d.due && !d.completed && d.date <= today).length;
   return {

@@ -16,6 +16,18 @@ interface SnapshotRef {
 
 const SESSION = "ava007-console";
 
+/**
+ * The Agent Browser renders the cards. Owner directive (2026-09-10):
+ * the browser session is wired to the Ava007 card surface in production —
+ * www.Ava007.Ingeniosity.tech (the old esa subdomain is REMOVED — there is
+ * no ESA console and no ESA exoskeleton entity; the only exoskeleton is the
+ * A2A-Exoskeleton). In dev the local ESA rendering-cards surface serves the
+ * same cards.
+ * Not a chat interface — the panel is a card viewport with snapshot/screenshot.
+ */
+const AVA007_CARDS_URL = "https://www.Ava007.Ingeniosity.tech";
+const LOCAL_ESA_CARDS = "/agent-browser/interface/3d-rendering/esa";
+
 function parseRefs(raw: string): SnapshotRef[] {
   // agent-browser's compact text snapshot lines look like: [button] "Sign in" @e3
   const lines = raw.split("\n").filter((l) => l.includes("@e"));
@@ -33,8 +45,8 @@ function parseRefs(raw: string): SnapshotRef[] {
 }
 
 export default function BrowserPanel() {
-  const [url, setUrl] = useState("https://example.com");
-  const [addressInput, setAddressInput] = useState("https://example.com");
+  const [url, setUrl] = useState(AVA007_CARDS_URL);
+  const [addressInput, setAddressInput] = useState(AVA007_CARDS_URL);
   const [tab, setTab] = useState<Tab>("snapshot");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<"idle" | "connected" | "error">("idle");
@@ -160,6 +172,36 @@ export default function BrowserPanel() {
         </button>
       </div>
       <EditModePanel open={editMode} onClose={() => setEditMode(false)} />
+
+      {/* card surface quick-jump — cards render HERE, on the Agent Browser */}
+      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+        <span style={{ fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--bento-text-muted)" }}>
+          Card surfaces
+        </span>
+        <button
+          className="ava-badge"
+          style={{ cursor: "pointer" }}
+          title="Production card surface — www.Ava007.Ingeniosity.tech"
+          onClick={() => {
+            setAddressInput(AVA007_CARDS_URL);
+            navigate(AVA007_CARDS_URL);
+          }}
+        >
+          Ava007 Cards · production
+        </button>
+        <button
+          className="ava-badge"
+          style={{ cursor: "pointer" }}
+          title="Local ESA rendering cards (dev)"
+          onClick={() => {
+            const abs = `${window.location.origin}${LOCAL_ESA_CARDS}`;
+            setAddressInput(abs);
+            navigate(abs);
+          }}
+        >
+          ESA Cards · local
+        </button>
+      </div>
 
       {/* viewport */}
       <div

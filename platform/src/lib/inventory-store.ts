@@ -1,7 +1,16 @@
 /**
  * ESA inventory store — mandatory when no catalog DB exists.
  * In-process for dev; swap for DuckDB/Arrow later without changing API shapes.
+ *
+ * Owner directive (2026-09-10): the Product card conducts inventory AND
+ * product orders. Orders are durable — appended to
+ * modules/esa/data/orders/orders.jsonl (append-only log, survives restarts)
+ * — and every order carries the HD Supply Punch-In deep link so the
+ * hand-off to the vendor site is one click from the card.
  */
+
+import { appendFile, mkdir, readFile } from "node:fs/promises";
+import path from "node:path";
 
 export type PartStatus = "in_stock" | "low" | "out_of_stock";
 
@@ -46,6 +55,19 @@ export type CatalogLink = {
   vendor: string;
 };
 
+/** Product order — recorded durably, handed off to HD Supply Punch-In. */
+export type ProductOrder = {
+  orderId: string;
+  sku: string;
+  name: string;
+  quantity: number;
+  vendor: string;
+  status: "queued_punch_in" | "handed_off";
+  punchInUrl: string;
+  catalogUrl?: string | null;
+  createdAt: string;
+};
+
 function statusFromQty(q: number): PartStatus {
   if (q <= 0) return "out_of_stock";
   if (q <= 3) return "low";
@@ -56,9 +78,87 @@ function id(prefix: string) {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
-/** Empty until first inventory session — system treats missing DB as mandatory inventory. */
-const parts = new Map<string, PartRecord>();
-const serviceRequests: ServiceRequest[] = [];
+/**
+ * Cross-route singletons — Next.js bundles each route handler separately in
+ * dev; plain module-level maps would give /api/inventory and /api/parts two
+ * different stores. Pin them on globalThis (Prisma-singleton pattern) so
+ * the Product card's inventory session is visible to the order endpoint.
+ * Inventory stays mandatory (gate = empty store) until the first session.
+ */
+type InventoryGlobal = {
+  __avaInventory?: {
+    parts: Map<string, PartRecord>;
+    serviceRequests: ServiceRequest[];
+    orders: ProductOrder[];
+    ordersLoaded: boolean;
+  };
+};
+const g = globalThis as InventoryGlobal;
+if (!g.__avaInventory) {
+  g.__avaInventory = {
+    parts: new Map<string, PartRecord>(),
+    serviceRequests: [],
+    orders: [],
+    ordersLoaded: false,
+  };
+}
+const parts = g.__avaInventory.parts;
+const serviceRequests = g.__avaInventory.serviceRequests;
+const orders = g.__avaInventory.orders;
+const ordersLoaded = () => g.__avaInventory!.ordersLoaded;
+function markOrdersLoaded() {
+  g.__avaInventory!.ordersLoaded = true;
+}
+
+/**
+ * Durable order log — append-only JSONL under the ESA data housing
+ * (next to the RocksDB DB). In-process mirror kept for fast reads.
+ */
+const ORDERS_LOG = "modules/esa/data/orders/orders.jsonl";
+
+function ordersLogAbs(): string {
+  // Server runs with cwd = platform/ → repo root is one level up.
+  // AVA007_REPO_ROOT overrides for non-standard launch dirs.
+  const root = process.env.AVA007_REPO_ROOT || path.join(process.cwd(), "..");
+  return path.isAbsolute(ORDERS_LOG) ? ORDERS_LOG : path.join(root, ORDERS_LOG);
+}
+
+async function appendOrderLog(order: ProductOrder): Promise<void> {
+  orders.unshift(order);
+  // Durable tier — the API response never waits on disk; mirror is
+  // already updated above so the card renders instantly.
+  try {
+    const abs = ordersLogAbs();
+    await mkdir(path.dirname(abs), { recursive: true });
+    await appendFile(abs, JSON.stringify(order) + "\n", "utf8");
+  } catch {
+    /* durable tier best-effort; in-process mirror always authoritative */
+  }
+}
+
+async function loadOrders(): Promise<void> {
+  if (ordersLoaded()) return;
+  markOrdersLoaded();
+  try {
+    const abs = ordersLogAbs();
+    const raw = await readFile(abs, "utf8");
+    const lines = raw.split("\n").filter(Boolean);
+    for (const line of lines.reverse()) {
+      try {
+        orders.push(JSON.parse(line) as ProductOrder);
+      } catch {
+        /* skip torn line */
+      }
+    }
+  } catch {
+    /* no log yet */
+  }
+}
+
+export async function listOrders(): Promise<ProductOrder[]> {
+  await loadOrders();
+  return [...orders];
+}
 
 /** HD Supply-style catalog links (scan/add or stream). */
 const CATALOG_LINKS: CatalogLink[] = [
@@ -200,13 +300,26 @@ export function setQuantity(skuOrId: string, quantity: number): PartRecord | und
 
 export function orderPart(
   skuOrId: string,
-  qty: number
-): { ok: boolean; part?: PartRecord; orderId?: string; error?: string } {
+  qty: number,
+  punchInUrl: string
+): { ok: boolean; part?: PartRecord; order?: ProductOrder; orderId?: string; error?: string } {
   const p = getPart(skuOrId);
   if (!p) return { ok: false, error: "Part not in inventory — run inventory first" };
   if (qty <= 0) return { ok: false, error: "Order quantity must be > 0" };
   const orderId = id("ORD");
-  return { ok: true, part: p, orderId };
+  const order: ProductOrder = {
+    orderId,
+    sku: p.sku,
+    name: p.name,
+    quantity: qty,
+    vendor: p.vendor,
+    status: "queued_punch_in",
+    punchInUrl,
+    catalogUrl: p.catalogUrl ?? null,
+    createdAt: new Date().toISOString(),
+  };
+  void appendOrderLog(order); // durable tier — mirror already updated
+  return { ok: true, part: p, order, orderId };
 }
 
 export function listServiceRequests(): ServiceRequest[] {
@@ -253,7 +366,7 @@ export function updateServiceRequestStatus(
   return row;
 }
 
-export function snapshot() {
+export async function snapshot() {
   const list = listParts();
   return {
     bootstrapRequired: inventoryBootstrapRequired(),
@@ -264,6 +377,7 @@ export function snapshot() {
       inStock: list.filter((p) => p.status === "in_stock").length,
     },
     parts: list,
+    orders: await listOrders(),
     catalogLinks: listCatalogLinks(),
     streamCatalog: streamCatalog(),
     serviceRequests: listServiceRequests(),
