@@ -9,6 +9,7 @@ It is **not** Cybernetic Ava007 and **not** a peer Intellect.
 | Latent skill acquisition | Model tier selection (Constellation) |
 | Untrusted / provisional code | Core-Membrain |
 | Candidate generation for promotion | REV.IKE / philosophical framing |
+| Freebuff capability exposure (Debian 13 runtime — Ava does not contain it) | Freebuff binary / Debian guest itself |
 
 Authoritative capability contract: `Agent-X-Capability.md`  
 Architecture SoR for the wider system: Ava007 `docs/exoskeleton/`  
