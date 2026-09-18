@@ -1,27 +1,18 @@
-# Radio / Telecom Ownership — Fixed
+# Radio / Telecom Ownership
 
-**Rule:** Ava007 knows *what* capability exists. It does **not** contain physical-radio implementation.
+**Ava007** issues intent. **Omnibus** promotes skills/contracts. **Agent-X** executes hardware.
 
-| Capability | Repo | Runtime container |
-|------------|------|-------------------|
-| Intelligence / orchestration | Cybernetic-Ava007 | ava007-core |
-| Cellular hardware (Onomondo, nRF91, NCS) | **Agent-X** | `containers/cellular-edge/` |
-| USB modem / serial | **Agent-X** | `containers/hardware-io/` |
-| SX1262 / CC1101 / LoRa | **Agent-X** | `containers/rf-edge/` |
-| SDR adapters | **Agent-X** | `containers/sdr-edge/` |
-| Telnyx SMS/MMS/Voice | **Agent-X** | `containers/telecom-gateway/` |
-| Cloudflare Tunnel | **Agent-X** | `containers/edge-tunnel/` |
-| srsRAN / gNB / FAPO | **fapo-ran** | ran-stack |
-| Connectivity memory / policy / receipts | **QAG-MemBrain** | connectivity-memory |
+| Capability | Active owner |
+|------------|--------------|
+| Cellular / Onomondo / nRF91 | Agent-X `containers/cellular-edge/` |
+| USB serial / modem I/O | Agent-X `containers/hardware-io/` |
+| LoRa / SX1262 / CC1101 | Agent-X `containers/rf-edge/` |
+| SDR adapters (non-gNB) | Agent-X `containers/sdr-edge/` |
+| Telnyx | Agent-X `containers/telecom-gateway/` |
+| Cloudflare Tunnel | Agent-X `containers/edge-tunnel/` |
+| RAN / srsRAN / FAPO | **fapo-ran** only |
+| Skill/contract promotion | **Omnibus** |
+| Historical RF/telecom research | **QAG-MemBrain** (read-only extract → Omnibus) |
 
-```text
-Cybernetic-Ava007
-        │ capability contract (A2A)
-        ├──────────────┬──────────────┐
-        ▼              ▼              ▼
-   Agent-X          fapo-ran      QAG-MemBrain
-   edge execution   RAN stack     memory/policy
-```
-
-Skill firmware (e.g. `skills/onomondo-ncs/`) stays as **definition**.  
-Hardware execution moves under `containers/*-edge/`.
+Intelligence does **not** belong in Agent-X merely because Agent-X executes it.  
+Receive promoted artifacts from Omnibus; do not treat QAG-MemBrain as live control plane.
