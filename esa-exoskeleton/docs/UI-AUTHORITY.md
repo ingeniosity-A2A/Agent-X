@@ -18,9 +18,11 @@ Status: binding. Read before touching ANY file in this directory.
    cards. Framework chrome (header, dock, nav, toolbar, loading/error
    screens) is framework identity — no tenant names in it, no framework
    names inside tenant cards.
-4. **The tenant surface is small and closed.** ESA = 5 rendering cards,
-   a calendar, a DB, inventory management. New ESA surface requires an
-   explicit owner decision — no growth byaccident.
+4. **The tenant surface is small and closed.** The current Agent Browser operator
+   surface is **3 primary ESA cards** — Maintenance Calls, Inventory, and Daily To-Do.
+   Chat Ingestion is embedded in every primary card. Calendar, inventory/catalog,
+   and service-request state are backing capabilities, not additional operator cards.
+   New ESA surface requires an explicit owner decision — no growth by accident.
 
 ## File classification
 
