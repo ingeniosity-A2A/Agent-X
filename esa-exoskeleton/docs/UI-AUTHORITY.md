@@ -57,11 +57,11 @@ Status: binding. Read before touching ANY file in this directory.
 
 | ESA asset | Files |
 |-----------|-------|
-| **5 rendering cards** | `ESA.DiagnosticCard.js` · `ESA.invpartscard-B.js` (parts + inventory + broadcast) · `ESA.workorder.js` · `ESA.MaintenanceChecklist.js` · `ESA.Ptac-B.js` |
+| **3 primary cards** | Agent Browser: `Maintenance Calls` · `Inventory` · `Daily To-Do`; legacy public components remain backing/compatibility assets |
 | **Calendar** | `ESA.Calendar.js` + `config/green-shield.js` (backend-parity schedule) |
 | **DB** | `config/duckdb-setup.js` (DuckDB WASM catalog) |
 | **Inventory management** | Inside `ESA.invpartscard-B.js` (inventory panel + broadcast B-side) |
-| Tenant chat/lens modules | `ESAIngestionChat.js` · `ESA.Ingestion.js` (dock adapter) · `ESA.ButtonPanel.js` · `hooks/use-esa-chat.js` |
+| **Chat Ingestion capability** | Embedded in every primary card; legacy chat/lens modules remain backing/compatibility assets |
 | Tenant wiring | `integration.js` (framework glue, tenant-configured) |
 
 ## Rules going forward
