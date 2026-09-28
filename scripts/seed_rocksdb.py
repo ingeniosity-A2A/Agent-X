@@ -4,7 +4,7 @@
 Doctrine (owner, 2026-09-07): ESA and Help Assembly live in the Agent-X repo
 and ONLY house RocksDB databases filled with their respective content.
 
-- modules/esa/data/rocksdb            ← ESA service assets (the 5 ESA cards,
+- modules/esa/data/rocksdb            ← ESA service assets (the 3 primary ESA cards: Maintenance Calls, Inventory, Daily To-Do,
                                         calendar, DB config, green shield)
 - modules/helpassembly/data/rocksdb   ← Help Assembly service assets
                                         (console, docs pipeline, build docs)
