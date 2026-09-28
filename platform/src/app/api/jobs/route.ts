@@ -55,7 +55,7 @@ export async function GET() {
 
   return NextResponse.json({
     surface: "daily_todos",
-    ingestion: "detached",
+    ingestion: "embedded_per_card",
     greeting: "Daily To-Dos",
     greenShield: {
       date: gs.date,
