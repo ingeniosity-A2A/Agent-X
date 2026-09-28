@@ -482,7 +482,6 @@ export default function AVAInventoryInterface() {
         </div>
       )}
       {/* Audio module removed — not an ESA module. */}
-      {/* Grok Console removed — not an ESA module (component does not exist in this repo). */}
 
       {/* Camera Lens removed — ingestion is not an ESA module. */}
 

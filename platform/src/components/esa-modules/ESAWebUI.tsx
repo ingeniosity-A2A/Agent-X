@@ -255,10 +255,7 @@ const PENDING_REQUESTS: PendingRequest[] = [
 ];
 
 const MODEL_OPTIONS = [
-  { id: "grok-4.5", label: "Grok 4.5", provider: "xAI" },
-  { id: "grok-4.20-multi-agent", label: "Grok 4.20 Multi-Agent", provider: "xAI" },
-  { id: "llama-3.3-70b", label: "Llama 3.3 70B", provider: "Meta" },
-  { id: "ava-finetuned-v1", label: "AVA Fine-Tuned v1", provider: "ESA" },
+  { id: "ava007", label: "Ava007", provider: "Ava007" },
 ];
 
 /* ── Simulated responses ── */
@@ -565,7 +562,7 @@ export default function ESAWebUI({ onLaunchCard }: { onLaunchCard?: (cardId: str
   const [loading, setLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [hasContent, setHasContent] = useState(false);
-  const [currentModel, setCurrentModel] = useState("grok-4.5");
+  const [currentModel, setCurrentModel] = useState("ava007");
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
