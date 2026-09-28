@@ -48,8 +48,8 @@ Ava007 intellect does **not** host these UIs.
   product orders; catalog fast-rendered from the ESA RocksDB housing;
   orders hand off to HD Supply Punch-In
 - Service Request
-- Green Shield Inspection (calendar + daily checklist)
-- Asset Stack (RocksDB housing)
+- Daily To-Do (calendar + Green Shield checklist)
+- RocksDB housing is backing card state, not a fourth operator card
 
 ## Missing viewport checklist
 
