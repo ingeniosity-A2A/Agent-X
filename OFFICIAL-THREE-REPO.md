@@ -14,7 +14,9 @@
 ## Agent-X KEEP
 
 - `esa-exoskeleton/` — Help + ESA sandboxed consoles
-- `platform/` — Next consoles, shell cards, API routes for ops
+- `platform/` — Next service cards, service APIs, Agent Browser rendering surface
+- ESA current operator surface = **three primary cards**: Maintenance Calls, Inventory, Daily To-Do
+- **Chat Ingestion is a shared capability inside every ESA primary card**: Lens/files, voice in, Ava007 conversation/voice out; card APIs remain the source of operational state
 - `skills/` — onomondo-ncs, agent-browser, firmware skills
 - `AGENTS.md`, `docs/` (capability, UI v6, agent-browser viewport)
 - S26 edge scripts: `s26_diagnostic.sh`, `setup_termux.sh`, `bootstrap_nonroot.sh`
