@@ -17,7 +17,6 @@ Ingestion (barcode, image, Agent X, IngeniosityLens, PianoWaver) = separate Ava0
 | Maint. Complete | `MaintenanceRequestComplete` | Maint. Complete | ACTIVE |
 | Service card shell | `ESAWebUI` (+ `ServiceCardShell` chrome) | Service Shell | ACTIVE |
 | Green Shield Operations | `ESAWebUI` sidebar/SOP data | Exoskeleton | ACTIVE |
-| Console | `GrokConsole` | Console | ACTIVE |
 
 ---
 
