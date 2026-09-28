@@ -5,6 +5,7 @@ import Link from "next/link";
 import { PartsCard } from "@/components/esa/PartsCard";
 import { ServiceRequestCard } from "@/components/esa/ServiceRequestCard";
 import { GreenShieldPanel } from "@/components/esa/GreenShieldPanel";
+import { ESAChatIngestion } from "@/components/esa/ESAChatIngestion";
 import { SendEmailButtons } from "@/components/esa/SendEmailButtons";
 import { TodaysJobs } from "@/components/a2ui";
 import type { TodayJob } from "@/components/a2ui/TodaysJobs";
@@ -13,7 +14,7 @@ type CardTab = "maintenance" | "inventory" | "todos";
 
 /**
  * ESA rendering surface — Select Card (never "select console").
- * Cards: Daily To-Dos · Parts + Inventory · Service Request · Green Shield
+ * Primary cards: Maintenance Calls · Inventory · Daily To-Do. Shared Chat Ingestion lives inside each card.
  */
 export default function ESARenderingCards() {
   const [card, setCard] = useState<CardTab>("maintenance");
@@ -143,18 +144,19 @@ export default function ESARenderingCards() {
 
         {card === "maintenance" && (
           <div className="mx-auto max-w-2xl">
-            <ServiceRequestCard />
+            <><ESAChatIngestion card="maintenance" /><ServiceRequestCard /></>
           </div>
         )}
 
         {card === "inventory" && (
           <div className="mx-auto max-w-2xl">
-            <PartsCard />
+            <><ESAChatIngestion card="inventory" /><PartsCard /></>
           </div>
         )}
 
         {card === "todos" && (
           <div className="mx-auto max-w-5xl space-y-4">
+            <ESAChatIngestion card="todos" />
             <TodaysJobs
               jobs={jobs}
               inProgress={counts.inProgress}
