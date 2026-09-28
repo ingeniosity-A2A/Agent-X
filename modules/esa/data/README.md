@@ -2,7 +2,7 @@
 
 ESA is a SERVICE in the Agent-X repo. This directory houses its database:
 `rocksdb/` — real RocksDB (rocksdict bundle), layers + meta column families,
-content = ESA service assets (the 5 ESA cards, calendar, green shield,
+content = ESA service assets (the 3 primary ESA cards: Maintenance Calls, Inventory, Daily To-Do; calendar, green shield,
 DuckDB config, console).
 
 - Schema: `job#frame#depth` keys → path references; `scripts/rocks_stack.py`
