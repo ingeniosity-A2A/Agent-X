@@ -16,7 +16,7 @@
 
 ## CRITICAL ARCHITECTURAL BOUNDARY
 
-This repository (`Ava007-Console` / Web UI) is the **Orchestration and Intelligence Layer**. It provides the dashboard, API routing, and high-level A2A coordination.
+This repository (`Agent-X`) is the **capability and service execution surface**. It prepares service packages, exposes service cards, runs service APIs, and provides the Agent Browser rendering surface. Ava007 remains the Intellect; Agent-X does not become an alternate intelligence layer.
 
 **DO NOT** look for or attempt to build the heavy-lifting edge SDKs here. The following components reside in the dedicated `Agent-X` repository and execute directly on the S26 Ultra via Termux:
 - `tekton-sdk` (Execution runtime)
