@@ -9,6 +9,21 @@
 
 ---
 
+## Current ESA operator contract
+
+The current Agent Browser surface renders exactly three primary ESA cards:
+
+1. **Maintenance Calls**
+2. **Inventory**
+3. **Daily To-Do**
+
+Each primary card contains the shared **Chat Ingestion** capability (Lens/files,
+voice input, Ava007 conversation and voice output). Service APIs and backing state
+remain behind the card; they are not promoted to additional operator cards.
+
+The older `public/` component inventory below is retained as implementation/history
+for the legacy Exoskeleton shell and must not redefine the current operator surface.
+
 ## ESA Components (All prefixed with ESA.)
 
 ### ✅ Verified Components
