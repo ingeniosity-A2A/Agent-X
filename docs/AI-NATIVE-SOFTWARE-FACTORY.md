@@ -143,3 +143,18 @@ This pattern does not imply:
 ## Source
 
 Yifei Fang, NVIDIA Technical Blog, “AI Native by Design: Lessons Learned from Building NVIDIA TensorRT Model Connect,” 29 Sep 2026.
+
+## UI composition rule
+
+The factory UI is not a centralized UI subsystem. It is a distributed feature contract.
+
+Watermelon is the reference/component catalogue. The owning application or feature implements its UI locally and imports that feature at the application composition boundary.
+
+Build-time integration is the integration boundary: if a feature is imported by an application route, the framework resolves and bundles it during the production build. There is no requirement for a global runtime component registry.
+
+For the current AI-native factory implementation, the production feature lives under Ava007-Omni-OS/forged/src/components/factory/ and is imported by forged/src/app/page.tsx.
+
+Modern organization:
+reference -> feature implementation -> app composition -> build -> rendered UI.
+
+This preserves independent feature ownership while still enforcing shared contracts, accessibility, design tokens, testability, and reproducible builds.
