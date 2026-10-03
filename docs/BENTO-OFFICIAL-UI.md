@@ -38,3 +38,23 @@ Destiny is not a living UI brand. Any Destiny *card* is upgraded **into** Bento 
 One framework: Bento.
 Upgrade in place. No second card system.
 ```
+
+
+## AI-native software factory alignment
+
+Bento remains the **single production UI framework**. The Watermelon catalogue is the reusable component/reference layer.
+
+The AI-native software-factory documentation lives here:
+
+- `docs/AI-NATIVE-SOFTWARE-FACTORY.md` — architecture and evidence model.
+- `docs/AI-NATIVE-SOFTWARE-FACTORY-COMMANDS.md` — command/state/receipt contract.
+
+The corresponding Watermelon components are:
+
+- **Factory Pipeline** — intent → outcome → agent runs → validation → verified.
+- **Agent Run Matrix** — independently owned parallel work units.
+- **Evidence Gate** — pass/fail, reproduce, revise/revert, verify.
+- **Factory Command Console** — human-readable command/state/receipt surface.
+
+These are reference components. Production surfaces must be implemented through Bento and its existing tokens, accessibility rules, and motion contract.
+
