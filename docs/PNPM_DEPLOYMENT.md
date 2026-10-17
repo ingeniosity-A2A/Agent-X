@@ -43,3 +43,6 @@ Here `pnpm import` migrates the existing npm lockfile. Review and commit the gen
 ## Platform deployment
 
 From `platform/`, use `pnpm install --frozen-lockfile`, `pnpm run build`, then `pnpm start` on the deployment host. The start script intentionally invokes Bun for the existing standalone Next.js runtime. Keep standalone service roots independent; do not move them into the platform workspace. Secrets belong in deployment environment variables, not package scripts or committed files.
+
+
+Shared package-manager guidance: [pnpm Skill](https://github.com/ingeniosity-A2A/a2a-exoskeleton/blob/pnpm/12.10.0-readiness/.agents/skills/pnpm/SKILL.md) (includes the release blog and upstream migration/performance references).
