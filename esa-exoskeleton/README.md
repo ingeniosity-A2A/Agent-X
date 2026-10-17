@@ -110,13 +110,13 @@ esa-exoskeleton/
 ### 1. Create Cloudflare Pages Project
 ```bash
 # Install Wrangler CLI globally
-pnpm dlx wrangler
+pnpm exec wrangler
 
 # Login to Cloudflare
-wrangler login
+pnpm exec wrangler login
 
 # Create Pages project
-wrangler pages project create esa-exoskeleton
+pnpm exec wrangler pages project create esa-exoskeleton
 ```
 
 ### 2. Get API Token
@@ -190,7 +190,7 @@ ESA SERVICE CARDS
 | `pnpm run build` | Build for production (no-op for static site) |
 | `pnpm run deploy` | Deploy to Cloudflare Pages manually |
 | `pnpm run init` | Login to Cloudflare via Wrangler |
-| `npm start` | Serve static files locally (port 3000) |
+| `pnpm start` | Serve static files locally (port 3000) |
 
 ---
 
