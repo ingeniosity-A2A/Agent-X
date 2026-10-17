@@ -184,8 +184,8 @@ setTheme('light');    // Force light mode
 
 ### Local Development
 ```bash
-npm install
-npm run dev      # http://localhost:8787
+pnpm install
+pnpm run dev      # http://localhost:8787
 ```
 
 ---
