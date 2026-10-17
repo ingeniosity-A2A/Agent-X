@@ -44,3 +44,8 @@ Platform app: see `platform/`.
 
 When Ava007 attaches `exo.help_assembly`, this repo’s `platform/` and `src/` provide the specialized suit.
 Mechanics: Ava007 `docs/exoskeleton/Exoskeleton-Rotational-Mechanics.md`.
+
+
+## pnpm setup and deployment
+
+Use the pinned pnpm 12.10.0 setup for `platform/`, ESA service cards, and document ingestion. Each remains its own deployable boundary; see [docs/PNPM_DEPLOYMENT.md](docs/PNPM_DEPLOYMENT.md) for first-install lockfile migration and deployment commands.
