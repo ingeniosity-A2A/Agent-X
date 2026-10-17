@@ -28,6 +28,16 @@ if ! command -v jq &>/dev/null; then
 fi
 echo "  Done."
 
+# Ensure the pinned package manager is available.
+if ! command -v pnpm &>/dev/null; then
+  if command -v corepack &>/dev/null; then
+    corepack enable
+    corepack prepare pnpm@12.10.0 --activate
+  else
+    npm install --global pnpm@12.10.0
+  fi
+fi
+
 # 2. Create project directory
 step="Create project directory"
 echo -e "${CYAN}[2/5] $step...${NC}"
