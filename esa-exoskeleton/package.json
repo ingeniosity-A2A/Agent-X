@@ -1,1 +1,36 @@
-{"name": "esa-exoskeleton", "version": "2.5.0", "description": "ESA EXOSKELETON - AI Agent Console with DuckDB Integration", "type": "module", "scripts": {"dev": "wrangler pages dev public --port 8787", "build": "echo 'ESA Exoskeleton - No build step required'", "deploy": "wrangler pages deploy public", "init": "wrangler login"}, "keywords": ["ESA", "Exoskeleton", "AI", "DuckDB", "Arrow.js", "Cloudflare"], "author": "ESA Team", "license": "MIT", "devDependencies": {"wrangler": "^3.0.0"}, "dependencies": {"@duckdb/duckdb-wasm": "^1.28.0", "@arrow-js/core": "^1.0.0", "@arrow-js/sandbox": "^1.0.0", "audiomotion-analyzer": "^4.5.0", "gsap": "^3.12.5"}}
+{
+  "name": "esa-exoskeleton",
+  "version": "2.5.0",
+  "description": "ESA EXOSKELETON - AI Agent Console with DuckDB Integration",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler pages dev public --port 8787",
+    "build": "echo 'ESA Exoskeleton - No build step required'",
+    "deploy": "wrangler pages deploy public",
+    "init": "wrangler login"
+  },
+  "keywords": [
+    "ESA",
+    "Exoskeleton",
+    "AI",
+    "DuckDB",
+    "Arrow.js",
+    "Cloudflare"
+  ],
+  "author": "ESA Team",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  },
+  "dependencies": {
+    "@duckdb/duckdb-wasm": "^1.28.0",
+    "@arrow-js/core": "^1.0.0",
+    "@arrow-js/sandbox": "^1.0.0",
+    "audiomotion-analyzer": "^4.5.0",
+    "gsap": "^3.12.5"
+  },
+  "packageManager": "pnpm@12.10.0",
+  "engines": {
+    "node": ">=22.13.0"
+  }
+}
