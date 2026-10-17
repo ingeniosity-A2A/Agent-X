@@ -42,6 +42,8 @@ cat > "$DOCS_DIR/package.json" << 'PKGJSON'
 {
   "name": "docs-pipeline",
   "version": "1.0.0",
+  "packageManager": "pnpm@12.10.0",
+  "engines": { "node": ">=22.13.0" },
   "type": "module",
   "scripts": {
     "start": "node src/server.js"
@@ -56,7 +58,7 @@ echo "  Done."
 # 4. Install Node dependencies
 step="Install Node dependencies"
 echo -e "${CYAN}[4/5] $step...${NC}"
-cd "$DOCS_DIR" && npm install --production 2>&1 | tail -3
+cd "$DOCS_DIR" && pnpm install --prod 2>&1 | tail -3
 echo "  Done."
 
 # 5. Create source files
@@ -160,7 +162,7 @@ echo "Set your token:"
 echo "  export DOCS_TOKEN='your-token-here'"
 echo ""
 echo "Start the server:"
-echo "  cd $DOCS_DIR && npm start"
+echo "  cd $DOCS_DIR && pnpm start"
 echo ""
 echo "Push content:"
 echo "  docs-push myfile.md"
