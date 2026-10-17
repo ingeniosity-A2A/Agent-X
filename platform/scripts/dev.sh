@@ -64,9 +64,9 @@ start_mini_services() {
 		(
 			cd "$service_dir"
 			echo "[$service_name] Installing dependencies..."
-			bun install
-			echo "[$service_name] Running bun run dev..."
-			exec bun run dev
+			pnpm install --frozen-lockfile
+			echo "[$service_name] Running pnpm run dev..."
+			exec pnpm run dev
 		) >"$PROJECT_DIR/.zscripts/mini-service-${service_name}.log" 2>&1 &
 
 		local service_pid=$!
@@ -120,19 +120,19 @@ if ! command -v bun >/dev/null 2>&1; then
 	exit 1
 fi
 
-log_step_start "bun install"
+log_step_start "pnpm install --frozen-lockfile"
 echo "[BUN] Installing dependencies..."
-bun install
-log_step_end "bun install"
+pnpm install --frozen-lockfile
+log_step_end "pnpm install --frozen-lockfile"
 
-log_step_start "bun run db:push"
+log_step_start "pnpm run db:push"
 echo "[BUN] Setting up database..."
-bun run db:push
-log_step_end "bun run db:push"
+pnpm run db:push
+log_step_end "pnpm run db:push"
 
 log_step_start "Starting Next.js dev server"
 echo "[BUN] Starting development server..."
-bun run dev &
+pnpm run dev &
 DEV_PID=$!
 log_step_end "Starting Next.js dev server"
 
