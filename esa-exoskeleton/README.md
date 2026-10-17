@@ -30,8 +30,8 @@
 ## Quick Start
 
 ### Prerequisites
-- Node.js >= 18.0.0
-- npm or pnpm
+- Node.js >= 22.13.0
+- pnpm 12.10.0
 - (Optional) Cloudflare account for deployment
 
 ### 1. Clone Repository
@@ -42,12 +42,12 @@ cd Agent-X/esa-exoskeleton
 
 ### 2. Install Dependencies
 ```bash
-npm install
+pnpm install
 ```
 
 ### 3. Local Development
 ```bash
-npm run dev
+pnpm run dev
 ```
 Open [http://localhost:8787](http://localhost:8787)
 
@@ -62,7 +62,7 @@ Open [http://localhost:8787](http://localhost:8787)
 
 #### Option B: Manual Deploy
 ```bash
-npm run deploy
+pnpm run deploy
 ```
 
 ---
@@ -110,7 +110,7 @@ esa-exoskeleton/
 ### 1. Create Cloudflare Pages Project
 ```bash
 # Install Wrangler CLI globally
-npm install -g wrangler
+pnpm dlx wrangler
 
 # Login to Cloudflare
 wrangler login
@@ -186,10 +186,10 @@ ESA SERVICE CARDS
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start local development server (port 8787) |
-| `npm run build` | Build for production (no-op for static site) |
-| `npm run deploy` | Deploy to Cloudflare Pages manually |
-| `npm run init` | Login to Cloudflare via Wrangler |
+| `pnpm run dev` | Start local development server (port 8787) |
+| `pnpm run build` | Build for production (no-op for static site) |
+| `pnpm run deploy` | Deploy to Cloudflare Pages manually |
+| `pnpm run init` | Login to Cloudflare via Wrangler |
 | `npm start` | Serve static files locally (port 3000) |
 
 ---
