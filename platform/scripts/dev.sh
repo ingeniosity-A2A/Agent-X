@@ -64,9 +64,9 @@ start_mini_services() {
 		(
 			cd "$service_dir"
 			echo "[$service_name] Installing dependencies..."
-			bun install
-			echo "[$service_name] Running bun run dev..."
-			exec bun run dev
+			pnpm install --ignore-workspace
+			echo "[$service_name] Running pnpm run dev..."
+			exec pnpm run dev
 		) >"$PROJECT_DIR/.zscripts/mini-service-${service_name}.log" 2>&1 &
 
 		local service_pid=$!
@@ -115,24 +115,19 @@ trap cleanup EXIT INT TERM
 
 cd "$PROJECT_DIR"
 
-if ! command -v bun >/dev/null 2>&1; then
-	echo "ERROR: bun is not installed or not in PATH"
-	exit 1
-fi
+log_step_start "pnpm install --frozen-lockfile"
+echo "[PNPM] Installing dependencies..."
+pnpm install --frozen-lockfile
+log_step_end "pnpm install --frozen-lockfile"
 
-log_step_start "bun install"
-echo "[BUN] Installing dependencies..."
-bun install
-log_step_end "bun install"
-
-log_step_start "bun run db:push"
-echo "[BUN] Setting up database..."
-bun run db:push
-log_step_end "bun run db:push"
+log_step_start "pnpm run db:push"
+echo "[PNPM] Setting up database..."
+pnpm run db:push
+log_step_end "pnpm run db:push"
 
 log_step_start "Starting Next.js dev server"
-echo "[BUN] Starting development server..."
-bun run dev &
+echo "[PNPM] Starting development server..."
+pnpm run dev &
 DEV_PID=$!
 log_step_end "Starting Next.js dev server"
 
@@ -141,9 +136,9 @@ wait_for_service "localhost" "3000" "Next.js dev server"
 log_step_end "Waiting for Next.js dev server"
 
 log_step_start "Health check"
-echo "[BUN] Performing health check..."
+echo "[PNPM] Performing health check..."
 curl -fsS localhost:3000 >/dev/null
-echo "[BUN] Health check passed"
+echo "[PNPM] Health check passed"
 log_step_end "Health check"
 
 start_mini_services

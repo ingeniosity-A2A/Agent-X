@@ -43,7 +43,7 @@ export async function runAgentBrowser(args: string[], timeoutMs = 20000): Promis
 
 export function cliInstallHint(stderr: string): string | null {
   if (/ENOENT|not found|not installed/i.test(stderr)) {
-    return "agent-browser CLI not installed on this host — npm install -g agent-browser && agent-browser install";
+    return "agent-browser CLI not installed on this host — pnpm add --global agent-browser && agent-browser install";
   }
   return null;
 }

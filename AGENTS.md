@@ -90,3 +90,11 @@ Agent-X does NOT own: Core-Q² weights, canonical architecture docs, memory impl
 - Inventory is mandatory when no parts DB exists.
 - Service requests → Daily To-Dos via `/api/service-request`.
 - AgentMail: ava007@agentmail.to → manager (ESA_MANAGER_EMAIL).
+
+
+## Package Management
+
+- `platform/` is the existing pnpm 12.10.0 workspace and owns its workspace manifest and lockfile.
+- `esa-exoskeleton/` and `modules/document-ingestion/docs-pipeline/` are standalone Node packages; install from each package directory with its pinned pnpm version.
+- Do not move the standalone service packages into `platform/`; keep their deployment and runtime boundaries intact.
+- The standalone packages still need pnpm lockfiles generated and validated before frozen installs can be required. Bun may remain a runtime where a script explicitly uses it; dependency installation should use pnpm.
