@@ -64,7 +64,7 @@ start_mini_services() {
 		(
 			cd "$service_dir"
 			echo "[$service_name] Installing dependencies..."
-			pnpm install
+			pnpm install --ignore-workspace
 			echo "[$service_name] Running pnpm run dev..."
 			exec pnpm run dev
 		) >"$PROJECT_DIR/.zscripts/mini-service-${service_name}.log" 2>&1 &
