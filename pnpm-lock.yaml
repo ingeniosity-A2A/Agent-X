@@ -6,7 +6,9 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  platform:
     dependencies:
       '@dnd-kit/core':
         specifier: ^6.3.1

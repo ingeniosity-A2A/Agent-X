@@ -4,6 +4,10 @@ __pycache__/
 cache/
 data/corpus/*.jsonl
 models/
+!models/README.md
+.model-store/
+.pnpm-store/
+node_modules/
 destiny_build/
 .openclaw/
 __pycache__/

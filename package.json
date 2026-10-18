@@ -1,0 +1,15 @@
+{
+  "name": "agent-x-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@12.14.0",
+  "engines": {
+    "node": ">=22.13.0",
+    "pnpm": ">=12.14.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter nextjs_tailwind_shadcn_ts dev",
+    "build": "pnpm --filter nextjs_tailwind_shadcn_ts build",
+    "lint": "pnpm --filter nextjs_tailwind_shadcn_ts lint"
+  }
+}
